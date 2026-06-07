@@ -1,11 +1,30 @@
 import Link from "next/link";
 import { getSession } from "@/lib/get-session";
 import { getStatusCounts, getUpcomingDeadlines } from "@/lib/data/applications";
-import {
-  APPLICATION_STATUSES,
-  STATUS_LABELS,
-} from "@/lib/validations/application";
+import { Pipeline } from "./pipeline";
 import { StatusBadge } from "./applications/status-badge";
+
+function Metric({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: string;
+  hint: string;
+}) {
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+      <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+        {label}
+      </p>
+      <p className="mt-1.5 text-2xl font-semibold tabular-nums text-black dark:text-zinc-50">
+        {value}
+      </p>
+      <p className="mt-0.5 text-xs text-zinc-500">{hint}</p>
+    </div>
+  );
+}
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -15,7 +34,13 @@ export default async function DashboardPage() {
     getStatusCounts(userId),
     getUpcomingDeadlines(userId),
   ]);
+
   const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  const applied =
+    counts.APPLIED + counts.INTERVIEW + counts.OFFER + counts.REJECTED;
+  const responded = counts.INTERVIEW + counts.OFFER + counts.REJECTED;
+  const interviews = counts.INTERVIEW + counts.OFFER;
+  const pct = (n: number) => (applied ? `${Math.round((n / applied) * 100)}%` : "—");
 
   return (
     <div className="flex flex-col gap-8">
@@ -25,7 +50,9 @@ export default async function DashboardPage() {
             Welcome, {session!.user.name}
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
-            {total} application{total === 1 ? "" : "s"} tracked.
+            {total === 0
+              ? "Let’s track your first application."
+              : `Tracking ${total} application${total === 1 ? "" : "s"}.`}
           </p>
         </div>
         <Link
@@ -36,29 +63,54 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-        {APPLICATION_STATUSES.map((s) => (
-          <Link
-            key={s}
-            href={`/dashboard/applications?status=${s}`}
-            className="rounded-lg border border-zinc-200 bg-white p-4 transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
-          >
-            <p className="text-2xl font-semibold text-black dark:text-zinc-50">
-              {counts[s]}
-            </p>
-            <p className="mt-1 text-xs font-medium uppercase tracking-wide text-zinc-500">
-              {STATUS_LABELS[s]}
-            </p>
-          </Link>
-        ))}
-      </section>
+      {total === 0 ? (
+        <div className="rounded-xl border border-dashed border-zinc-300 p-12 text-center dark:border-zinc-700">
+          <p className="text-sm text-zinc-500">
+            No applications yet.{" "}
+            <Link
+              href="/dashboard/applications/new"
+              className="font-medium text-black underline-offset-4 hover:underline dark:text-zinc-50"
+            >
+              Add your first one
+            </Link>{" "}
+            to start building your pipeline.
+          </p>
+        </div>
+      ) : (
+        <>
+          <section className="grid grid-cols-3 gap-3">
+            <Metric
+              label="Response rate"
+              value={pct(responded)}
+              hint={applied ? `of ${applied} applied` : "no applications yet"}
+            />
+            <Metric
+              label="Interview rate"
+              value={pct(interviews)}
+              hint="reached interview"
+            />
+            <Metric
+              label="Offers"
+              value={String(counts.OFFER)}
+              hint={counts.OFFER === 1 ? "offer in hand" : "offers in hand"}
+            />
+          </section>
+
+          <section>
+            <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-zinc-500">
+              Pipeline
+            </h2>
+            <Pipeline counts={counts} />
+          </section>
+        </>
+      )}
 
       <section>
         <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
           Upcoming deadlines
         </h2>
         {upcoming.length === 0 ? (
-          <p className="mt-3 rounded-lg border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
+          <p className="mt-3 rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
             No upcoming deadlines.
           </p>
         ) : (
@@ -67,7 +119,7 @@ export default async function DashboardPage() {
               <li key={app.id}>
                 <Link
                   href={`/dashboard/applications/${app.id}`}
-                  className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-white px-4 py-3 transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
+                  className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white px-4 py-3 transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
                 >
                   <div className="min-w-0">
                     <p className="truncate font-medium text-black dark:text-zinc-50">
@@ -78,7 +130,7 @@ export default async function DashboardPage() {
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-3">
-                    <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                    <span className="text-xs font-medium tabular-nums text-zinc-600 dark:text-zinc-400">
                       {app.deadline?.toISOString().slice(0, 10)}
                     </span>
                     <StatusBadge status={app.status} />
