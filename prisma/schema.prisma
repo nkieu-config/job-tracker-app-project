@@ -107,6 +107,14 @@ model Application {
   @@map("application")
 }
 
+model RateLimit {
+  key       String   @id
+  count     Int
+  expiresAt DateTime
+
+  @@map("rate_limit")
+}
+
 model ResumeVersion {
   id        String   @id @default(cuid())
   userId    String

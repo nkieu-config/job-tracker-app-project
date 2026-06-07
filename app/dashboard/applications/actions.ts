@@ -17,6 +17,7 @@ import {
   saveResumeEmbedding,
   getResumesNeedingEmbedding,
 } from "@/lib/data/embeddings";
+import { rateLimit, AI_RATE_MAX, AI_RATE_WINDOW_MS } from "@/lib/rate-limit";
 
 export type FormState = {
   error?: string;
@@ -98,6 +99,15 @@ export async function analyzeApplication(
     return { error: "Add a job description before analyzing." };
   }
 
+  const limit = await rateLimit(
+    `ai:${session.user.id}`,
+    AI_RATE_MAX,
+    AI_RATE_WINDOW_MS,
+  );
+  if (!limit.ok) {
+    return { error: "AI rate limit reached. Please try again later." };
+  }
+
   let analysis;
   try {
     analysis = await analyzeJobDescription(application.jobDescription);
@@ -139,6 +149,15 @@ export async function computeResumeFit(
   const resumes = await getResumeVersions(session.user.id);
   if (!resumes.some((r) => r.content?.trim())) {
     return { error: "Upload a resume with readable text first." };
+  }
+
+  const limit = await rateLimit(
+    `ai:${session.user.id}`,
+    AI_RATE_MAX,
+    AI_RATE_WINDOW_MS,
+  );
+  if (!limit.ok) {
+    return { error: "AI rate limit reached. Please try again later." };
   }
 
   try {
