@@ -4,10 +4,8 @@
 
 **A smart job-application tracker that uses AI to analyze job descriptions and tailor your resume — built to manage a real job hunt instead of a spreadsheet.**
 
-<!-- Replace YOUR-APP below with your real Vercel URL (e.g. job-tracker-xyz.vercel.app). -->
-
 [![CI](https://github.com/nkieu-config/job-tracker-app-project/actions/workflows/ci.yml/badge.svg)](https://github.com/nkieu-config/job-tracker-app-project/actions/workflows/ci.yml)
-[![Live demo](https://img.shields.io/badge/Live_demo-▲_Vercel-black)](https://YOUR-APP.vercel.app)
+[![Live demo](https://img.shields.io/badge/Live_demo-▲_Vercel-black)](https://job-tracker-app-project.vercel.app)
 &nbsp;
 
 ![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs&logoColor=white)
@@ -16,7 +14,7 @@
 ![Prisma 7](https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma&logoColor=white)
 ![Gemini 2.5](https://img.shields.io/badge/AI-Gemini_2.5-8E75B2?logo=googlegemini&logoColor=white)
 
-**[Open the live demo →](https://YOUR-APP.vercel.app)**
+**[Open the live demo →](https://job-tracker-app-project.vercel.app)**
 
 Click **“Try the demo account”** on the sign-in page — or use
 `demo@jobtracker.app` / `demotracker2026` — for a pre-populated dashboard.
