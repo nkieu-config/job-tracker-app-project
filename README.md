@@ -2,7 +2,8 @@
 
 A smart job-application tracker that uses AI to analyze job descriptions and tailor your resume — built to manage a real job hunt instead of a spreadsheet.
 
-> **Live demo:** _add your Vercel URL here_
+> **Live demo:** _add your Vercel URL here_ — click **“Try the demo account”** on the
+> sign-in page (or use `demo@jobtracker.app` / `demotracker2026`) for a pre-populated dashboard.
 >
 > _Add a screenshot or GIF of the dashboard + AI analysis here._
 
@@ -69,7 +70,14 @@ npm run build       # production build
 npm run lint        # eslint
 npm run typecheck   # tsc --noEmit
 npm test            # vitest
+npm run seed        # populate the demo account (server must be running)
 ```
+
+### Demo account
+
+`npm run seed` creates `demo@jobtracker.app` / `demotracker2026` with sample
+applications, a resume, and a pre-computed JD analysis so the live demo is
+never empty. Start the server first (`npm run start &`), then run the seed.
 
 ## Deploy (GitHub → Vercel → Neon)
 

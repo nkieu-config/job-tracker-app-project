@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "@/lib/auth-client";
+import { DEMO_EMAIL, DEMO_PASSWORD } from "@/lib/demo";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -11,6 +12,7 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -20,6 +22,21 @@ export default function SignInPage() {
     setLoading(false);
     if (error) {
       setError(error.message ?? "Invalid email or password.");
+      return;
+    }
+    router.push("/dashboard");
+  }
+
+  async function loginDemo() {
+    setError(null);
+    setDemoLoading(true);
+    const { error } = await signIn.email({
+      email: DEMO_EMAIL,
+      password: DEMO_PASSWORD,
+    });
+    setDemoLoading(false);
+    if (error) {
+      setError("The demo account is unavailable right now.");
       return;
     }
     router.push("/dashboard");
@@ -71,12 +88,27 @@ export default function SignInPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || demoLoading}
             className="mt-2 inline-flex h-10 items-center justify-center rounded-md bg-black px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
           >
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
+
+        <div className="mt-4 flex items-center gap-3 text-xs text-zinc-400">
+          <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+          or
+          <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+        </div>
+
+        <button
+          type="button"
+          onClick={loginDemo}
+          disabled={loading || demoLoading}
+          className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-md border border-zinc-300 px-4 text-sm font-medium text-zinc-800 transition-colors hover:bg-zinc-100 disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-900"
+        >
+          {demoLoading ? "Loading demo…" : "Try the demo account"}
+        </button>
 
         <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
           Don&apos;t have an account?{" "}
