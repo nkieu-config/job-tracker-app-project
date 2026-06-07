@@ -9,6 +9,7 @@ import {
   applicationInputSchema,
   applicationInputFromFormData,
 } from "@/lib/validations/application";
+import { analyzeJobDescription, AiError } from "@/lib/ai/analyze-jd";
 
 export type FormState = {
   error?: string;
@@ -68,6 +69,44 @@ export async function updateApplication(
   revalidatePath(`/dashboard/applications/${id}`);
   revalidatePath("/dashboard");
   redirect(`/dashboard/applications/${id}`);
+}
+
+export type AnalyzeState = { error?: string };
+
+export async function analyzeApplication(
+  id: string,
+  _prevState: AnalyzeState,
+  _formData: FormData,
+): Promise<AnalyzeState> {
+  const session = await getSession();
+  if (!session) redirect("/sign-in");
+
+  const application = await prisma.application.findFirst({
+    where: { id, userId: session.user.id },
+  });
+  if (!application) {
+    return { error: "Application not found." };
+  }
+  if (!application.jobDescription?.trim()) {
+    return { error: "Add a job description before analyzing." };
+  }
+
+  let analysis;
+  try {
+    analysis = await analyzeJobDescription(application.jobDescription);
+  } catch (err) {
+    return {
+      error: err instanceof AiError ? err.message : "Analysis failed.",
+    };
+  }
+
+  await prisma.application.updateMany({
+    where: { id, userId: session.user.id },
+    data: { analysis, analyzedAt: new Date() },
+  });
+
+  revalidatePath(`/dashboard/applications/${id}`);
+  return {};
 }
 
 export async function deleteApplication(id: string): Promise<void> {

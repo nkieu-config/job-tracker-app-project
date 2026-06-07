@@ -2,8 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/get-session";
 import { getApplication } from "@/lib/data/applications";
+import { getResumeVersions } from "@/lib/data/resumes";
+import { jdAnalysisSchema } from "@/lib/validations/jd-analysis";
+import { matchSkills } from "@/lib/skills";
 import { StatusBadge } from "../status-badge";
 import { DeleteApplicationButton } from "../delete-application-button";
+import { AnalyzeButton } from "../analyze-button";
 
 export default async function ApplicationDetailPage({
   params,
@@ -17,6 +21,16 @@ export default async function ApplicationDetailPage({
   if (!application) {
     notFound();
   }
+
+  // Parse the stored AI analysis (it was validated before saving, but the DB
+  // column is untyped JSON, so validate again on the way out).
+  const analysisResult = jdAnalysisSchema.safeParse(application.analysis);
+  const analysis = analysisResult.success ? analysisResult.data : null;
+
+  // Gap analysis compares required skills against all the user's resume text.
+  const resumes = await getResumeVersions(session!.user.id);
+  const resumeText = resumes.map((r) => r.content ?? "").join("\n");
+  const gap = analysis ? matchSkills(analysis.requiredSkills, resumeText) : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -96,6 +110,110 @@ export default async function ApplicationDetailPage({
           </p>
         </section>
       )}
+
+      <section className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+            Skills analysis
+          </h2>
+          {application.jobDescription?.trim() && (
+            <AnalyzeButton
+              id={application.id}
+              label={analysis ? "Re-analyze" : "Analyze job description"}
+            />
+          )}
+        </div>
+
+        {!application.jobDescription?.trim() ? (
+          <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
+            Add a job description (via Edit) to analyze the required skills.
+          </p>
+        ) : !analysis ? (
+          <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
+            Not analyzed yet — run “Analyze job description”.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-5 rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+            <div>
+              <p className="text-sm text-zinc-800 dark:text-zinc-200">
+                {analysis.summary}
+              </p>
+              <p className="mt-2 text-xs text-zinc-500">
+                Seniority:{" "}
+                <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                  {analysis.seniority}
+                </span>
+              </p>
+            </div>
+
+            <div>
+              <div className="flex items-baseline justify-between gap-2">
+                <h3 className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                  Required skills
+                </h3>
+                {gap && resumes.length > 0 && (
+                  <span className="text-xs text-zinc-500">
+                    {gap.matched.length}/{analysis.requiredSkills.length} in your
+                    resume
+                  </span>
+                )}
+              </div>
+              <ul className="mt-2 flex flex-wrap gap-1.5">
+                {analysis.requiredSkills.map((skill) => {
+                  const matched = gap?.matched.includes(skill);
+                  const cls =
+                    resumes.length === 0
+                      ? "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                      : matched
+                        ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300"
+                        : "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300";
+                  return (
+                    <li
+                      key={skill}
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${cls}`}
+                    >
+                      {skill}
+                      {resumes.length > 0 && (matched ? " ✓" : " ✗")}
+                    </li>
+                  );
+                })}
+              </ul>
+              {resumes.length === 0 && (
+                <p className="mt-2 text-xs text-zinc-500">
+                  Upload a resume to see which skills you’re missing.
+                </p>
+              )}
+            </div>
+
+            {analysis.niceToHave.length > 0 && (
+              <div>
+                <h3 className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                  Nice to have
+                </h3>
+                <ul className="mt-2 flex flex-wrap gap-1.5">
+                  {analysis.niceToHave.map((skill) => (
+                    <li
+                      key={skill}
+                      className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                    >
+                      {skill}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {gap && resumes.length > 0 && gap.missing.length > 0 && (
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                <span className="font-medium text-black dark:text-zinc-50">
+                  Gap:
+                </span>{" "}
+                consider adding {gap.missing.join(", ")} to your resume.
+              </p>
+            )}
+          </div>
+        )}
+      </section>
 
       {application.notes && (
         <section>
