@@ -78,7 +78,10 @@ export async function POST(request: Request) {
   let fileUrl: string;
   try {
     const blob = await put(`resumes/${session.user.id}/${file.name}`, file, {
-      access: "public",
+      // Private: the blob URL isn't publicly reachable. Resumes are personal
+      // data — they're served only through our authenticated, ownership-scoped
+      // route at /api/resumes/[id]/file.
+      access: "private",
       addRandomSuffix: true,
       contentType: ACCEPTED_RESUME_TYPE,
     });
