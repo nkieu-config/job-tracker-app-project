@@ -3,7 +3,7 @@
 Smart job application tracker with AI-powered JD analysis and resume tailoring.
 Built to track real job applications — and to showcase a full-stack + AI skill set.
 
-> Status: **Phase 0** — project scaffolded, builds clean, ready to deploy.
+> Status: **Phase 1** — email/password auth, protected dashboard, deployed.
 
 ## Tech stack
 
@@ -35,9 +35,11 @@ Open http://localhost:3000.
 
 ## Environment variables
 
-See [.env.example](.env.example) for the full list. Phase 0 needs only:
+See [.env.example](.env.example) for the full list. Through phase 1:
 
-- `DATABASE_URL` — Neon Postgres connection string (use the **pooled** string).
+- `DATABASE_URL` / `DIRECT_URL` — Neon Postgres connection strings.
+- `BETTER_AUTH_SECRET` — random secret (`openssl rand -base64 32`).
+- `BETTER_AUTH_URL` — `http://localhost:3000` locally; the deployment URL in prod.
 
 `.env` is gitignored — never commit real secrets.
 
@@ -46,7 +48,9 @@ See [.env.example](.env.example) for the full list. Phase 0 needs only:
 1. **Neon:** create a free Postgres project, copy the pooled `DATABASE_URL`.
 2. **GitHub:** push this repo.
 3. **Vercel:** import the GitHub repo. In **Project → Settings → Environment
-   Variables**, add `DATABASE_URL`. Every push then deploys automatically.
+   Variables**, add `DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, and
+   `BETTER_AUTH_URL` (set to your production URL). Every push then deploys
+   automatically.
 4. Run the first migration against the Neon database:
    ```bash
    npx prisma migrate deploy
