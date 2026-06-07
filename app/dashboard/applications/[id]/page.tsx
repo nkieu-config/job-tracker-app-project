@@ -5,9 +5,12 @@ import { getApplication } from "@/lib/data/applications";
 import { getResumeVersions } from "@/lib/data/resumes";
 import { jdAnalysisSchema } from "@/lib/validations/jd-analysis";
 import { matchSkills } from "@/lib/skills";
+import { getResumeFitScores } from "@/lib/data/embeddings";
 import { StatusBadge } from "../status-badge";
 import { DeleteApplicationButton } from "../delete-application-button";
 import { AnalyzeButton } from "../analyze-button";
+import { ComputeFitButton } from "../compute-fit-button";
+import { TailorBullets } from "../tailor-bullets";
 
 export default async function ApplicationDetailPage({
   params,
@@ -31,6 +34,9 @@ export default async function ApplicationDetailPage({
   const resumes = await getResumeVersions(session!.user.id);
   const resumeText = resumes.map((r) => r.content ?? "").join("\n");
   const gap = analysis ? matchSkills(analysis.requiredSkills, resumeText) : null;
+
+  // pgvector ranking of resume versions by similarity to the JD embedding.
+  const fitScores = await getResumeFitScores(id, session!.user.id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -214,6 +220,73 @@ export default async function ApplicationDetailPage({
           </div>
         )}
       </section>
+
+      <section className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+            Resume fit
+          </h2>
+          {application.jobDescription?.trim() && (
+            <ComputeFitButton
+              id={application.id}
+              label={fitScores.length ? "Recompute fit" : "Compute resume fit"}
+            />
+          )}
+        </div>
+
+        {!application.jobDescription?.trim() ? (
+          <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
+            Add a job description to score your resumes against it.
+          </p>
+        ) : fitScores.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
+            {resumes.some((r) => r.content?.trim())
+              ? "No fit scores yet — run “Compute resume fit” to rank your resumes against this JD."
+              : "Upload a resume with readable text, then compute fit."}
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {fitScores.map((fit, i) => (
+              <li
+                key={fit.id}
+                className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950"
+              >
+                <Link
+                  href={`/dashboard/resumes/${fit.id}`}
+                  className="min-w-0 truncate font-medium text-black hover:underline dark:text-zinc-50"
+                >
+                  {fit.label}
+                </Link>
+                <div className="flex shrink-0 items-center gap-3">
+                  {i === 0 && (
+                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300">
+                      Best match
+                    </span>
+                  )}
+                  <span className="text-sm font-semibold text-black dark:text-zinc-50">
+                    {Math.round(fit.score * 100)}%
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {application.jobDescription?.trim() && (
+        <section className="flex flex-col gap-3">
+          <div>
+            <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+              Tailor resume bullets
+            </h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              Paste an experience and the AI rewrites it as bullets tuned to this
+              job — streamed live.
+            </p>
+          </div>
+          <TailorBullets id={application.id} />
+        </section>
+      )}
 
       {application.notes && (
         <section>

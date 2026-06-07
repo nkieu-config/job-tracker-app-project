@@ -98,6 +98,7 @@ model Application {
   notes          String?
   analysis       Json?
   analyzedAt     DateTime?
+  jdEmbedding    Unsupported("vector(768)")?
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
 
@@ -113,6 +114,7 @@ model ResumeVersion {
   label     String
   fileUrl   String?
   content   String?
+  embedding Unsupported("vector(768)")?
   createdAt DateTime @default(now())
 
   @@index([userId])

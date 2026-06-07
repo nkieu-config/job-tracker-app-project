@@ -10,6 +10,13 @@ import {
   applicationInputFromFormData,
 } from "@/lib/validations/application";
 import { analyzeJobDescription, AiError } from "@/lib/ai/analyze-jd";
+import { embedText } from "@/lib/ai/embeddings";
+import { getResumeVersions } from "@/lib/data/resumes";
+import {
+  saveJdEmbedding,
+  saveResumeEmbedding,
+  getResumesNeedingEmbedding,
+} from "@/lib/data/embeddings";
 
 export type FormState = {
   error?: string;
@@ -106,6 +113,52 @@ export async function analyzeApplication(
   });
 
   revalidatePath(`/dashboard/applications/${id}`);
+  return {};
+}
+
+export type FitState = { error?: string };
+
+export async function computeResumeFit(
+  applicationId: string,
+  _prevState: FitState,
+  _formData: FormData,
+): Promise<FitState> {
+  const session = await getSession();
+  if (!session) redirect("/sign-in");
+
+  const application = await prisma.application.findFirst({
+    where: { id: applicationId, userId: session.user.id },
+  });
+  if (!application) {
+    return { error: "Application not found." };
+  }
+  if (!application.jobDescription?.trim()) {
+    return { error: "Add a job description before computing fit." };
+  }
+
+  const resumes = await getResumeVersions(session.user.id);
+  if (!resumes.some((r) => r.content?.trim())) {
+    return { error: "Upload a resume with readable text first." };
+  }
+
+  try {
+    // JD is the query; resumes are the documents (asymmetric retrieval).
+    const jdVector = await embedText(application.jobDescription, "RETRIEVAL_QUERY");
+    await saveJdEmbedding(applicationId, session.user.id, jdVector);
+
+    // Embed any resume that doesn't have an embedding yet.
+    const pending = await getResumesNeedingEmbedding(session.user.id);
+    for (const resume of pending) {
+      const vector = await embedText(resume.content, "RETRIEVAL_DOCUMENT");
+      await saveResumeEmbedding(resume.id, session.user.id, vector);
+    }
+  } catch (err) {
+    return {
+      error: err instanceof AiError ? err.message : "Could not compute fit.",
+    };
+  }
+
+  revalidatePath(`/dashboard/applications/${applicationId}`);
   return {};
 }
 
