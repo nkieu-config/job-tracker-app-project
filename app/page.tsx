@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <div className="flex flex-1 items-center justify-center bg-zinc-50 px-6 dark:bg-black">
@@ -12,6 +14,20 @@ export default function Home() {
           Smart job application tracker with AI-powered JD analysis and resume
           tailoring. Auth, CRUD, and AI features are on the way.
         </p>
+        <div className="flex flex-col gap-3 self-center sm:flex-row sm:self-start">
+          <Link
+            href="/sign-up"
+            className="inline-flex h-10 items-center justify-center rounded-md bg-black px-5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+          >
+            Get started
+          </Link>
+          <Link
+            href="/sign-in"
+            className="inline-flex h-10 items-center justify-center rounded-md border border-zinc-300 px-5 text-sm font-medium text-zinc-800 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-900"
+          >
+            Sign in
+          </Link>
+        </div>
       </main>
     </div>
   );
