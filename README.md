@@ -47,7 +47,7 @@ shot should show. Recommended width ~1400px; use a GIF for the streaming one.
 
 | Resume fit ranking (pgvector) | Bullet tailoring (streamed live) |
 | :---: | :---: |
-| <img src="docs/screenshots/resume-fit.png" alt="Resume versions ranked by cosine similarity to the job description" width="400" /> | <img src="docs/screenshots/tailor.gif" alt="Resume bullets streaming in token by token" width="400" /> |
+| <img src="docs/screenshots/resume-fit.png" alt="Resume versions ranked by cosine similarity to the job description" width="400" /> | <img src="docs/screenshots/tailor.png" alt="Resume bullets tailored to the job description" width="400" /> |
 
 ## Features
 
@@ -139,5 +139,3 @@ never empty. Start the server first (`npm run start &`), then run the seed.
 - **Next 16 renamed `middleware` → `proxy`.** Read the bundled Next docs and used the new `proxy.ts` convention (which also reinforces the data-layer auth checks above).
 - **Trusting AI output.** Gemini occasionally returns off-schema JSON; the Zod round-trip (schema-out, validate-in) makes the failure explicit and recoverable instead of crashing the page.
 - **Private resumes.** Resume PDFs are stored in a private Blob and streamed only through an authenticated, ownership-scoped route — the blob URL is never public.
-
-See [the build plan](docs/job_tracker_build_plan.md) for the full phase-by-phase plan.
