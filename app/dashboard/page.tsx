@@ -7,21 +7,31 @@ import { StatusBadge } from "./applications/status-badge";
 function Metric({
   label,
   value,
+  pct,
+  bar,
   hint,
 }: {
   label: string;
   value: string;
+  pct: number;
+  bar: string;
   hint: string;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-      <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+    <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
         {label}
       </p>
-      <p className="mt-1.5 text-2xl font-semibold tabular-nums text-black dark:text-zinc-50">
+      <p className="mt-1.5 text-3xl font-semibold leading-none tabular-nums text-black dark:text-zinc-50">
         {value}
       </p>
-      <p className="mt-0.5 text-xs text-zinc-500">{hint}</p>
+      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+        <div
+          className={`h-full rounded-full ${bar}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <p className="mt-2 text-xs text-zinc-500">{hint}</p>
     </div>
   );
 }
@@ -40,7 +50,8 @@ export default async function DashboardPage() {
     counts.APPLIED + counts.INTERVIEW + counts.OFFER + counts.REJECTED;
   const responded = counts.INTERVIEW + counts.OFFER + counts.REJECTED;
   const interviews = counts.INTERVIEW + counts.OFFER;
-  const pct = (n: number) => (applied ? `${Math.round((n / applied) * 100)}%` : "—");
+  const rate = (n: number) => (applied ? Math.round((n / applied) * 100) : 0);
+  const fmt = (n: number) => (applied ? `${rate(n)}%` : "—");
 
   return (
     <div className="flex flex-col gap-8">
@@ -81,18 +92,24 @@ export default async function DashboardPage() {
           <section className="grid grid-cols-3 gap-3">
             <Metric
               label="Response rate"
-              value={pct(responded)}
+              value={fmt(responded)}
+              pct={rate(responded)}
+              bar="bg-blue-500"
               hint={applied ? `of ${applied} applied` : "no applications yet"}
             />
             <Metric
               label="Interview rate"
-              value={pct(interviews)}
+              value={fmt(interviews)}
+              pct={rate(interviews)}
+              bar="bg-amber-500"
               hint="reached interview"
             />
             <Metric
-              label="Offers"
-              value={String(counts.OFFER)}
-              hint={counts.OFFER === 1 ? "offer in hand" : "offers in hand"}
+              label="Offer rate"
+              value={fmt(counts.OFFER)}
+              pct={rate(counts.OFFER)}
+              bar="bg-green-500"
+              hint={`${counts.OFFER} offer${counts.OFFER === 1 ? "" : "s"}`}
             />
           </section>
 
