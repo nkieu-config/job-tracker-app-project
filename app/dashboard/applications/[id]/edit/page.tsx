@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getSession } from "@/lib/get-session";
+import { requireSession } from "@/lib/get-session";
+import { formatDate } from "@/lib/format";
 import { getApplication } from "@/lib/data/applications";
 import { ApplicationForm } from "../../application-form";
 import { updateApplication } from "../../actions";
@@ -11,8 +12,8 @@ export default async function EditApplicationPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const session = await getSession();
-  const application = await getApplication(id, session!.user.id);
+  const session = await requireSession();
+  const application = await getApplication(id, session.user.id);
 
   if (!application) {
     notFound();
@@ -41,7 +42,7 @@ export default async function EditApplicationPage({
           status: application.status,
           jobUrl: application.jobUrl ?? "",
           deadline: application.deadline
-            ? application.deadline.toISOString().slice(0, 10)
+            ? formatDate(application.deadline)
             : "",
           jobDescription: application.jobDescription ?? "",
           notes: application.notes ?? "",

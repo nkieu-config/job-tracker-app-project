@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getSession } from "@/lib/get-session";
+import { requireSession } from "@/lib/get-session";
+import { formatDate } from "@/lib/format";
 import { getStatusCounts, getUpcomingDeadlines } from "@/lib/data/applications";
 import { Pipeline } from "./pipeline";
 import { StatusBadge } from "./applications/status-badge";
@@ -37,8 +38,8 @@ function Metric({
 }
 
 export default async function DashboardPage() {
-  const session = await getSession();
-  const userId = session!.user.id;
+  const session = await requireSession();
+  const userId = session.user.id;
 
   const [counts, upcoming] = await Promise.all([
     getStatusCounts(userId),
@@ -58,7 +59,7 @@ export default async function DashboardPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-black dark:text-zinc-50">
-            Welcome, {session!.user.name}
+            Welcome, {session.user.name}
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
             {total === 0
@@ -148,7 +149,7 @@ export default async function DashboardPage() {
                   </div>
                   <div className="flex shrink-0 items-center gap-3">
                     <span className="text-xs font-medium tabular-nums text-zinc-600 dark:text-zinc-400">
-                      {app.deadline?.toISOString().slice(0, 10)}
+                      {app.deadline ? formatDate(app.deadline) : null}
                     </span>
                     <StatusBadge status={app.status} />
                   </div>

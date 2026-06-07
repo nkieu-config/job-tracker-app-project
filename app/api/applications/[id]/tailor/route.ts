@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { getSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
-import { rateLimit, AI_RATE_MAX, AI_RATE_WINDOW_MS } from "@/lib/rate-limit";
+import { checkAiRateLimit } from "@/lib/rate-limit";
 
 // Allow time for the model to stream on Vercel (Pro+).
 export const maxDuration = 30;
@@ -34,12 +34,7 @@ export async function POST(
     return new Response("Describe your experience first.", { status: 400 });
   }
 
-  const limit = await rateLimit(
-    `ai:${session.user.id}`,
-    AI_RATE_MAX,
-    AI_RATE_WINDOW_MS,
-  );
-  if (!limit.ok) {
+  if (!(await checkAiRateLimit(session.user.id))) {
     return new Response("AI rate limit reached. Please try again later.", {
       status: 429,
     });

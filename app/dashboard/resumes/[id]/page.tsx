@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getSession } from "@/lib/get-session";
+import { requireSession } from "@/lib/get-session";
+import { formatDate } from "@/lib/format";
 import { getResumeVersion } from "@/lib/data/resumes";
 import { DeleteResumeButton } from "../delete-resume-button";
 
@@ -10,8 +11,8 @@ export default async function ResumeDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const session = await getSession();
-  const resume = await getResumeVersion(id, session!.user.id);
+  const session = await requireSession();
+  const resume = await getResumeVersion(id, session.user.id);
 
   if (!resume) {
     notFound();
@@ -32,7 +33,7 @@ export default async function ResumeDetailPage({
               {resume.label}
             </h1>
             <p className="mt-1 text-sm text-zinc-500">
-              Added {resume.createdAt.toISOString().slice(0, 10)}
+              Added {formatDate(resume.createdAt)}
             </p>
           </div>
           <div className="flex items-center gap-2">
