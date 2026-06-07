@@ -3,7 +3,7 @@
 Smart job application tracker with AI-powered JD analysis and resume tailoring.
 Built to track real job applications — and to showcase a full-stack + AI skill set.
 
-> Status: **Phase 4** — AI job-description analysis + skill gap, deployed.
+> Status: **Phase 5** — embeddings fit score (pgvector) + streaming bullet rewrite.
 
 ## Tech stack
 
