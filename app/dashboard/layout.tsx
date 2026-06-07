@@ -31,6 +31,12 @@ export default async function DashboardLayout({
           >
             Applications
           </Link>
+          <Link
+            href="/dashboard/resumes"
+            className="text-zinc-600 transition-colors hover:text-black dark:text-zinc-400 dark:hover:text-zinc-50"
+          >
+            Resumes
+          </Link>
         </nav>
         <div className="flex items-center gap-4">
           <span className="hidden text-sm text-zinc-500 sm:inline">
