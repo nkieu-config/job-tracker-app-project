@@ -22,6 +22,8 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  applications   Application[]
+  resumeVersions ResumeVersion[]
 
   @@unique([email])
   @@map("user")
@@ -73,4 +75,44 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+enum ApplicationStatus {
+  SAVED
+  APPLIED
+  INTERVIEW
+  OFFER
+  REJECTED
+}
+
+model Application {
+  id             String            @id @default(cuid())
+  userId         String
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company        String
+  role           String
+  status         ApplicationStatus @default(SAVED)
+  jobDescription String?
+  jobUrl         String?
+  deadline       DateTime?
+  notes          String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@index([userId])
+  @@index([userId, status])
+  @@map("application")
+}
+
+model ResumeVersion {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label     String
+  fileUrl   String?
+  content   String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("resume_version")
 }
