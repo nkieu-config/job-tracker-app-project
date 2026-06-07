@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { getSession } from "@/lib/get-session";
+import { requireSession } from "@/lib/get-session";
+import { formatDate } from "@/lib/format";
 import { getResumeVersions } from "@/lib/data/resumes";
 import { ResumeUploadForm } from "./resume-upload-form";
 
 export default async function ResumesPage() {
-  const session = await getSession();
-  const resumes = await getResumeVersions(session!.user.id);
+  const session = await requireSession();
+  const resumes = await getResumeVersions(session.user.id);
 
   return (
     <div className="flex flex-col gap-8">
@@ -41,7 +42,7 @@ export default async function ResumesPage() {
                     {resume.label}
                   </span>
                   <span className="shrink-0 text-xs text-zinc-500">
-                    {resume.createdAt.toISOString().slice(0, 10)}
+                    {formatDate(resume.createdAt)}
                   </span>
                 </Link>
               </li>

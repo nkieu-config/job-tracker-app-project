@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getSession } from "@/lib/get-session";
+import { requireSession } from "@/lib/get-session";
+import { formatDate } from "@/lib/format";
 import { getApplication } from "@/lib/data/applications";
 import { getResumeVersions } from "@/lib/data/resumes";
 import { jdAnalysisSchema } from "@/lib/validations/jd-analysis";
@@ -18,8 +19,8 @@ export default async function ApplicationDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const session = await getSession();
-  const application = await getApplication(id, session!.user.id);
+  const session = await requireSession();
+  const application = await getApplication(id, session.user.id);
 
   if (!application) {
     notFound();
@@ -31,12 +32,12 @@ export default async function ApplicationDetailPage({
   const analysis = analysisResult.success ? analysisResult.data : null;
 
   // Gap analysis compares required skills against all the user's resume text.
-  const resumes = await getResumeVersions(session!.user.id);
+  const resumes = await getResumeVersions(session.user.id);
   const resumeText = resumes.map((r) => r.content ?? "").join("\n");
   const gap = analysis ? matchSkills(analysis.requiredSkills, resumeText) : null;
 
   // pgvector ranking of resume versions by similarity to the JD embedding.
-  const fitScores = await getResumeFitScores(id, session!.user.id);
+  const fitScores = await getResumeFitScores(id, session.user.id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -81,7 +82,7 @@ export default async function ApplicationDetailPage({
           </dt>
           <dd className="mt-1 text-sm text-black dark:text-zinc-50">
             {application.deadline
-              ? application.deadline.toISOString().slice(0, 10)
+              ? formatDate(application.deadline)
               : "—"}
           </dd>
         </div>

@@ -35,3 +35,10 @@ export async function rateLimit(
   const row = rows[0];
   return { ok: row.count <= max, resetAt: row.expiresAt };
 }
+
+// Shared helper for all AI features: returns false once the per-user hourly
+// AI budget is exceeded.
+export async function checkAiRateLimit(userId: string): Promise<boolean> {
+  const { ok } = await rateLimit(`ai:${userId}`, AI_RATE_MAX, AI_RATE_WINDOW_MS);
+  return ok;
+}

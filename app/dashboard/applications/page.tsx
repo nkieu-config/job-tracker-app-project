@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getSession } from "@/lib/get-session";
+import { requireSession } from "@/lib/get-session";
+import { formatDate } from "@/lib/format";
 import { getApplications } from "@/lib/data/applications";
 import {
   APPLICATION_STATUSES,
@@ -19,9 +20,9 @@ export default async function ApplicationsPage({
 }: {
   searchParams: Promise<{ status?: string }>;
 }) {
-  const session = await getSession();
+  const session = await requireSession();
   // userId is guaranteed by the layout guard; assert for the query.
-  const userId = session!.user.id;
+  const userId = session.user.id;
 
   const { status: statusParam } = await searchParams;
   const status = parseStatus(statusParam);
@@ -96,7 +97,7 @@ export default async function ApplicationsPage({
                 <div className="flex shrink-0 items-center gap-3">
                   {app.deadline && (
                     <span className="hidden text-xs text-zinc-500 sm:inline">
-                      Due {app.deadline.toISOString().slice(0, 10)}
+                      Due {formatDate(app.deadline)}
                     </span>
                   )}
                   <StatusBadge status={app.status} />
