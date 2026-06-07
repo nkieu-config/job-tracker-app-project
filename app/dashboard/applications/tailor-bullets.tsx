@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { inputClass } from "@/lib/form-styles";
 
 export function TailorBullets({ id }: { id: string }) {
   const [experience, setExperience] = useState("");
@@ -51,7 +52,7 @@ export function TailorBullets({ id }: { id: string }) {
           onChange={(e) => setExperience(e.target.value)}
           rows={4}
           placeholder="Paste a rough description of a project or role you want to tailor…"
-          className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black outline-none focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:ring-zinc-800"
+          className={inputClass}
         />
         <button
           type="submit"
