@@ -3,7 +3,7 @@
 Smart job application tracker with AI-powered JD analysis and resume tailoring.
 Built to track real job applications — and to showcase a full-stack + AI skill set.
 
-> Status: **Phase 1** — email/password auth, protected dashboard, deployed.
+> Status: **Phase 2** — application tracker CRUD with dashboard, deployed.
 
 ## Tech stack
 
