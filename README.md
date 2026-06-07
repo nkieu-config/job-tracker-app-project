@@ -1,11 +1,55 @@
-# Job Tracker
+<div align="center">
 
-A smart job-application tracker that uses AI to analyze job descriptions and tailor your resume — built to manage a real job hunt instead of a spreadsheet.
+# 💼 Job Tracker
 
-> **Live demo:** _add your Vercel URL here_ — click **“Try the demo account”** on the
-> sign-in page (or use `demo@jobtracker.app` / `demotracker2026`) for a pre-populated dashboard.
->
-> _Add a screenshot or GIF of the dashboard + AI analysis here._
+**A smart job-application tracker that uses AI to analyze job descriptions and tailor your resume — built to manage a real job hunt instead of a spreadsheet.**
+
+<!-- Replace YOUR-APP below with your real Vercel URL (e.g. job-tracker-xyz.vercel.app). -->
+
+[![CI](https://github.com/nkieu-config/job-tracker-app-project/actions/workflows/ci.yml/badge.svg)](https://github.com/nkieu-config/job-tracker-app-project/actions/workflows/ci.yml)
+[![Live demo](https://img.shields.io/badge/Live_demo-▲_Vercel-black)](https://YOUR-APP.vercel.app)
+&nbsp;
+
+![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![Postgres + pgvector](https://img.shields.io/badge/Postgres-pgvector-4169E1?logo=postgresql&logoColor=white)
+![Prisma 7](https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma&logoColor=white)
+![Gemini 2.5](https://img.shields.io/badge/AI-Gemini_2.5-8E75B2?logo=googlegemini&logoColor=white)
+
+**[Open the live demo →](https://YOUR-APP.vercel.app)**
+
+Click **“Try the demo account”** on the sign-in page — or use
+`demo@jobtracker.app` / `demotracker2026` — for a pre-populated dashboard.
+
+</div>
+
+---
+
+## 📸 Screenshots
+
+<!--
+Capture these with the demo account (Try the demo account → it's pre-populated)
+and save them in docs/screenshots/. See docs/screenshots/README.md for what each
+shot should show. Recommended width ~1400px; use a GIF for the streaming one.
+-->
+
+<div align="center">
+
+**Dashboard — applications by status & upcoming deadlines**
+
+<img src="docs/screenshots/dashboard.png" alt="Dashboard showing application counts per status and upcoming deadlines" width="820" />
+
+<br />
+
+**AI job-description analysis + skill gap**
+
+<img src="docs/screenshots/jd-analysis.png" alt="Required skills tagged as matched or missing against the resume" width="820" />
+
+</div>
+
+| Resume fit ranking (pgvector) | Bullet tailoring (streamed live) |
+| :---: | :---: |
+| <img src="docs/screenshots/resume-fit.png" alt="Resume versions ranked by cosine similarity to the job description" width="400" /> | <img src="docs/screenshots/tailor.gif" alt="Resume bullets streaming in token by token" width="400" /> |
 
 ## Features
 
