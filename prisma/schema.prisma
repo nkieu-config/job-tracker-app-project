@@ -96,6 +96,8 @@ model Application {
   jobUrl         String?
   deadline       DateTime?
   notes          String?
+  analysis       Json?
+  analyzedAt     DateTime?
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
 

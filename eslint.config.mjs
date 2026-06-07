@@ -12,7 +12,19 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated Prisma client (not our source).
+    "app/generated/**",
   ]),
+  {
+    rules: {
+      // Allow intentionally-unused args/vars prefixed with "_"
+      // (e.g. required-but-unused useActionState params).
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;
