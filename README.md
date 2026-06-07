@@ -140,4 +140,4 @@ never empty. Start the server first (`npm run start &`), then run the seed.
 - **Trusting AI output.** Gemini occasionally returns off-schema JSON; the Zod round-trip (schema-out, validate-in) makes the failure explicit and recoverable instead of crashing the page.
 - **Private resumes.** Resume PDFs are stored in a private Blob and streamed only through an authenticated, ownership-scoped route — the blob URL is never public.
 
-See [job_tracker_build_plan.md](job_tracker_build_plan.md) for the full phase-by-phase plan.
+See [the build plan](docs/job_tracker_build_plan.md) for the full phase-by-phase plan.
