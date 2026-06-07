@@ -38,7 +38,7 @@ export default async function ResumeDetailPage({
           <div className="flex items-center gap-2">
             {resume.fileUrl && (
               <a
-                href={resume.fileUrl}
+                href={`/api/resumes/${resume.id}/file`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex h-9 items-center justify-center rounded-md border border-zinc-300 px-3 text-sm font-medium text-zinc-800 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-900"
