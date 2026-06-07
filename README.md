@@ -117,6 +117,8 @@ npm test            # vitest
 npm run seed        # populate the demo account (server must be running)
 ```
 
+To verify a running deployment by hand, follow [docs/manual-qa.md](docs/manual-qa.md).
+
 ### Demo account
 
 `npm run seed` creates `demo@jobtracker.app` / `demotracker2026` with sample
