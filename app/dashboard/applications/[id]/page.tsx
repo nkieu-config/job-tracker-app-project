@@ -20,7 +20,15 @@ export default async function ApplicationDetailPage({
 }) {
   const { id } = await params;
   const session = await requireSession();
-  const application = await getApplication(id, session.user.id);
+  const userId = session.user.id;
+
+  // These three reads are independent (each keyed only by userId/id), so run
+  // them in parallel instead of waterfalling three DB round-trips.
+  const [application, resumes, fitScores] = await Promise.all([
+    getApplication(id, userId),
+    getResumeVersions(userId),
+    getResumeFitScores(id, userId),
+  ]);
 
   if (!application) {
     notFound();
@@ -32,12 +40,8 @@ export default async function ApplicationDetailPage({
   const analysis = analysisResult.success ? analysisResult.data : null;
 
   // Gap analysis compares required skills against all the user's resume text.
-  const resumes = await getResumeVersions(session.user.id);
   const resumeText = resumes.map((r) => r.content ?? "").join("\n");
   const gap = analysis ? matchSkills(analysis.requiredSkills, resumeText) : null;
-
-  // pgvector ranking of resume versions by similarity to the JD embedding.
-  const fitScores = await getResumeFitScores(id, session.user.id);
 
   return (
     <div className="flex flex-col gap-6">
