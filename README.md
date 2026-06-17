@@ -93,7 +93,7 @@ npm run dev            # http://localhost:3000
 
 See [.env.example](.env.example). `.env` is gitignored — never commit secrets.
 
-- `DATABASE_URL` / `DIRECT_URL` — Neon Postgres connection strings (the app uses the direct one; see Challenges).
+- `DATABASE_URL` — Neon Postgres connection string (pooled connection is supported and recommended via the Neon Serverless driver).
 - `BETTER_AUTH_SECRET` — random secret (`openssl rand -base64 32`).
 - `BETTER_AUTH_URL` — `http://localhost:3000` locally; your deployment URL in prod.
 - `BLOB_READ_WRITE_TOKEN` — from a Vercel Blob store (`vercel env pull`).
@@ -128,8 +128,8 @@ never empty. Start the server first (`npm run start &`), then run the seed.
 
 ## 🧩 Challenges & solutions
 
-- **Prisma 7 dropped the bundled query engine.** It now requires a driver adapter, so the client uses `@prisma/adapter-pg` and the datasource URL lives in `prisma.config.ts`, not the schema.
-- **Neon's pooled endpoint broke node-postgres TLS.** Its multi-label hostname isn't covered by Neon's wildcard cert, and the driver can't both send SNI for routing and skip verification. Diagnosed down to the cert SAN / SNI error; the app uses the direct connection with `uselibpqcompat` (encrypt without hostname verification, Neon's documented `sslmode=require` behavior).
+- **Prisma 7 dropped the bundled query engine.** It now requires a driver adapter, so the client uses `@prisma/adapter-neon` and the datasource URL lives in `prisma.config.ts`, not the schema.
+- **Database Connection Pooling in Serverless.** To prevent connection exhaustion from Next.js Serverless functions, the app uses `@neondatabase/serverless` and `@prisma/adapter-neon`. This enables robust connection pooling over HTTP/WebSocket natively, resolving prior TLS/SNI routing issues encountered with the standard `pg` driver.
 - **Better Auth pulled a broken kysely.** kysely `0.29.2` stopped re-exporting a symbol the adapter imports; pinned to `0.28.17` via an npm `override`.
 - **Next 16 renamed `middleware` → `proxy`.** Read the bundled Next docs and used the new `proxy.ts` convention (which also reinforces the data-layer auth checks above).
 - **Trusting AI output.** Gemini occasionally returns off-schema JSON; the Zod round-trip (schema-out, validate-in) makes the failure explicit and recoverable instead of crashing the page.
