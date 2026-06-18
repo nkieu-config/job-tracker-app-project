@@ -85,7 +85,7 @@ export default async function DashboardPage() {
             <div className="flex flex-col gap-3 rounded-[12px] bg-canvas-lavender p-6 border border-hairline">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-on-primary font-bold">1</span>
               <h3 className="font-sans font-bold text-ink text-[16px]">Upload Base Resume</h3>
-              <p className="font-sans text-[14px] text-ink-mute flex-1">Upload your PDF resumes. We'll use these to compare against jobs.</p>
+              <p className="font-sans text-[14px] text-ink-mute flex-1">Upload your PDF resumes. We&apos;ll use these to compare against jobs.</p>
               <Link href="/dashboard/resumes" className="text-[14px] text-link-blue font-bold hover:underline self-start mt-2">Go to Resumes →</Link>
             </div>
             <div className="flex flex-col gap-3 rounded-[12px] bg-canvas-lavender p-6 border border-hairline">
