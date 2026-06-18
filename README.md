@@ -16,7 +16,7 @@
 
 **[Open the live demo →](https://job-tracker-app-project.vercel.app)**
 
-Click **“Try the demo account”** on the sign-in page — or use
+Click **“Try Live Demo”** on the homepage or sign-up page — or manually use
 `demo@jobtracker.app` / `demotracker2026` — for a pre-populated dashboard.
 
 </div>
@@ -45,6 +45,7 @@ Click **“Try the demo account”** on the sign-in page — or use
 
 ## ✨ Features
 
+- **Beautiful & Responsive UI** — styled with a modern 'Slacc' aesthetic using strict semantic design tokens, fully optimized for mobile devices.
 - **Auth & accounts** — email/password sign up / sign in; every piece of data is scoped to the signed-in user.
 - **Application tracker** — full CRUD for applications with status (Saved → Applied → Interview → Offer → Rejected), deadlines, notes, and a dashboard that counts by status and surfaces upcoming deadlines.
 - **Resume versions** — upload PDF resumes; text is extracted and stored for the AI features.
@@ -115,8 +116,8 @@ To verify a running deployment by hand, follow [docs/manual-qa.md](docs/manual-q
 ### Demo account
 
 `npm run seed` creates `demo@jobtracker.app` / `demotracker2026` with sample
-applications, a resume, and a pre-computed JD analysis so the live demo is
-never empty. Start the server first (`npm run start &`), then run the seed.
+applications, multiple resumes, and various high-fit/low-fit pre-computed JD
+analyses so the live demo fully showcases the AI features. Start the server first (`npm run start &`), then run the seed.
 
 ## 🚀 Deploy (GitHub → Vercel → Neon)
 
