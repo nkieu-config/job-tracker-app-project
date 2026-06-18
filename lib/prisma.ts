@@ -6,11 +6,11 @@ import ws from "ws";
 // Set up WebSocket constructor for Neon's serverless driver
 neonConfig.webSocketConstructor = ws;
 
-// We use the pooled connection string (DATABASE_URL) for the Neon serverless driver
-// to take advantage of connection pooling, preventing connection exhaustion.
-const connectionString = process.env.DATABASE_URL;
+// The Neon serverless driver connects over WebSockets. The -pooler URL
+// can cause TLS certificate altname mismatches. The direct URL is preferred.
+const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
 if (!connectionString) {
-  throw new Error("DATABASE_URL must be set");
+  throw new Error("DIRECT_URL or DATABASE_URL must be set");
 }
 
 // Reuse a single PrismaClient across hot reloads in dev to avoid
