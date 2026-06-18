@@ -19,20 +19,20 @@ function Metric({
   hint: string;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+    <div className="rounded-[16px] border border-hairline bg-canvas p-[32px] shadow-sm">
+      <p className="text-[14px] font-sans font-medium text-ink-mute">
         {label}
       </p>
-      <p className="mt-1.5 text-3xl font-semibold leading-none tabular-nums text-black dark:text-zinc-50">
+      <p className="mt-2 font-display-lg text-primary tabular-nums">
         {value}
       </p>
-      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+      <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-hairline">
         <div
           className={`h-full rounded-full ${bar}`}
           style={{ width: `${pct}%` }}
         />
       </div>
-      <p className="mt-2 text-xs text-zinc-500">{hint}</p>
+      <p className="mt-3 text-[14px] font-sans text-ink-mute">{hint}</p>
     </div>
   );
 }
@@ -55,13 +55,13 @@ export default async function DashboardPage() {
   const fmt = (n: number) => (applied ? `${rate(n)}%` : "—");
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-black dark:text-zinc-50">
+          <h1 className="font-display-md text-ink tracking-tight">
             Welcome, {session.user.name}
           </h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-2 font-sans text-[16px] text-ink-mute">
             {total === 0
               ? "Let’s track your first application."
               : `Tracking ${total} application${total === 1 ? "" : "s"}.`}
@@ -69,53 +69,66 @@ export default async function DashboardPage() {
         </div>
         <Link
           href="/dashboard/applications/new"
-          className="inline-flex h-9 items-center justify-center rounded-md bg-black px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+          className="w-full sm:w-auto inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-[16px] tracking-[0.2px] py-[14px] px-[28px] rounded-[90px] transition-colors hover:bg-primary-press whitespace-nowrap"
         >
           New application
         </Link>
       </div>
 
       {total === 0 ? (
-        <div className="rounded-xl border border-dashed border-zinc-300 p-12 text-center dark:border-zinc-700">
-          <p className="text-sm text-zinc-500">
-            No applications yet.{" "}
-            <Link
-              href="/dashboard/applications/new"
-              className="font-medium text-black underline-offset-4 hover:underline dark:text-zinc-50"
-            >
-              Add your first one
-            </Link>{" "}
-            to start building your pipeline.
-          </p>
+        <div className="flex flex-col gap-6 rounded-[16px] border border-hairline bg-canvas p-8 shadow-sm">
+          <div>
+            <h2 className="font-display-md text-ink text-[24px]">Welcome to your Job Tracker!</h2>
+            <p className="mt-2 font-sans text-[16px] text-ink-mute">Follow these 3 simple steps to let AI power your job search.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex flex-col gap-3 rounded-[12px] bg-canvas-lavender p-6 border border-hairline">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-on-primary font-bold">1</span>
+              <h3 className="font-sans font-bold text-ink text-[16px]">Upload Base Resume</h3>
+              <p className="font-sans text-[14px] text-ink-mute flex-1">Upload your PDF resumes. We'll use these to compare against jobs.</p>
+              <Link href="/dashboard/resumes" className="text-[14px] text-link-blue font-bold hover:underline self-start mt-2">Go to Resumes →</Link>
+            </div>
+            <div className="flex flex-col gap-3 rounded-[12px] bg-canvas-lavender p-6 border border-hairline">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-on-primary font-bold">2</span>
+              <h3 className="font-sans font-bold text-ink text-[16px]">Track a Job</h3>
+              <p className="font-sans text-[14px] text-ink-mute flex-1">Add a new application and <b>paste the Job Description</b>.</p>
+              <Link href="/dashboard/applications/new" className="text-[14px] text-link-blue font-bold hover:underline self-start mt-2">New application →</Link>
+            </div>
+            <div className="flex flex-col gap-3 rounded-[12px] bg-canvas-lavender p-6 border border-hairline">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-semantic-warning-tint text-semantic-warning font-bold">✨</span>
+              <h3 className="font-sans font-bold text-ink text-[16px]">Let AI Do the Work</h3>
+              <p className="font-sans text-[14px] text-ink-mute flex-1">Open your application to let AI automatically score your fit and identify missing skills.</p>
+            </div>
+          </div>
         </div>
       ) : (
         <>
-          <section className="grid grid-cols-3 gap-3">
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Metric
               label="Response rate"
               value={fmt(responded)}
               pct={rate(responded)}
-              bar="bg-blue-500"
+              bar="bg-link-blue"
               hint={applied ? `of ${applied} applied` : "no applications yet"}
             />
             <Metric
               label="Interview rate"
               value={fmt(interviews)}
               pct={rate(interviews)}
-              bar="bg-amber-500"
+              bar="bg-semantic-error"
               hint="reached interview"
             />
             <Metric
               label="Offer rate"
               value={fmt(counts.OFFER)}
               pct={rate(counts.OFFER)}
-              bar="bg-green-500"
+              bar="bg-semantic-success"
               hint={`${counts.OFFER} offer${counts.OFFER === 1 ? "" : "s"}`}
             />
           </section>
 
           <section>
-            <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-zinc-500">
+            <h2 className="mb-4 font-sans font-bold text-[18px] text-ink">
               Pipeline
             </h2>
             <Pipeline counts={counts} />
@@ -124,31 +137,31 @@ export default async function DashboardPage() {
       )}
 
       <section>
-        <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+        <h2 className="mb-4 font-sans font-bold text-[18px] text-ink">
           Upcoming deadlines
         </h2>
         {upcoming.length === 0 ? (
-          <p className="mt-3 rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
+          <p className="rounded-[16px] border border-dashed border-hairline p-8 text-center font-sans text-[16px] text-ink-mute bg-canvas">
             No upcoming deadlines.
           </p>
         ) : (
-          <ul className="mt-3 flex flex-col gap-2">
+          <ul className="flex flex-col gap-3">
             {upcoming.map((app) => (
               <li key={app.id}>
                 <Link
                   href={`/dashboard/applications/${app.id}`}
-                  className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white px-4 py-3 transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
+                  className="flex items-center justify-between gap-4 rounded-[12px] border border-hairline bg-canvas px-6 py-4 transition-shadow hover:shadow-[0_5px_20px_rgba(0,0,0,0.05)]"
                 >
                   <div className="min-w-0">
-                    <p className="truncate font-medium text-black dark:text-zinc-50">
+                    <p className="truncate font-sans font-bold text-ink">
                       {app.role}
                     </p>
-                    <p className="truncate text-sm text-zinc-500">
+                    <p className="truncate font-sans text-[14px] text-ink-mute mt-1">
                       {app.company}
                     </p>
                   </div>
-                  <div className="flex shrink-0 items-center gap-3">
-                    <span className="text-xs font-medium tabular-nums text-zinc-600 dark:text-zinc-400">
+                  <div className="flex shrink-0 items-center gap-4">
+                    <span className="font-sans text-[14px] font-medium tabular-nums text-ink-mute">
                       {app.deadline ? formatDate(app.deadline) : null}
                     </span>
                     <StatusBadge status={app.status} />

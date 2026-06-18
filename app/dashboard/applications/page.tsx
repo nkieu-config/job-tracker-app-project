@@ -35,19 +35,19 @@ export default async function ApplicationsPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-black dark:text-zinc-50">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="font-display-md text-ink tracking-tight">
           Applications
         </h1>
         <Link
           href="/dashboard/applications/new"
-          className="inline-flex h-9 items-center justify-center rounded-md bg-black px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+          className="w-full sm:w-auto inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-[16px] tracking-[0.2px] py-[10px] px-[20px] rounded-[90px] transition-colors hover:bg-primary-press whitespace-nowrap"
         >
           New application
         </Link>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 mt-4">
         {filters.map((f) => {
           const active = f.value === status || (!f.value && !status);
           const href = f.value
@@ -57,10 +57,10 @@ export default async function ApplicationsPage({
             <Link
               key={f.label}
               href={href}
-              className={`rounded-full px-3 py-1 text-sm transition-colors ${
+              className={`rounded-[90px] px-4 py-2 text-[14px] font-bold font-sans transition-colors ${
                 active
-                  ? "bg-black text-white dark:bg-white dark:text-black"
-                  : "border border-zinc-300 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-900"
+                  ? "bg-primary text-on-primary"
+                  : "bg-canvas text-ink border border-hairline hover:bg-canvas-lavender"
               }`}
             >
               {f.label}
@@ -70,33 +70,33 @@ export default async function ApplicationsPage({
       </div>
 
       {applications.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-zinc-300 p-10 text-center text-sm text-zinc-500 dark:border-zinc-700">
+        <div className="mt-4 rounded-[16px] border border-dashed border-hairline p-10 text-center text-[16px] font-sans text-ink-mute bg-canvas">
           No applications {status ? `with status “${STATUS_LABELS[status]}”` : "yet"}.{" "}
           <Link
             href="/dashboard/applications/new"
-            className="font-medium text-black underline-offset-4 hover:underline dark:text-zinc-50"
+            className="font-bold text-link-blue underline-offset-4 hover:underline"
           >
             Add one
           </Link>
           .
         </div>
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="mt-4 flex flex-col gap-3">
           {applications.map((app) => (
             <li key={app.id}>
               <Link
                 href={`/dashboard/applications/${app.id}`}
-                className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-white px-4 py-3 transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-[12px] border border-hairline bg-canvas px-6 py-4 transition-shadow hover:shadow-[0_5px_20px_rgba(0,0,0,0.05)]"
               >
                 <div className="min-w-0">
-                  <p className="truncate font-medium text-black dark:text-zinc-50">
+                  <p className="truncate font-sans font-bold text-ink">
                     {app.role}
                   </p>
-                  <p className="truncate text-sm text-zinc-500">{app.company}</p>
+                  <p className="truncate font-sans text-[14px] text-ink-mute mt-1">{app.company}</p>
                 </div>
-                <div className="flex shrink-0 items-center gap-3">
+                <div className="flex shrink-0 items-center justify-between sm:justify-end gap-4 w-full sm:w-auto border-t sm:border-none border-hairline pt-3 sm:pt-0">
                   {app.deadline && (
-                    <span className="hidden text-xs text-zinc-500 sm:inline">
+                    <span className="font-sans text-[14px] font-medium tabular-nums text-ink-mute">
                       Due {formatDate(app.deadline)}
                     </span>
                   )}

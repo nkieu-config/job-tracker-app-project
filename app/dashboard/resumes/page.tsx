@@ -11,37 +11,39 @@ export default async function ResumesPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-black dark:text-zinc-50">
+        <h1 className="font-display-md text-ink tracking-tight">
           Resumes
         </h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Upload PDF versions of your resume. We extract the text so the AI
-          features (coming next) can use it.
+        <p className="mt-2 font-sans text-[16px] text-ink-mute">
+          Upload PDF versions of your resume. Our AI uses these to compute your Fit Score and identify missing skills for any job application.
         </p>
       </div>
 
       <ResumeUploadForm />
 
       <section>
-        <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+        <h2 className="text-[18px] font-sans font-bold text-ink">
           Your versions
         </h2>
         {resumes.length === 0 ? (
-          <p className="mt-3 rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700">
-            No resume versions yet.
-          </p>
+          <div className="mt-4 rounded-[16px] border border-dashed border-hairline p-10 text-center bg-canvas flex flex-col items-center justify-center">
+            <span className="text-[32px] mb-3">📄</span>
+            <p className="font-sans text-[16px] text-ink-mute">
+              No resumes uploaded yet. Upload your first resume above to unlock AI Fit Scoring.
+            </p>
+          </div>
         ) : (
-          <ul className="mt-3 flex flex-col gap-2">
+          <ul className="mt-4 flex flex-col gap-3">
             {resumes.map((resume) => (
               <li key={resume.id}>
                 <Link
                   href={`/dashboard/resumes/${resume.id}`}
-                  className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-white px-4 py-3 transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
+                  className="flex items-center justify-between gap-4 rounded-[12px] border border-hairline bg-canvas px-6 py-4 transition-shadow hover:shadow-[0_5px_20px_rgba(0,0,0,0.05)]"
                 >
-                  <span className="truncate font-medium text-black dark:text-zinc-50">
+                  <span className="truncate font-sans font-bold text-ink">
                     {resume.label}
                   </span>
-                  <span className="shrink-0 text-xs text-zinc-500">
+                  <span className="shrink-0 font-sans text-[14px] text-ink-mute">
                     {formatDate(resume.createdAt)}
                   </span>
                 </Link>

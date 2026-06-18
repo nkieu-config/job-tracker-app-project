@@ -7,17 +7,17 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <div className="flex flex-1 items-center justify-center bg-zinc-50 px-6 dark:bg-black">
+    <div className="flex flex-1 items-center justify-center bg-canvas px-6">
       <div className="text-center">
-        <h1 className="text-2xl font-semibold tracking-tight text-black dark:text-zinc-50">
+        <h1 className="font-display-md text-ink tracking-tight">
           Something went wrong
         </h1>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 font-sans text-[16px] text-ink-mute">
           An unexpected error occurred. Please try again.
         </p>
         <button
           onClick={reset}
-          className="mt-6 inline-flex h-10 items-center justify-center rounded-md bg-black px-5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+          className="mt-6 inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-[16px] tracking-[0.2px] py-[14px] px-[28px] rounded-[90px] transition-colors hover:bg-primary-press"
         >
           Try again
         </button>

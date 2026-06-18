@@ -2,18 +2,61 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1d1d1d; /* ink */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  
+  /* Slacc Colors */
+  --color-primary: #4a154b;
+  --color-primary-deep: #481a54;
+  --color-primary-press: #611f69;
+  --color-primary-tint: #592466;
+  --color-on-primary: #ffffff;
+  
+  --color-ink: #1d1d1d;
+  --color-ink-mute: #696969;
+  
+  --color-link-blue: #1264a3;
+  --color-link-hover: #3860be;
+  
+  --color-canvas: #ffffff;
+  --color-canvas-cream: #f4ede4;
+  --color-canvas-lavender: #f9f0ff;
+  
+  --color-surface-elev: #ffffff;
+  --color-surface-aubergine: #4a154b;
+  --color-on-aubergine-mute: #d9bdde;
+  
+  --color-hairline: #e6e6e6;
+  --color-hairline-strong: #000000;
+  
+  --color-semantic-error: #cc4117;
+  --color-semantic-error-tint: #fdebea;
+  --color-semantic-error-hover: #fad8d6;
+  
+  --color-semantic-success: #007a5a;
+  --color-semantic-success-tint: #e2f1ea;
+  
+  --color-semantic-warning: #d69f12;
+  --color-semantic-warning-tint: #fcf2db;
+
+  --color-canvas-lavender-hover: #ebdcf5;
+  --color-canvas-error: #fdf0f0;
+  --color-surface-hover: #f5eded;
+
+  /* Slacc Layout */
+  --radius-pill: 90px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
+    /* Keeping dark mode roughly consistent with base template for now,
+       though Slacc relies heavily on the specific cream/aubergine scheme. 
+       We will adapt some colors for a dark-mode variant. */
     --background: #0a0a0a;
     --foreground: #ededed;
   }
@@ -22,10 +65,48 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
 }
 
-/* Staggered entrance for dashboard pipeline stages */
+/* Typography Overrides based on Slacc Design */
+.font-display-xxl {
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.768px;
+}
+
+.font-display-xl {
+  font-size: 58px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.464px;
+}
+
+.font-display-lg {
+  font-size: 50px;
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.6px;
+}
+
+.font-display-md {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.256px;
+}
+
+/* Pastel Mesh Gradient */
+.bg-pastel-mesh {
+  background-color: var(--color-canvas-cream);
+  background-image: 
+    radial-gradient(at 100% 0%, rgba(233, 216, 255, 0.6) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(255, 240, 230, 0.7) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(220, 240, 230, 0.5) 0px, transparent 50%);
+}
+
+/* Animations */
 @keyframes rise {
   from {
     opacity: 0;
