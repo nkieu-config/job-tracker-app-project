@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "@/lib/auth-client";
-import { DEMO_EMAIL, DEMO_PASSWORD } from "@/lib/demo";
+import { DemoButton } from "@/app/components/demo-button";
 import { inputClass, labelClass } from "@/lib/form-styles";
 
 export default function SignInPage() {
@@ -13,7 +13,6 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [demoLoading, setDemoLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -28,32 +27,25 @@ export default function SignInPage() {
     router.push("/dashboard");
   }
 
-  async function loginDemo() {
-    setError(null);
-    setDemoLoading(true);
-    const { error } = await signIn.email({
-      email: DEMO_EMAIL,
-      password: DEMO_PASSWORD,
-    });
-    setDemoLoading(false);
-    if (error) {
-      setError("The demo account is unavailable right now.");
-      return;
-    }
-    router.push("/dashboard");
-  }
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-zinc-50 px-6 py-16 dark:bg-black">
+    <div className="flex flex-1 items-center justify-center bg-canvas px-6 py-16">
       <div className="w-full max-w-sm">
-        <h1 className="text-2xl font-semibold tracking-tight text-black dark:text-zinc-50">
+        <div className="flex justify-center mb-8">
+            <Link href="/">
+              <div className="w-12 h-12 bg-primary rounded-md flex items-center justify-center">
+                <span className="text-on-primary font-bold text-2xl leading-none">J</span>
+              </div>
+            </Link>
+        </div>
+        <h1 className="font-display-md text-ink text-center tracking-tight mb-2">
           Welcome back
         </h1>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-center font-sans text-ink-mute mb-8">
           Sign in to your job tracker.
         </p>
 
-        <form onSubmit={onSubmit} className="mt-8 flex flex-col gap-4">
+        <form onSubmit={onSubmit} className="flex flex-col gap-5">
           <label className={labelClass}>
             Email
             <input
@@ -81,7 +73,7 @@ export default function SignInPage() {
           {error && (
             <p
               role="alert"
-              className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-400"
+              className="rounded-md bg-canvas-error px-4 py-3 text-sm text-semantic-error font-medium"
             >
               {error}
             </p>
@@ -89,33 +81,30 @@ export default function SignInPage() {
 
           <button
             type="submit"
-            disabled={loading || demoLoading}
-            className="mt-2 inline-flex h-10 items-center justify-center rounded-md bg-black px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+            disabled={loading}
+            className="mt-2 inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-[16px] tracking-[0.2px] py-[14px] px-[28px] rounded-[90px] transition-colors hover:bg-primary-press disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
 
-        <div className="mt-4 flex items-center gap-3 text-xs text-zinc-400">
-          <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+        <div className="my-6 flex items-center gap-3 text-[14px] font-sans text-ink-mute">
+          <span className="h-px flex-1 bg-hairline" />
           or
-          <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+          <span className="h-px flex-1 bg-hairline" />
         </div>
 
-        <button
-          type="button"
-          onClick={loginDemo}
-          disabled={loading || demoLoading}
-          className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-md border border-zinc-300 px-4 text-sm font-medium text-zinc-800 transition-colors hover:bg-zinc-100 disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-900"
-        >
-          {demoLoading ? "Loading demo…" : "Try the demo account"}
-        </button>
+        <DemoButton 
+          onError={setError} 
+          disabled={loading} 
+          className="inline-flex w-full items-center justify-center bg-canvas text-primary font-sans font-bold text-[16px] tracking-[0.2px] py-[14px] px-[28px] rounded-[90px] border-2 border-primary transition-colors hover:bg-canvas-lavender disabled:opacity-60 disabled:cursor-not-allowed" 
+        />
 
-        <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-8 text-center font-sans text-[14px] text-ink-mute">
           Don&apos;t have an account?{" "}
           <Link
             href="/sign-up"
-            className="font-medium text-black underline-offset-4 hover:underline dark:text-zinc-50"
+            className="font-bold text-link-blue hover:text-link-hover hover:underline transition-colors"
           >
             Sign up
           </Link>
