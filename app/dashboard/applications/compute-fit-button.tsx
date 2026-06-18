@@ -21,12 +21,12 @@ export function ComputeFitButton({
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex h-9 w-fit items-center justify-center rounded-md border border-zinc-300 px-4 text-sm font-medium text-zinc-800 transition-colors hover:bg-zinc-100 disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-900"
+        className="inline-flex items-center justify-center bg-canvas text-ink font-sans font-bold text-[14px] tracking-[0.144px] py-[10px] px-[20px] rounded-[90px] border border-hairline transition-colors hover:bg-canvas-lavender disabled:opacity-60"
       >
         {pending ? "Embedding…" : label}
       </button>
       {state.error && (
-        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+        <p role="alert" className="text-[14px] font-sans text-semantic-error">
           {state.error}
         </p>
       )}

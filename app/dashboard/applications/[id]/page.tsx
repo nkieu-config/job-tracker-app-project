@@ -48,64 +48,66 @@ export default async function ApplicationDetailPage({
       <div>
         <Link
           href="/dashboard/applications"
-          className="text-sm text-zinc-500 hover:text-black dark:hover:text-zinc-50"
+          className="text-[14px] font-sans font-bold text-ink-mute hover:text-ink transition-colors"
         >
           ← Applications
         </Link>
-        <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
+        <div className="mt-2 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-black dark:text-zinc-50">
+            <h1 className="font-display-md text-ink tracking-tight">
               {application.role}
             </h1>
-            <p className="mt-1 text-zinc-500">{application.company}</p>
+            <p className="mt-2 font-sans text-[16px] text-ink-mute">{application.company}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex w-full sm:w-auto items-center gap-2">
             <Link
               href={`/dashboard/applications/${application.id}/edit`}
-              className="inline-flex h-9 items-center justify-center rounded-md border border-zinc-300 px-3 text-sm font-medium text-zinc-800 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-900"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center bg-canvas-lavender text-ink font-sans font-bold text-[14px] tracking-[0.144px] py-[10px] px-[20px] rounded-[90px] transition-colors hover:bg-canvas-lavender-hover"
             >
               Edit
             </Link>
-            <DeleteApplicationButton id={application.id} />
+            <div className="flex-1 sm:flex-none *:w-full">
+              <DeleteApplicationButton id={application.id} />
+            </div>
           </div>
         </div>
       </div>
 
-      <dl className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-5 sm:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-950">
+      <dl className="grid gap-4 rounded-[16px] border border-hairline bg-canvas p-[32px] sm:grid-cols-2">
         <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+          <dt className="text-[14px] font-sans font-medium text-ink-mute">
             Status
           </dt>
-          <dd className="mt-1">
+          <dd className="mt-2">
             <StatusBadge status={application.status} />
           </dd>
         </div>
         <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+          <dt className="text-[14px] font-sans font-medium text-ink-mute">
             Deadline
           </dt>
-          <dd className="mt-1 text-sm text-black dark:text-zinc-50">
+          <dd className="mt-2 text-[16px] font-sans font-bold text-ink">
             {application.deadline
               ? formatDate(application.deadline)
               : "—"}
           </dd>
         </div>
         <div className="sm:col-span-2">
-          <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+          <dt className="text-[14px] font-sans font-medium text-ink-mute">
             Job URL
           </dt>
-          <dd className="mt-1 text-sm">
+          <dd className="mt-2 text-[16px] font-sans">
             {application.jobUrl ? (
               <a
                 href={application.jobUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="break-all text-black underline-offset-4 hover:underline dark:text-zinc-50"
+                className="break-all font-bold text-link-blue underline-offset-4 hover:underline hover:text-link-hover"
               >
                 {application.jobUrl}
               </a>
             ) : (
-              <span className="text-zinc-500">—</span>
+              <span className="text-ink-mute">—</span>
             )}
           </dd>
         </div>
@@ -113,10 +115,10 @@ export default async function ApplicationDetailPage({
 
       {application.jobDescription && (
         <section>
-          <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+          <h2 className="text-[18px] font-sans font-bold text-ink">
             Job description
           </h2>
-          <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-800 dark:text-zinc-200">
+          <p className="mt-4 whitespace-pre-wrap text-[16px] font-sans text-ink">
             {application.jobDescription}
           </p>
         </section>
@@ -124,34 +126,48 @@ export default async function ApplicationDetailPage({
 
       <section className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+          <h2 className="text-[18px] font-sans font-bold text-ink">
             Skills analysis
           </h2>
           {application.jobDescription?.trim() && (
-            <AnalyzeButton
-              id={application.id}
-              label={analysis ? "Re-analyze" : "Analyze job description"}
-            />
+            <div className="w-full sm:w-auto">
+              <AnalyzeButton
+                id={application.id}
+                label={analysis ? "✨ Re-analyze" : "✨ Analyze job description"}
+              />
+            </div>
           )}
         </div>
 
         {!application.jobDescription?.trim() ? (
-          <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
-            Add a job description (via Edit) to analyze the required skills.
-          </p>
+          <div className="rounded-[16px] border border-hairline p-8 text-center bg-canvas-lavender flex flex-col items-center justify-center gap-2 shadow-sm">
+            <span className="text-[24px]">✨</span>
+            <p className="font-sans text-[16px] text-ink">
+              <b>Unlock AI Skills Analysis</b>
+            </p>
+            <p className="font-sans text-[14px] text-ink-mute">
+              Edit this application and paste the Job Description to automatically extract required skills.
+            </p>
+            <Link
+              href={`/dashboard/applications/${application.id}/edit`}
+              className="mt-2 inline-flex items-center justify-center bg-canvas text-link-blue font-sans font-bold text-[14px] py-[8px] px-[16px] rounded-[90px] border border-hairline hover:bg-hairline transition-colors"
+            >
+              Add Job Description
+            </Link>
+          </div>
         ) : !analysis ? (
-          <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
+          <p className="rounded-[16px] border border-dashed border-hairline p-8 text-center font-sans text-[16px] text-ink-mute bg-canvas">
             Not analyzed yet — run “Analyze job description”.
           </p>
         ) : (
-          <div className="flex flex-col gap-5 rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+          <div className="flex flex-col gap-6 rounded-[16px] border border-hairline bg-canvas p-[32px]">
             <div>
-              <p className="text-sm text-zinc-800 dark:text-zinc-200">
+              <p className="text-[16px] font-sans text-ink">
                 {analysis.summary}
               </p>
-              <p className="mt-2 text-xs text-zinc-500">
+              <p className="mt-2 text-[14px] font-sans text-ink-mute">
                 Seniority:{" "}
-                <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                <span className="font-bold text-ink">
                   {analysis.seniority}
                 </span>
               </p>
@@ -159,29 +175,29 @@ export default async function ApplicationDetailPage({
 
             <div>
               <div className="flex items-baseline justify-between gap-2">
-                <h3 className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                <h3 className="text-[14px] font-sans font-medium text-ink-mute">
                   Required skills
                 </h3>
                 {gap && resumes.length > 0 && (
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-[14px] font-sans text-ink-mute">
                     {gap.matched.length}/{analysis.requiredSkills.length} in your
                     resume
                   </span>
                 )}
               </div>
-              <ul className="mt-2 flex flex-wrap gap-1.5">
+              <ul className="mt-3 flex flex-wrap gap-2">
                 {analysis.requiredSkills.map((skill) => {
                   const matched = gap?.matched.includes(skill);
                   const cls =
                     resumes.length === 0
-                      ? "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                      ? "bg-hairline text-ink"
                       : matched
-                        ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300"
-                        : "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300";
+                        ? "bg-semantic-success-tint text-semantic-success"
+                        : "bg-semantic-error-tint text-semantic-error";
                   return (
                     <li
                       key={skill}
-                      className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${cls}`}
+                      className={`rounded-full px-3 py-1 text-[14px] font-sans font-bold ${cls}`}
                     >
                       {skill}
                       {resumes.length > 0 && (matched ? " ✓" : " ✗")}
@@ -190,7 +206,7 @@ export default async function ApplicationDetailPage({
                 })}
               </ul>
               {resumes.length === 0 && (
-                <p className="mt-2 text-xs text-zinc-500">
+                <p className="mt-3 text-[14px] font-sans text-ink-mute">
                   Upload a resume to see which skills you’re missing.
                 </p>
               )}
@@ -198,14 +214,14 @@ export default async function ApplicationDetailPage({
 
             {analysis.niceToHave.length > 0 && (
               <div>
-                <h3 className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                <h3 className="text-[14px] font-sans font-medium text-ink-mute">
                   Nice to have
                 </h3>
-                <ul className="mt-2 flex flex-wrap gap-1.5">
+                <ul className="mt-3 flex flex-wrap gap-2">
                   {analysis.niceToHave.map((skill) => (
                     <li
                       key={skill}
-                      className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                      className="rounded-full bg-hairline px-3 py-1 text-[14px] font-sans font-bold text-ink"
                     >
                       {skill}
                     </li>
@@ -215,8 +231,8 @@ export default async function ApplicationDetailPage({
             )}
 
             {gap && resumes.length > 0 && gap.missing.length > 0 && (
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                <span className="font-medium text-black dark:text-zinc-50">
+              <p className="text-[16px] font-sans text-ink-mute">
+                <span className="font-bold text-ink">
                   Gap:
                 </span>{" "}
                 consider adding {gap.missing.join(", ")} to your resume.
@@ -228,47 +244,55 @@ export default async function ApplicationDetailPage({
 
       <section className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+          <h2 className="text-[18px] font-sans font-bold text-ink">
             Resume fit
           </h2>
           {application.jobDescription?.trim() && (
-            <ComputeFitButton
-              id={application.id}
-              label={fitScores.length ? "Recompute fit" : "Compute resume fit"}
-            />
+            <div className="w-full sm:w-auto">
+              <ComputeFitButton
+                id={application.id}
+                label={fitScores.length ? "✨ Recompute fit" : "✨ Compute resume fit"}
+              />
+            </div>
           )}
         </div>
 
         {!application.jobDescription?.trim() ? (
-          <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
-            Add a job description to score your resumes against it.
-          </p>
+          <div className="rounded-[16px] border border-hairline p-8 text-center bg-canvas-lavender flex flex-col items-center justify-center gap-2 shadow-sm">
+            <span className="text-[24px]">✨</span>
+            <p className="font-sans text-[16px] text-ink">
+              <b>Unlock AI Fit Scoring</b>
+            </p>
+            <p className="font-sans text-[14px] text-ink-mute">
+              Paste the Job Description to rank your uploaded resumes and find your best match.
+            </p>
+          </div>
         ) : fitScores.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
+          <p className="rounded-[16px] border border-dashed border-hairline p-8 text-center font-sans text-[16px] text-ink-mute bg-canvas">
             {resumes.some((r) => r.content?.trim())
               ? "No fit scores yet — run “Compute resume fit” to rank your resumes against this JD."
               : "Upload a resume with readable text, then compute fit."}
           </p>
         ) : (
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-3">
             {fitScores.map((fit, i) => (
               <li
                 key={fit.id}
-                className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-[12px] border border-hairline bg-canvas px-6 py-4"
               >
                 <Link
                   href={`/dashboard/resumes/${fit.id}`}
-                  className="min-w-0 truncate font-medium text-black hover:underline dark:text-zinc-50"
+                  className="min-w-0 truncate font-sans font-bold text-link-blue hover:text-link-hover hover:underline"
                 >
                   {fit.label}
                 </Link>
-                <div className="flex shrink-0 items-center gap-3">
+                <div className="flex shrink-0 items-center justify-between sm:justify-end gap-4 w-full sm:w-auto border-t sm:border-none border-hairline pt-3 sm:pt-0">
                   {i === 0 && (
-                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-300">
+                    <span className="rounded-[4px] bg-semantic-success-tint px-2 py-1 text-[12px] font-sans font-bold text-semantic-success">
                       Best match
                     </span>
                   )}
-                  <span className="text-sm font-semibold text-black dark:text-zinc-50">
+                  <span className="font-display-md text-ink">
                     {Math.round(fit.score * 100)}%
                   </span>
                 </div>
@@ -281,10 +305,10 @@ export default async function ApplicationDetailPage({
       {application.jobDescription?.trim() && (
         <section className="flex flex-col gap-3">
           <div>
-            <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
-              Tailor resume bullets
+            <h2 className="text-[18px] font-sans font-bold text-ink">
+              ✨ Tailor resume bullets
             </h2>
-            <p className="mt-1 text-sm text-zinc-500">
+            <p className="mt-2 font-sans text-[16px] text-ink-mute">
               Paste an experience and the AI rewrites it as bullets tuned to this
               job — streamed live.
             </p>
@@ -295,10 +319,10 @@ export default async function ApplicationDetailPage({
 
       {application.notes && (
         <section>
-          <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+          <h2 className="text-[18px] font-sans font-bold text-ink">
             Notes
           </h2>
-          <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-800 dark:text-zinc-200">
+          <p className="mt-4 whitespace-pre-wrap text-[16px] font-sans text-ink">
             {application.notes}
           </p>
         </section>

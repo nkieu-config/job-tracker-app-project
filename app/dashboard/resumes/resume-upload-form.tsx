@@ -68,7 +68,7 @@ export function ResumeUploadForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="flex flex-col gap-4 rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950"
+      className="flex flex-col gap-6 rounded-[16px] border border-hairline bg-canvas p-[32px]"
     >
       <label className={labelClass}>
         Label
@@ -88,9 +88,9 @@ export function ResumeUploadForm() {
           name="file"
           accept="application/pdf,.pdf"
           required
-          className="text-sm text-zinc-600 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-zinc-800 hover:file:bg-zinc-200 dark:text-zinc-400 dark:file:bg-zinc-800 dark:file:text-zinc-200"
+          className="text-[14px] text-ink-mute file:mr-3 file:rounded-[4px] file:border-0 file:bg-hairline file:px-3 file:py-2 file:text-[14px] file:font-medium file:text-ink hover:file:bg-canvas-lavender"
         />
-        <span className="text-xs font-normal text-zinc-500">
+        <span className="text-[12px] font-sans font-medium text-ink-mute">
           PDF only, up to {humanFileSize(MAX_RESUME_BYTES)}.
         </span>
       </label>
@@ -98,7 +98,7 @@ export function ResumeUploadForm() {
       {error && (
         <p
           role="alert"
-          className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-400"
+          className="rounded-[8px] bg-semantic-error-tint px-3 py-2 text-[14px] font-sans text-semantic-error"
         >
           {error}
         </p>
@@ -107,7 +107,7 @@ export function ResumeUploadForm() {
       <button
         type="submit"
         disabled={loading}
-        className="inline-flex h-10 w-fit items-center justify-center rounded-md bg-black px-5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+        className="inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-[16px] tracking-[0.2px] py-[14px] px-[28px] rounded-[90px] transition-colors hover:bg-primary-press disabled:opacity-60"
       >
         {loading ? "Uploading & parsing…" : "Upload resume"}
       </button>

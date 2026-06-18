@@ -57,20 +57,20 @@ export function TailorBullets({ id }: { id: string }) {
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex h-9 w-fit items-center justify-center rounded-md bg-black px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+          className="inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-[16px] tracking-[0.2px] py-[10px] px-[20px] rounded-[90px] transition-colors hover:bg-primary-press disabled:opacity-60"
         >
           {loading ? "Tailoring…" : "Tailor bullets"}
         </button>
       </form>
 
       {error && (
-        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+        <p role="alert" className="text-[14px] font-sans text-semantic-error">
           {error}
         </p>
       )}
 
       {(output || loading) && (
-        <pre className="whitespace-pre-wrap rounded-lg border border-zinc-200 bg-white p-4 font-sans text-sm text-zinc-800 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200">
+        <pre className="whitespace-pre-wrap rounded-[12px] border border-hairline bg-canvas p-[24px] font-sans text-[16px] text-ink">
           {output}
           {loading && <span className="animate-pulse">▍</span>}
         </pre>

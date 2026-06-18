@@ -21,14 +21,14 @@ export function AnalyzeButton({
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex h-9 w-fit items-center justify-center rounded-md bg-black px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+        className="inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-[14px] tracking-[0.144px] py-[10px] px-[20px] rounded-[90px] transition-colors hover:bg-primary-press disabled:opacity-60"
       >
         {pending ? "Analyzing…" : label}
       </button>
       {state.error && (
         <p
           role="alert"
-          className="text-sm text-red-600 dark:text-red-400"
+          className="text-[14px] font-sans text-semantic-error"
         >
           {state.error}
         </p>

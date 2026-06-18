@@ -18,7 +18,7 @@ function FunnelBar({
   total: number;
 }) {
   return (
-    <div className="flex h-3 w-full gap-0.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+    <div className="flex h-3 w-full gap-0.5 overflow-hidden rounded-full bg-hairline">
       {APPLICATION_STATUSES.map((status) =>
         counts[status] > 0 ? (
           <div
@@ -51,20 +51,20 @@ function StageCard({
     <Link
       href={`/dashboard/applications?status=${status}`}
       style={{ animationDelay: `${index * 70}ms` }}
-      className="animate-rise flex flex-1 flex-col gap-2.5 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md md:min-w-0 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
+      className="animate-rise flex flex-1 flex-col gap-2.5 rounded-[12px] border border-hairline bg-canvas p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md md:min-w-0"
     >
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-2">
         <span className={`h-2 w-2 rounded-full ${color.dot}`} />
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+        <span className="text-[12px] font-sans font-bold uppercase tracking-wider text-ink-mute">
           {STATUS_LABELS[status]}
         </span>
       </div>
       <span
-        className={`text-4xl font-semibold leading-none tabular-nums ${color.num}`}
+        className={`font-display-md tabular-nums ${color.num}`}
       >
         {count}
       </span>
-      <div className="mt-auto h-1.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+      <div className="mt-auto h-1.5 w-full overflow-hidden rounded-full bg-hairline">
         <div
           className={`h-full rounded-full ${color.fill}`}
           style={{ width: `${pct}%` }}
@@ -92,8 +92,8 @@ export function Pipeline({
             <StageCard status={status} count={counts[status]} max={max} index={i} />
             {i < FUNNEL.length - 1 && (
               <div
-                aria-hidden
-                className="hidden shrink-0 items-center justify-center px-1.5 text-zinc-300 md:flex dark:text-zinc-700"
+                aria-hidden="true"
+                className="hidden shrink-0 items-center justify-center px-1.5 text-ink-mute md:flex"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                   <path
@@ -113,13 +113,13 @@ export function Pipeline({
       <Link
         href="/dashboard/applications?status=REJECTED"
         style={{ animationDelay: "280ms" }}
-        className="animate-rise flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50/60 px-4 py-2.5 transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900/40 dark:hover:border-zinc-700"
+        className="animate-rise flex items-center justify-between rounded-[12px] border border-hairline bg-canvas px-4 py-3 transition-colors hover:bg-surface-hover"
       >
-        <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+        <span className="flex items-center gap-2 text-[12px] font-sans font-bold uppercase tracking-wider text-ink-mute">
           <span className={`h-2 w-2 rounded-full ${STATUS_COLORS.REJECTED.dot}`} />
           Rejected
         </span>
-        <span className="text-sm font-semibold tabular-nums text-zinc-600 dark:text-zinc-400">
+        <span className="text-[16px] font-sans font-bold tabular-nums text-ink-mute">
           {counts.REJECTED}
         </span>
       </Link>

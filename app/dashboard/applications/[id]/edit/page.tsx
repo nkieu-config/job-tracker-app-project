@@ -24,11 +24,11 @@ export default async function EditApplicationPage({
       <div>
         <Link
           href={`/dashboard/applications/${application.id}`}
-          className="text-sm text-zinc-500 hover:text-black dark:hover:text-zinc-50"
+          className="text-[14px] font-sans font-bold text-ink-mute hover:text-ink transition-colors"
         >
           ← Back
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-black dark:text-zinc-50">
+        <h1 className="mt-2 font-display-md text-ink tracking-tight">
           Edit application
         </h1>
       </div>
