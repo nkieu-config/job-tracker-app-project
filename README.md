@@ -63,6 +63,19 @@ The parts I'd want a technical interviewer to look at:
 - **Streaming end to end.** Tailored bullets and interview questions stream token-by-token — Gemini's chunk iterator is piped straight into a Route Handler `ReadableStream` → browser — so output appears in under a second.
 - **Production paper cuts, actually fixed.** Serverless connection pooling via the Neon driver adapter, a broken transitive kysely release pinned with an npm override, Prisma 7's engine removal, Next 16's `middleware` → `proxy` rename — the full list with solutions is in [docs/architecture.md](docs/architecture.md#challenges--solutions).
 
+### AI eval scorecard
+
+Real metrics from [`evals/`](evals/) (`npm run eval`), not vibes:
+
+| Suite | Metric | Result |
+| --- | --- | --- |
+| Skill matching | recall, lexical → **+ embeddings** | 86.1% → **94.4%** (**+8.3** recall lift), F1 90.5% → **95.5%** |
+| JD analysis | skill P/R/F1 · seniority acc · schema-valid | ✅ validated; full run needs paid Gemini quota |
+| Bullet tailoring | LLM-as-judge (relevance/grounding) · hallucination rate | ✅ implemented; run with paid quota |
+
+The embedding layer's **+8.3 pts of recall** is the quantified case for semantic
+matching over lexical — the kind of ablation most portfolios never run.
+
 ## Tech stack
 
 | Layer | Choice |

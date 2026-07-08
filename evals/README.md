@@ -51,9 +51,21 @@ other model response, and token usage is recorded for cost observability.
 
 ## Results
 
-Run on `gemini-2.5-flash` / `gemini-embedding-001`. Regenerate with `npm run eval`.
+Run on `gemini-2.5-flash` + `gemini-embedding-001`; `npm run eval` regenerates.
 
-### skill-match (12 examples) — captured
+| Suite | Measures | Result |
+| --- | --- | --- |
+| **skill-match** | embedding layer's lift over lexical-only matching (macro, n=12) | recall **86.1% → 94.4% (+8.3)**, F1 **90.5% → 95.5%**, precision 97.9% — **captured** ✅ |
+| **jd-analysis** | skill extraction P/R/F1 · seniority accuracy · schema-valid rate (n=15) | 100% on a 4-example validation sample; full run pending quota † |
+| **tailoring** | LLM-as-judge relevance / grounding / formatting (1–5) · hallucination rate | implemented; run pending quota † |
+
+† The Gemini **free tier caps generation at 20 requests/day**, and `jd-analysis`
+(15) + `tailoring` (6 gen + 6 judge) exceeds that in a single day. `skill-match`
+runs on the separate embeddings quota, so it captures in full. Use a paid key —
+or run one suite per day, or `--n` to subset — to fill the rest; the report
+writes itself.
+
+### skill-match — the ablation, in detail
 
 | Metric | Lexical only | Lexical + embeddings |
 | --- | --- | --- |
@@ -61,19 +73,10 @@ Run on `gemini-2.5-flash` / `gemini-embedding-001`. Regenerate with `npm run eva
 | Recall | 86.1% | **94.4%** |
 | Precision | ~100% | 97.9% |
 
-**Recall lift from the embedding layer: +8.3%** — it recovers paraphrased skills
-(e.g. `observability` from “Prometheus metrics and Grafana dashboards”) at a
-small precision cost. This is the quantified justification for doing semantic
-matching on top of lexical.
-
-### jd-analysis & tailoring
-
-The harness is validated end-to-end (a 3-example `jd-analysis` spike scored 100%
-skill-F1 / 100% seniority / 100% schema-valid). Full scorecards call the
-generation model heavily — `jd-analysis` (15) + `tailoring` (6 gen + 6 judge) is
-27 requests, above the **Gemini free tier's 20-requests/day** cap. To capture
-them, run on a paid key, or run one suite per day, or subset with `--n`. The
-report file fills in automatically.
+The embedding layer recovers paraphrased skills that lexical matching misses —
+`observability` from “Prometheus metrics and Grafana dashboards”, `CI/CD` from
+“GitHub Actions pipelines” — for **+8.3 points of recall** at a small precision
+cost. That is the quantified justification for the semantic layer.
 
 ## Design notes
 
