@@ -10,11 +10,11 @@
 ## Quick start
 
 ```bash
-# 1. Install deps (workspaces + postinstall runs prisma generate)
+# 1. Install deps (postinstall runs prisma generate)
 npm install
 
 # 2. Configure environment
-cp apps/web/.env.example apps/web/.env
+cp .env.example .env
 # Fill in DATABASE_URL, DIRECT_URL, BETTER_AUTH_SECRET, GEMINI_API_KEY, ...
 
 # 3. Apply migrations to your database
@@ -26,9 +26,9 @@ npm run dev              # http://localhost:3000
 
 ## Environment variables
 
-See [apps/web/.env.example](../apps/web/.env.example). `.env` files are gitignored.
+See [.env.example](../.env.example). `.env` files are gitignored.
 
-### Web app (`apps/web/.env`)
+### Web app (`.env`)
 
 | Variable | Notes |
 | --- | --- |
@@ -46,7 +46,7 @@ npm run dev         # Next.js dev server
 npm run build       # production build (web)
 npm run lint        # eslint
 npm run typecheck   # web app only
-npm run check       # turbo: typecheck all workspaces
+npm run check       # typecheck
 npm test            # vitest
 npm run seed        # populate the demo account (server must be running)
 ```

@@ -8,7 +8,7 @@ How the system is put together, and the reasoning behind the key decisions.
 Browser
    │
    ▼
-Next.js (apps/web) ── auth, CRUD, file upload, pgvector queries, AI
+Next.js ── auth, CRUD, file upload, pgvector queries, AI
    │                        │
    │                        ├──▶ Postgres (Neon) + Vercel Blob
    │                        │
@@ -17,31 +17,45 @@ Next.js (apps/web) ── auth, CRUD, file upload, pgvector queries, AI
 
 - **One Next.js service.** Server Actions and Route Handlers handle UI, sessions, database access, file upload, rate limiting, and the AI calls. `GEMINI_API_KEY` is read only inside `lib/ai/` (server-side) and is never sent to the browser.
 - **`lib/ai/` module.** `analyze` (structured JSON), `embeddings` (batch), and `stream` (token-by-token bullet tailoring + interview prep). The heavy Gemini logic sits behind one boundary; the rest of the app imports a thin facade (`lib/ai-client.ts`).
-- **Shared Zod schemas** in `packages/shared/` are the single source of truth for the AI contract — used both to constrain the model (schema-out) and to validate its response (validate-in).
+- **Zod schemas** in `src/lib/schemas/` are the single source of truth for the AI contract — used both to constrain the model (schema-out) and to validate its response (validate-in).
 
-## Monorepo layout
+## Project layout
 
 ```
-job-tracker/
-├── apps/
-│   ├── web/                 # @job-tracker/web — Next.js 16
-│   │   ├── src/
-│   │   │   ├── app/         # App Router (routes)
-│   │   │   ├── components/  # UI by domain (auth, applications, resumes…)
-│   │   │   ├── actions/     # Server Actions
-│   │   │   └── lib/         # Server utilities (auth, data, ai/)
-│   │   └── tests/
-├── packages/
-│   ├── db/                  # Prisma schema + migrations + generated client
-│   └── shared/              # Zod schemas, AiError, shared constants
+job-tracker/                 # a single Next.js 16 app
+├── src/
+│   ├── app/                 # App Router (routes) + Route Handlers
+│   ├── components/          # UI by domain (auth, applications, resumes…)
+│   ├── actions/             # Server Actions
+│   ├── lib/                 # Server utilities: auth, data, ai/, schemas/, errors
+│   └── generated/prisma/    # Prisma client (generated, gitignored)
+├── prisma/                  # schema + migrations
+├── evals/                   # AI evaluation harness
+├── tests/
 ├── docs/
-├── scripts/
-└── turbo.json               # Turborepo task pipeline
+└── scripts/
 ```
-
-Orchestrated with npm workspaces + Turborepo (`npm run check` typechecks every workspace through the turbo pipeline).
 
 ## Key decisions
+
+### Why this is a single app (and was briefly a monorepo)
+
+The repo went through a deliberate arc, visible in the git history:
+
+1. **Monorepo + Turborepo** — introduced when the system was two deployables
+   (Next.js + an Express AI service) that shared a validation contract. A
+   monorepo with `packages/shared` (Zod schemas) and `packages/db` (Prisma)
+   earned its place: it kept one source of truth across two apps and let
+   Turborepo cache/parallelise their tasks.
+2. **Collapsed back to a single Next.js app** — once the Express service was
+   folded in-process, `shared` and `db` had a single consumer, so the workspace
+   split, the `@job-tracker/*` package boundaries, and Turborepo were all
+   ceremony without a payoff. They were removed; schemas moved to
+   `src/lib/schemas/`, Prisma to `prisma/` + `src/generated/`.
+
+The point isn't monorepo-vs-not — it's that structure should track the shape of
+the system. Complexity was added when two services justified it and removed when
+one didn't.
 
 ### Why the AI runs in-process (and not as a separate service)
 
@@ -82,7 +96,7 @@ Resume PDFs live in a **private** Vercel Blob store and are streamed only throug
 
 | Challenge | Solution |
 | --- | --- |
-| **Prisma 7 dropped the bundled query engine** | Schema and generated client live in `packages/db/`; migrations run from the repo root via `prisma.config.ts`. |
+| **Prisma 7 dropped the bundled query engine** | Prisma schema + migrations live in `prisma/`; the client generates into `src/generated/` and is configured via `prisma.config.ts`. |
 | **Connection exhaustion in serverless** | Next.js serverless functions were exhausting Postgres connections with the standard `pg` driver (plus TLS/SNI routing issues). Switched to `@neondatabase/serverless` + `@prisma/adapter-neon`, which pool natively over HTTP/WebSocket. |
 | **Better Auth pulled a broken kysely** | kysely `0.29.2` stopped re-exporting a symbol the adapter imports; pinned to `0.28.17` via an npm `override`. |
 | **Next 16 renamed `middleware` → `proxy`** | Read the bundled Next docs and adopted the new `proxy.ts` convention — which also reinforced the decision to keep auth checks in the data layer. |

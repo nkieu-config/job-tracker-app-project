@@ -1,16 +1,12 @@
 import { config } from "dotenv";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { defineConfig } from "prisma/config";
 
-const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
-config({ path: path.join(rootDir, "apps/web/.env"), quiet: true });
+config({ path: ".env", quiet: true });
 
-// Root Prisma config — delegates to the @job-tracker/db package.
 export default defineConfig({
-  schema: "packages/db/prisma/schema.prisma",
+  schema: "prisma/schema.prisma",
   migrations: {
-    path: "packages/db/prisma/migrations",
+    path: "prisma/migrations",
   },
   datasource: {
     url: process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"],

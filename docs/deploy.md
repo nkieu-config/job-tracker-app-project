@@ -6,7 +6,7 @@ service to deploy.
 
 | Service | Host | Env file (local) |
 |---------|------|------------------|
-| Next.js app | Vercel | `apps/web/.env` |
+| Next.js app | Vercel | `.env` |
 
 `GEMINI_API_KEY` is a server-only Vercel env var — never exposed to the browser.
 
@@ -14,7 +14,7 @@ service to deploy.
 
 ## Prerequisites
 
-1. Push the monorepo to GitHub (includes `apps/web/vercel.json`).
+1. Push to GitHub (includes `vercel.json`).
 2. Neon Postgres + Vercel Blob configured.
 3. Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey).
 
@@ -22,12 +22,8 @@ service to deploy.
 
 ## Step 1 — Vercel project settings (one-time)
 
-In [Vercel project settings](https://vercel.com):
-
-1. **Root Directory** → `apps/web`
-2. Enable **Include source files outside of the Root Directory** (for `packages/shared` and `packages/db`).
-
-`apps/web/vercel.json` sets monorepo install/build commands.
+In [Vercel project settings](https://vercel.com), keep **Root Directory** at the
+repository root (default). `vercel.json` sets the install/build commands.
 
 ### Environment variables
 

@@ -14,7 +14,7 @@ loadWebEnv();
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 
-// Keep in sync with @job-tracker/shared/constants/demo
+// Keep in sync with src/lib/constants/demo
 const DEMO_EMAIL = "demo@jobtracker.app";
 const DEMO_PASSWORD = "demotracker2026";
 

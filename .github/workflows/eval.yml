@@ -27,11 +27,11 @@ jobs:
       - name: Run evals
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: npm run eval -w @job-tracker/web -- ${{ github.event.inputs.suite }}
+        run: npm run eval -- ${{ github.event.inputs.suite }}
 
       - name: Upload scorecard
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: eval-report
-          path: apps/web/evals/reports/
+          path: evals/reports/

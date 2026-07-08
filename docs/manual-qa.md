@@ -38,7 +38,7 @@ either target:
 
 ## If something fails
 
-- **An AI button errors** → check `GEMINI_API_KEY` is set (locally in `apps/web/.env`; in prod, in Vercel env vars). In production, redeploy after changing env vars.
+- **An AI button errors** → check `GEMINI_API_KEY` is set (locally in `.env`; in prod, in Vercel env vars). In production, redeploy after changing env vars.
 - **Upload or View PDF fails** → `BLOB_READ_WRITE_TOKEN` is missing; set it and
   redeploy.
 - **Hit “AI rate limit reached”** → expected after 30 AI actions/hour per user;
