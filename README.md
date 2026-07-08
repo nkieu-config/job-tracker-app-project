@@ -59,6 +59,7 @@ The parts I'd want a technical interviewer to look at:
 - **Defense-in-depth auth.** Middleware does an optimistic cookie check, but every page, Server Action, and route handler independently re-verifies the session and scopes queries by `userId` — middleware is never the only gate (see CVE-2025-29927, a Next.js middleware bypass that this design survives).
 - **The LLM is treated as untrusted input.** The JSON schema Gemini must follow is *derived from* a Zod schema, and the response is re-validated with that same schema — malformed model output becomes an explicit, recoverable error, never a crashed page.
 - **Vector search in the database, not the app.** Embeddings live in Postgres `vector(768)` columns behind an HNSW index; resume ranking is one raw-SQL cosine-distance query (`<=>`), not an application-side similarity loop.
+- **The AI is measured, not assumed.** An [evaluation harness](apps/web/evals/) scores each AI feature with real metrics — precision/recall/F1 on JD skill extraction, an ablation proving the embedding layer lifts skill-match recall **+8.3%** over lexical-only, and an LLM-as-judge pass (relevance/grounding + hallucination rate) on tailored bullets. `npm run eval` regenerates the scorecard.
 - **Streaming end to end.** Tailored bullets and interview questions stream token-by-token — Gemini's chunk iterator is piped straight into a Route Handler `ReadableStream` → browser — so output appears in under a second.
 - **Production paper cuts, actually fixed.** Serverless connection pooling via the Neon driver adapter, a broken transitive kysely release pinned with an npm override, Prisma 7's engine removal, Next 16's `middleware` → `proxy` rename — the full list with solutions is in [docs/architecture.md](docs/architecture.md#challenges--solutions).
 
@@ -72,7 +73,7 @@ The parts I'd want a technical interviewer to look at:
 | Auth | Better Auth (sessions in Postgres) |
 | UI | Tailwind CSS v4, semantic design tokens ([design system](docs/DESIGN.md)) |
 | Storage | Vercel Blob (private) |
-| Quality | Zod validation end-to-end · Vitest + Testing Library · GitHub Actions CI |
+| Quality | Zod validation end-to-end · Vitest + Testing Library · AI eval harness · GitHub Actions CI |
 | Infra | npm workspaces + Turborepo · Vercel |
 
 ## Architecture at a glance
@@ -106,6 +107,7 @@ Full environment-variable reference, scripts, and demo seeding: **[docs/setup.md
 | [docs/setup.md](docs/setup.md) | Local setup, env vars, scripts, demo account |
 | [docs/deploy.md](docs/deploy.md) | Step-by-step deploy: Neon → Vercel |
 | [docs/manual-qa.md](docs/manual-qa.md) | 14-step click-through smoke test |
+| [apps/web/evals/](apps/web/evals/) | AI evaluation harness — methodology + scorecard |
 | [docs/DESIGN.md](docs/DESIGN.md) | Design system: tokens, typography, components |
 
 ## About me

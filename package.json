@@ -15,6 +15,7 @@
     "check": "turbo run typecheck",
     "test": "turbo run test",
     "test:watch": "npm run test:watch -w @job-tracker/web",
+    "eval": "npm run eval -w @job-tracker/web",
     "seed": "node scripts/seed.mjs",
     "generate": "turbo run generate",
     "postinstall": "npm run generate -w @job-tracker/db",

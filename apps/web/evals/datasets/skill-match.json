@@ -1,0 +1,74 @@
+[
+  {
+    "id": "sm-exact-stack",
+    "requiredSkills": ["React", "TypeScript", "PostgreSQL"],
+    "resumeText": "Frontend engineer with 4 years building web apps. Shipped a customer portal in React and TypeScript, backed by a PostgreSQL database. Wrote unit tests and reviewed pull requests.",
+    "expectedMatched": ["React", "TypeScript", "PostgreSQL"]
+  },
+  {
+    "id": "sm-cicd-paraphrase",
+    "requiredSkills": ["React", "CI/CD", "Docker"],
+    "resumeText": "Built and maintained UIs in React. Set up GitHub Actions pipelines that automatically test and deploy the app on every merge. Containerised services with Docker for local development.",
+    "expectedMatched": ["React", "CI/CD", "Docker"]
+  },
+  {
+    "id": "sm-rest-paraphrase",
+    "requiredSkills": ["Node.js", "REST APIs", "MongoDB"],
+    "resumeText": "Backend developer. Wrote Node.js services exposing RESTful web endpoints consumed by mobile clients. Stored documents in MongoDB and tuned queries.",
+    "expectedMatched": ["Node.js", "REST APIs", "MongoDB"]
+  },
+  {
+    "id": "sm-ml-paraphrase",
+    "requiredSkills": ["Python", "machine learning", "AWS"],
+    "resumeText": "Data scientist proficient in Python. Trained and evaluated deep learning models for image classification and deployed them on Amazon Web Services using SageMaker.",
+    "expectedMatched": ["Python", "machine learning", "AWS"]
+  },
+  {
+    "id": "sm-partial-miss",
+    "requiredSkills": ["Go", "Kubernetes", "Rust"],
+    "resumeText": "Platform engineer. Wrote microservices in Go and deployed them to a Kubernetes cluster. Owned Helm charts and cluster upgrades.",
+    "expectedMatched": ["Go", "Kubernetes"]
+  },
+  {
+    "id": "sm-k8s-alias",
+    "requiredSkills": ["Docker", "Kubernetes", "Terraform"],
+    "resumeText": "DevOps engineer. Packaged apps with Docker, orchestrated them with k8s, and managed cloud infra as code using Terraform.",
+    "expectedMatched": ["Docker", "Kubernetes", "Terraform"]
+  },
+  {
+    "id": "sm-all-present-exact",
+    "requiredSkills": ["Java", "Spring Boot", "SQL"],
+    "resumeText": "Software engineer with 5 years in Java. Built REST services with Spring Boot and wrote complex SQL queries against a relational database.",
+    "expectedMatched": ["Java", "Spring Boot", "SQL"]
+  },
+  {
+    "id": "sm-frontend-paraphrase",
+    "requiredSkills": ["Vue", "accessibility", "GraphQL"],
+    "resumeText": "Frontend developer specialising in Vue. Made sure every screen met WCAG standards and was usable with a screen reader. Fetched data through a GraphQL API.",
+    "expectedMatched": ["Vue", "accessibility", "GraphQL"]
+  },
+  {
+    "id": "sm-none-match",
+    "requiredSkills": ["Swift", "SwiftUI", "Objective-C"],
+    "resumeText": "Backend engineer focused on distributed systems in Go and Python. No mobile development experience.",
+    "expectedMatched": []
+  },
+  {
+    "id": "sm-mixed",
+    "requiredSkills": ["TypeScript", "Next.js", "Prisma", "Redis"],
+    "resumeText": "Full-stack engineer. Built a Next.js app in TypeScript, modelled the database with Prisma, and cached hot paths in an in-memory store. No Redis specifically but used Memcached.",
+    "expectedMatched": ["TypeScript", "Next.js", "Prisma"]
+  },
+  {
+    "id": "sm-observability-paraphrase",
+    "requiredSkills": ["Linux", "observability", "Python"],
+    "resumeText": "SRE with strong Linux fundamentals. Instrumented services with Prometheus metrics and Grafana dashboards to monitor latency and errors. Automated runbooks in Python.",
+    "expectedMatched": ["Linux", "observability", "Python"]
+  },
+  {
+    "id": "sm-data-paraphrase",
+    "requiredSkills": ["SQL", "ETL", "Airflow"],
+    "resumeText": "Data engineer. Wrote SQL transformations and built data pipelines that extract, transform, and load records nightly, orchestrated with Apache Airflow.",
+    "expectedMatched": ["SQL", "ETL", "Airflow"]
+  }
+]

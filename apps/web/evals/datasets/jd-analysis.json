@@ -1,0 +1,137 @@
+[
+  {
+    "id": "jd-fe-mid",
+    "jobDescription": "We're hiring a Frontend Engineer to build our customer dashboard. You'll ship features in React and TypeScript, style with Tailwind CSS, and consume REST APIs. 3+ years of professional frontend experience required. Experience with Next.js and testing (Jest or Vitest) is a plus.",
+    "expected": {
+      "seniority": "mid",
+      "requiredSkills": ["React", "TypeScript", "Tailwind CSS", "REST APIs"],
+      "niceToHave": ["Next.js", "Jest", "Vitest"]
+    }
+  },
+  {
+    "id": "jd-be-senior",
+    "jobDescription": "Senior Backend Engineer wanted to own our payments platform. Must have deep experience with Node.js, PostgreSQL, and designing REST APIs at scale. You will lead technical design and mentor mid-level engineers. Kubernetes and Kafka experience preferred.",
+    "expected": {
+      "seniority": "senior",
+      "requiredSkills": ["Node.js", "PostgreSQL", "REST APIs"],
+      "niceToHave": ["Kubernetes", "Kafka"]
+    }
+  },
+  {
+    "id": "jd-fullstack-mid",
+    "jobDescription": "Full-stack Developer (mid-level) to work across our web app. Day to day you'll write TypeScript on both ends, build UIs in React, and model data in PostgreSQL with Prisma. Familiarity with AWS and Docker is nice to have.",
+    "expected": {
+      "seniority": "mid",
+      "requiredSkills": ["TypeScript", "React", "PostgreSQL", "Prisma"],
+      "niceToHave": ["AWS", "Docker"]
+    }
+  },
+  {
+    "id": "jd-data-senior",
+    "jobDescription": "We are looking for a Senior Data Engineer to build our analytics pipelines. Strong Python and SQL are required, along with hands-on experience with Apache Spark and Airflow. You'll own data quality and lead the roadmap. Snowflake experience a bonus.",
+    "expected": {
+      "seniority": "senior",
+      "requiredSkills": ["Python", "SQL", "Apache Spark", "Airflow"],
+      "niceToHave": ["Snowflake"]
+    }
+  },
+  {
+    "id": "jd-devops-mid",
+    "jobDescription": "DevOps Engineer to manage our cloud infrastructure. Required: strong Linux, Docker, Kubernetes, and Terraform. You will build CI/CD pipelines and monitor production. Experience with AWS and Prometheus is preferred.",
+    "expected": {
+      "seniority": "mid",
+      "requiredSkills": ["Linux", "Docker", "Kubernetes", "Terraform", "CI/CD"],
+      "niceToHave": ["AWS", "Prometheus"]
+    }
+  },
+  {
+    "id": "jd-mobile-junior",
+    "jobDescription": "Junior Mobile Developer to help build our iOS app. You should know Swift and be comfortable with UIKit or SwiftUI. This is an early-career role; we provide mentorship. Any exposure to REST APIs is a plus.",
+    "expected": {
+      "seniority": "junior",
+      "requiredSkills": ["Swift", "SwiftUI", "UIKit"],
+      "niceToHave": ["REST APIs"]
+    }
+  },
+  {
+    "id": "jd-ml-senior",
+    "jobDescription": "Senior Machine Learning Engineer to take models to production. Required: strong Python, PyTorch, and experience deploying models as services. Familiarity with vector databases and RAG pipelines is highly desirable.",
+    "expected": {
+      "seniority": "senior",
+      "requiredSkills": ["Python", "PyTorch", "Machine Learning"],
+      "niceToHave": ["vector databases", "RAG"]
+    }
+  },
+  {
+    "id": "jd-intern-swe",
+    "jobDescription": "Software Engineering Intern for our summer program. We're looking for students with a foundation in Java or Python and basic knowledge of data structures and algorithms. No professional experience required.",
+    "expected": {
+      "seniority": "intern",
+      "requiredSkills": ["Java", "Python", "data structures", "algorithms"],
+      "niceToHave": []
+    }
+  },
+  {
+    "id": "jd-lead-platform",
+    "jobDescription": "Engineering Lead for our Platform team. You will set technical direction, lead a team of 6, and remain hands-on in Go and gRPC. Deep experience with distributed systems and Kubernetes is required. You define architecture and own delivery.",
+    "expected": {
+      "seniority": "lead",
+      "requiredSkills": ["Go", "gRPC", "distributed systems", "Kubernetes"],
+      "niceToHave": []
+    }
+  },
+  {
+    "id": "jd-fe-senior-vue",
+    "jobDescription": "Senior Frontend Engineer (Vue). Own the frontend architecture of our SaaS product built with Vue and TypeScript. Strong CSS and accessibility (WCAG) knowledge required. GraphQL experience is a plus.",
+    "expected": {
+      "seniority": "senior",
+      "requiredSkills": ["Vue", "TypeScript", "CSS", "accessibility"],
+      "niceToHave": ["GraphQL"]
+    }
+  },
+  {
+    "id": "jd-be-junior-python",
+    "jobDescription": "Junior Backend Developer to join our API team. You'll write Python with FastAPI, work with PostgreSQL, and learn from senior engineers. 0-2 years experience. Docker knowledge is a nice bonus.",
+    "expected": {
+      "seniority": "junior",
+      "requiredSkills": ["Python", "FastAPI", "PostgreSQL"],
+      "niceToHave": ["Docker"]
+    }
+  },
+  {
+    "id": "jd-vague-generalist",
+    "jobDescription": "Join our fast-growing startup as a Software Engineer! We move fast and wear many hats. You'll work on our product and help customers succeed. Great communication skills and a passion for building are what matter most.",
+    "expected": {
+      "seniority": "unknown",
+      "requiredSkills": [],
+      "niceToHave": []
+    }
+  },
+  {
+    "id": "jd-sre-senior",
+    "jobDescription": "Site Reliability Engineer (senior). Keep our services up and fast. Required: strong Linux, Kubernetes, and observability tooling (Prometheus, Grafana). You'll write automation in Python or Go and own on-call. Terraform experience preferred.",
+    "expected": {
+      "seniority": "senior",
+      "requiredSkills": ["Linux", "Kubernetes", "Prometheus", "Grafana", "Python", "Go"],
+      "niceToHave": ["Terraform"]
+    }
+  },
+  {
+    "id": "jd-fullstack-senior-next",
+    "jobDescription": "Senior Full-stack Engineer to lead feature development on our Next.js application. Must be expert in TypeScript, React, and Node.js, and comfortable with SQL databases. Experience with Vercel and serverless is a plus.",
+    "expected": {
+      "seniority": "senior",
+      "requiredSkills": ["Next.js", "TypeScript", "React", "Node.js", "SQL"],
+      "niceToHave": ["Vercel", "serverless"]
+    }
+  },
+  {
+    "id": "jd-android-mid",
+    "jobDescription": "Android Engineer (mid-level) to build features for our consumer app. Required: Kotlin, Android SDK, and experience with Jetpack Compose. You should understand REST APIs and app architecture patterns like MVVM. Firebase experience is nice to have.",
+    "expected": {
+      "seniority": "mid",
+      "requiredSkills": ["Kotlin", "Android SDK", "Jetpack Compose", "REST APIs", "MVVM"],
+      "niceToHave": ["Firebase"]
+    }
+  }
+]

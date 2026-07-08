@@ -1,0 +1,32 @@
+[
+  {
+    "id": "tl-backend",
+    "jobDescription": "Backend Engineer. Build scalable REST APIs in Node.js and PostgreSQL. Care about performance, testing, and clean code. Experience with caching and message queues a plus.",
+    "experience": "Worked on a food delivery app's backend. Built the order service with Node and a Postgres database. Added Redis caching that made the menu endpoint much faster. Wrote integration tests."
+  },
+  {
+    "id": "tl-frontend",
+    "jobDescription": "Frontend Engineer. Build accessible, performant UIs in React and TypeScript. Collaborate with designers and ship features end to end.",
+    "experience": "I built the checkout flow for an e-commerce site using React and TypeScript. Improved Lighthouse performance score from 60 to 95 by lazy-loading and code-splitting. Made the forms keyboard-accessible."
+  },
+  {
+    "id": "tl-data",
+    "jobDescription": "Data Engineer. Build reliable data pipelines with Python and SQL. Own data quality and work with Airflow.",
+    "experience": "Built a nightly ETL pipeline in Python that pulled data from third-party APIs, cleaned it, and loaded it into a warehouse. Used Airflow to schedule it and added data validation checks that caught bad records."
+  },
+  {
+    "id": "tl-devops",
+    "jobDescription": "DevOps Engineer. Manage Kubernetes infrastructure and CI/CD. Automate everything.",
+    "experience": "Migrated our deployment from manual scripts to a Kubernetes setup. Wrote GitHub Actions workflows for CI/CD that cut deploy time from 30 minutes to 5. Set up monitoring with Prometheus."
+  },
+  {
+    "id": "tl-fullstack",
+    "jobDescription": "Full-stack Engineer. Work across a Next.js app with TypeScript, from UI to database. Ship features fast.",
+    "experience": "Led a project to add a dashboard to our Next.js product. Built the UI, the API routes, and the Prisma database models. Shipped it in three weeks and it's now used by 2,000 customers daily."
+  },
+  {
+    "id": "tl-sparse",
+    "jobDescription": "Senior Software Engineer. Strong CS fundamentals, systems design, and a track record of shipping.",
+    "experience": "Built a URL shortener as a side project. It uses a hash function to generate short codes and stores mappings in a database."
+  }
+]

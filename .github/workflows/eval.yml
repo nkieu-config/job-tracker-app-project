@@ -1,0 +1,37 @@
+name: AI Eval
+
+# Manual only — evals call the real Gemini API (cost + quota), so they are not
+# part of the push/PR CI. Run from the Actions tab; the scorecard is uploaded
+# as an artifact. Requires a GEMINI_API_KEY repository secret.
+on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: "Suite to run (all | jd-analysis | skill-match | tailoring)"
+        required: false
+        default: "skill-match"
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Run evals
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: npm run eval -w @job-tracker/web -- ${{ github.event.inputs.suite }}
+
+      - name: Upload scorecard
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: apps/web/evals/reports/
