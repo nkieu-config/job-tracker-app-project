@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireSession } from "@/lib/get-session";
+import { requireSession } from "@/server/get-session";
 import { formatDate } from "@/lib/format";
-import { getApplication } from "@/lib/data/applications";
+import { getApplication } from "@/server/data/applications";
 import { ApplicationForm } from "@/components/applications/application-form";
 import { updateApplication } from "@/actions/applications";
 
@@ -24,7 +24,7 @@ export default async function EditApplicationPage({
       <div>
         <Link
           href={`/dashboard/applications/${application.id}`}
-          className="text-[14px] font-sans font-bold text-ink-mute hover:text-ink transition-colors"
+          className="text-body font-sans font-bold text-ink-mute hover:text-ink transition-colors"
         >
           ← Back
         </Link>

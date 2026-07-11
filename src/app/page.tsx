@@ -79,13 +79,13 @@ export default function Home() {
         <div className="flex items-center gap-4">
           <Link
             href="/sign-in"
-            className="hidden sm:inline-flex items-center justify-center font-sans font-bold text-[16px] text-ink hover:text-primary transition-colors"
+            className="hidden sm:inline-flex items-center justify-center font-sans font-bold text-body-lg text-ink hover:text-primary transition-colors"
           >
             Sign in
           </Link>
           <Link
             href="/sign-up"
-            className="inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-[14px] sm:text-[16px] tracking-[0.2px] py-2.5 px-5 sm:py-3.5 sm:px-7 rounded-pill transition-colors hover:bg-primary-press whitespace-nowrap"
+            className="inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-body sm:text-body-lg tracking-[0.2px] py-2.5 px-5 sm:py-3.5 sm:px-7 rounded-pill transition-colors hover:bg-primary-press whitespace-nowrap"
           >
             Try For Free
           </Link>
@@ -98,20 +98,20 @@ export default function Home() {
             <h1 className="font-display-xxl text-ink mb-6 max-w-4xl">
               Track your applications.<br />Land your dream job.
             </h1>
-            <p className="font-sans text-[18px] text-ink max-w-2xl leading-[1.55] mb-10">
+            <p className="font-sans text-title text-ink max-w-2xl leading-[1.55] mb-10">
               Drag your pipeline forward on a kanban board while AI analyzes job
               descriptions, scores your resumes, and preps you for the interview.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <Link
                 href="/sign-up"
-                className="w-full sm:w-auto inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-[16px] sm:text-[18px] py-3.5 sm:py-4.5 px-6 sm:px-9 rounded-pill shadow-[0_5px_20px_rgba(0,0,0,0.1)] transition-transform hover:scale-105 whitespace-nowrap"
+                className="w-full sm:w-auto inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-body-lg sm:text-title py-3.5 sm:py-4.5 px-6 sm:px-9 rounded-pill shadow-[0_5px_20px_rgba(0,0,0,0.1)] transition-transform hover:scale-105 whitespace-nowrap"
               >
                 Get started for free
               </Link>
               <DemoButton
                 label="Try Live Demo"
-                className="w-full sm:w-auto inline-flex items-center justify-center bg-canvas-lavender text-primary border-2 border-primary font-sans font-bold text-[16px] sm:text-[18px] py-3 sm:py-4 px-6 sm:px-9 rounded-pill transition-transform hover:scale-105 whitespace-nowrap"
+                className="w-full sm:w-auto inline-flex items-center justify-center bg-canvas-lavender text-primary border-2 border-primary font-sans font-bold text-body-lg sm:text-title py-3 sm:py-4 px-6 sm:px-9 rounded-pill transition-transform hover:scale-105 whitespace-nowrap"
               />
             </div>
           </div>
@@ -124,18 +124,18 @@ export default function Home() {
             </div>
             <div className="flex gap-6 bg-canvas p-4 text-left md:p-8">
               <div className="hidden md:flex w-44 shrink-0 flex-col gap-2 border-r border-hairline pr-6">
-                <div className="flex items-center gap-3 px-3 py-2 rounded-md text-ink-mute text-[14px] font-medium">
+                <div className="flex items-center gap-3 px-3 py-2 rounded-md text-ink-mute text-body font-medium">
                   <LayoutDashboard size={16} aria-hidden="true" /> Overview
                 </div>
-                <div className="flex items-center gap-3 px-3 py-2 rounded-md bg-canvas-lavender text-primary font-bold text-[14px]">
+                <div className="flex items-center gap-3 px-3 py-2 rounded-md bg-canvas-lavender text-primary font-bold text-body">
                   <Briefcase size={16} aria-hidden="true" /> Applications
                 </div>
-                <div className="flex items-center gap-3 px-3 py-2 text-ink-mute text-[14px] font-medium">
+                <div className="flex items-center gap-3 px-3 py-2 text-ink-mute text-body font-medium">
                   <FileText size={16} aria-hidden="true" /> Resumes
                 </div>
               </div>
               <div className="flex min-w-0 flex-1 flex-col gap-4">
-                <h2 className="font-display-md text-[24px] text-ink">Applications</h2>
+                <h2 className="font-display-sm text-ink">Applications</h2>
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                   {MOCK_COLUMNS.map((column) => (
                     <div key={column.label} className="flex flex-col gap-2">
@@ -144,7 +144,7 @@ export default function Home() {
                           className={`h-2 w-2 rounded-full ${column.dot}`}
                           aria-hidden="true"
                         />
-                        <span className="text-[12px] font-bold uppercase tracking-wider text-ink-mute">
+                        <span className="text-fine font-bold uppercase tracking-wider text-ink-mute">
                           {column.label}
                         </span>
                       </div>
@@ -158,10 +158,10 @@ export default function Home() {
                                 : ""
                             }`}
                           >
-                            <p className="truncate text-[12px] font-bold text-ink">
+                            <p className="truncate text-fine font-bold text-ink">
                               {card.role}
                             </p>
-                            <p className="truncate text-[11px] text-ink-mute">
+                            <p className="truncate text-fine text-ink-mute">
                               {card.company}
                             </p>
                           </div>
@@ -181,7 +181,7 @@ export default function Home() {
               <h2 className="font-display-lg text-ink">
                 Your job hunt, with an AI copilot
               </h2>
-              <p className="mt-4 font-sans text-[18px] leading-[1.55] text-ink-mute">
+              <p className="mt-4 font-sans text-title leading-[1.55] text-ink-mute">
                 Four AI features built on Gemini and pgvector do the tedious
                 parts, so you can focus on interviews.
               </p>
@@ -195,10 +195,10 @@ export default function Home() {
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-on-primary">
                     <feature.icon size={22} aria-hidden="true" />
                   </span>
-                  <h3 className="font-sans text-[18px] font-bold text-ink">
+                  <h3 className="font-sans text-title font-bold text-ink">
                     {feature.title}
                   </h3>
-                  <p className="font-sans text-[15px] leading-relaxed text-ink-mute">
+                  <p className="font-sans text-body-lg leading-relaxed text-ink-mute">
                     {feature.body}
                   </p>
                 </div>
@@ -214,7 +214,7 @@ export default function Home() {
         </h2>
         <Link
             href="/sign-up"
-            className="inline-flex items-center justify-center bg-canvas text-primary font-sans font-bold text-[16px] sm:text-[18px] py-3.5 sm:py-4.5 px-8 sm:px-12 rounded-pill shadow-lg transition-transform hover:scale-105 whitespace-nowrap"
+            className="inline-flex items-center justify-center bg-canvas text-primary font-sans font-bold text-body-lg sm:text-title py-3.5 sm:py-4.5 px-8 sm:px-12 rounded-pill shadow-lg transition-transform hover:scale-105 whitespace-nowrap"
           >
             Start tracking now
           </Link>

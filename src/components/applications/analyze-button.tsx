@@ -28,7 +28,7 @@ export function AnalyzeButton({
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-sans font-bold text-[14px] tracking-[0.144px] py-2.5 px-5 rounded-pill transition-colors hover:bg-primary-press disabled:opacity-60"
+        className="inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-sans font-bold text-body tracking-[0.144px] py-2.5 px-5 rounded-pill transition-colors hover:bg-primary-press disabled:opacity-60"
       >
         <Sparkles size={16} aria-hidden="true" />
         {pending ? "Analyzing…" : label}
@@ -36,7 +36,7 @@ export function AnalyzeButton({
       {state.error && (
         <p
           role="alert"
-          className="text-[14px] font-sans text-semantic-error"
+          className="text-body font-sans text-semantic-error"
         >
           {state.error}
         </p>

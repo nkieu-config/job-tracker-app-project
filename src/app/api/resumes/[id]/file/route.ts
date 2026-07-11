@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { get } from "@vercel/blob";
-import { getSession } from "@/lib/get-session";
-import { getResumeVersion } from "@/lib/data/resumes";
+import { getSession } from "@/server/get-session";
+import { getResumeFileUrl } from "@/server/data/resumes";
 import { ACCEPTED_RESUME_TYPE } from "@/lib/schemas/resume";
 
 // Streams a private resume PDF. The blob store is private, so its URL isn't
@@ -17,7 +17,7 @@ export async function GET(
   }
 
   const { id } = await params;
-  const resume = await getResumeVersion(id, session.user.id);
+  const resume = await getResumeFileUrl(id, session.user.id);
   if (!resume || !resume.fileUrl) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

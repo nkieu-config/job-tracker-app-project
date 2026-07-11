@@ -3,17 +3,33 @@
 import { useState, useTransition } from "react";
 import { deleteApplication } from "@/actions/applications";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useToast } from "@/components/ui/toast";
 
 export function DeleteApplicationButton({ id }: { id: string }) {
+  const toast = useToast();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+
+  function confirmDelete() {
+    startTransition(async () => {
+      try {
+        await deleteApplication(id);
+      } catch {
+        // Without this the rejection escapes the transition and takes the whole
+        // route to the error boundary. A successful delete redirects instead of
+        // resolving here, so reaching this line always means the call failed.
+        setOpen(false);
+        toast("Couldn't delete the application. Please try again.", "error");
+      }
+    });
+  }
 
   return (
     <>
       <button
         onClick={() => setOpen(true)}
         disabled={pending}
-        className="inline-flex items-center justify-center bg-semantic-error-tint text-semantic-error font-sans font-bold text-[14px] tracking-[0.144px] py-2.5 px-5 rounded-pill transition-colors hover:bg-semantic-error-hover disabled:opacity-60"
+        className="inline-flex items-center justify-center bg-semantic-error-tint text-semantic-error font-sans font-bold text-body tracking-[0.144px] py-2.5 px-5 rounded-pill transition-colors hover:bg-semantic-error-hover disabled:opacity-60"
       >
         {pending ? "Deleting…" : "Delete"}
       </button>
@@ -24,7 +40,7 @@ export function DeleteApplicationButton({ id }: { id: string }) {
         confirmLabel="Delete"
         pending={pending}
         onCancel={() => setOpen(false)}
-        onConfirm={() => startTransition(() => deleteApplication(id))}
+        onConfirm={confirmDelete}
       />
     </>
   );

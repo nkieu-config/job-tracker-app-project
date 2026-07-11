@@ -1,12 +1,12 @@
-import { getSession } from "@/lib/get-session";
-import { prisma } from "@/lib/prisma";
-import { interviewPrepStream } from "@/lib/ai-client";
-import { checkAiRateLimit } from "@/lib/rate-limit";
+import { getSession } from "@/server/get-session";
+import { prisma } from "@/server/prisma";
+import { interviewPrepStream } from "@/server/ai-client";
+import { checkAiRateLimit } from "@/server/rate-limit";
 
 export const maxDuration = 30;
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await getSession();
@@ -17,6 +17,7 @@ export async function POST(
   const { id } = await params;
   const application = await prisma.application.findFirst({
     where: { id, userId: session.user.id },
+    select: { jobDescription: true, role: true },
   });
   if (!application) {
     return new Response("Not found", { status: 404 });
@@ -34,6 +35,8 @@ export async function POST(
   const aiRes = await interviewPrepStream(
     application.jobDescription,
     application.role,
+    request.signal,
+    session.user.id,
   );
 
   if (!aiRes.ok || !aiRes.body) {

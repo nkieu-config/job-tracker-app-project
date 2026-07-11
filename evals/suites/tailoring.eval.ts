@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { tailorBulletsStream } from "@/lib/ai/stream";
+import { tailorBulletsStream } from "@/server/ai/stream";
 import { judgeBullets } from "../lib/judge";
 import { paceGenerate } from "../lib/pace";
 import { mean, percentile } from "../lib/metrics";

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getSession } from "@/lib/get-session";
+import { getSession } from "@/server/get-session";
+import { isAdminEmail } from "@/server/admin";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 
@@ -15,6 +16,7 @@ export default async function DashboardLayout({
   if (!session) {
     redirect("/sign-in");
   }
+  const isAdmin = isAdminEmail(session.user.email);
 
   return (
     <div className="flex flex-1 bg-canvas-lavender font-sans">
@@ -31,11 +33,11 @@ export default async function DashboardLayout({
             </span>
           </Link>
           <nav aria-label="Main">
-            <DashboardNav orientation="vertical" />
+            <DashboardNav orientation="vertical" isAdmin={isAdmin} />
           </nav>
         </div>
         <div className="flex flex-col gap-3 border-t border-hairline pt-4">
-          <span className="truncate px-2 text-[13px] text-ink-mute">
+          <span className="truncate px-2 text-caption text-ink-mute">
             {session.user.email}
           </span>
           <SignOutButton />
@@ -52,7 +54,7 @@ export default async function DashboardLayout({
             </div>
           </Link>
           <nav aria-label="Main" className="min-w-0">
-            <DashboardNav orientation="horizontal" />
+            <DashboardNav orientation="horizontal" isAdmin={isAdmin} />
           </nav>
           <SignOutButton />
         </header>

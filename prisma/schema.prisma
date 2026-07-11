@@ -99,6 +99,8 @@ model Application {
   analysis       Json?
   analyzedAt     DateTime?
   jdEmbedding    Unsupported("vector(768)")?
+  jdEmbeddingHash String?
+  jdEmbeddingModel String?
   tailoredExperience String?
   tailoredBullets    String?
   tailoredAt         DateTime?
@@ -107,7 +109,6 @@ model Application {
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
 
-  @@index([userId])
   @@index([userId, status])
   @@map("application")
 }
@@ -117,6 +118,7 @@ model RateLimit {
   count     Int
   expiresAt DateTime
 
+  @@index([expiresAt])
   @@map("rate_limit")
 }
 
@@ -128,6 +130,7 @@ model ResumeVersion {
   fileUrl   String?
   content   String?
   embedding Unsupported("vector(768)")?
+  embeddingModel String?
   createdAt DateTime @default(now())
 
   @@index([userId])
@@ -136,6 +139,7 @@ model ResumeVersion {
 
 model AiUsage {
   id           String   @id @default(cuid())
+  userId       String?
   feature      String
   model        String
   promptTokens Int      @default(0)
@@ -147,5 +151,6 @@ model AiUsage {
 
   @@index([createdAt])
   @@index([feature])
+  @@index([userId])
   @@map("ai_usage")
 }

@@ -18,6 +18,16 @@ export const STATUS_LABELS: Record<ApplicationStatus, string> = {
   REJECTED: "Rejected",
 };
 
+export const APPLICATION_SORTS = ["newest", "deadline", "company"] as const;
+
+export type ApplicationSort = (typeof APPLICATION_SORTS)[number];
+
+export const SORT_LABELS: Record<ApplicationSort, string> = {
+  newest: "Newest first",
+  deadline: "Deadline (soonest)",
+  company: "Company (A–Z)",
+};
+
 const emptyToNull = (v: unknown) =>
   typeof v === "string" && v.trim() === "" ? null : v;
 
@@ -27,7 +37,10 @@ export const applicationInputSchema = z.object({
   status: z.enum(APPLICATION_STATUSES),
   jobUrl: z.preprocess(
     emptyToNull,
-    z.url("Enter a valid URL").max(2000).nullable(),
+    z
+      .url({ protocol: /^https?$/, error: "Enter a valid http(s) URL" })
+      .max(2000)
+      .nullable(),
   ),
   jobDescription: z.preprocess(
     emptyToNull,

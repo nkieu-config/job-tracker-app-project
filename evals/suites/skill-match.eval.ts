@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { matchSkills } from "@/lib/skills";
-import { matchSkillsSemantic } from "@/lib/semantic-skills";
+import { matchSkillsSemantic } from "@/server/semantic-skills";
 import { skillPRF1, macroAverage, mean, percentile } from "../lib/metrics";
 import type { SuiteResult, RunOptions, ItemResult } from "../lib/types";
 

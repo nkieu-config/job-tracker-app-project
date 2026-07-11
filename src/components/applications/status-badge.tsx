@@ -2,7 +2,7 @@ import {
   STATUS_LABELS,
   type ApplicationStatus,
 } from "@/lib/schemas/application";
-import { STATUS_COLORS } from "@/lib/status-colors";
+import { STATUS_COLORS } from "@/components/ui/status-colors";
 
 export function StatusBadge({ status }: { status: ApplicationStatus }) {
   return (

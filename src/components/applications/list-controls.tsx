@@ -1,15 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { inputClass } from "@/lib/form-styles";
-import type { ApplicationSort } from "@/lib/data/applications";
-import type { ApplicationStatus } from "@/lib/schemas/application";
-
-const SORT_OPTIONS: { value: ApplicationSort; label: string }[] = [
-  { value: "newest", label: "Newest first" },
-  { value: "deadline", label: "Deadline (soonest)" },
-  { value: "company", label: "Company (A–Z)" },
-];
+import { inputClass } from "@/components/ui/form-styles";
+import {
+  APPLICATION_SORTS,
+  SORT_LABELS,
+  type ApplicationSort,
+  type ApplicationStatus,
+} from "@/lib/schemas/application";
 
 export function ListControls({
   query,
@@ -46,19 +44,19 @@ export function ListControls({
         placeholder="Search company or role…"
         aria-label="Search applications"
         autoComplete="off"
-        className={`${inputClass} flex-1 text-[14px]`}
+        className={`${inputClass} flex-1 text-body`}
       />
-      <label className="flex items-center gap-2 font-sans text-[14px] text-ink-mute">
+      <label className="flex items-center gap-2 font-sans text-body text-ink-mute">
         Sort by
         <select
           value={sort}
           onChange={(e) => apply(query, e.target.value as ApplicationSort)}
           aria-label="Sort applications"
-          className={`${inputClass} text-[14px]`}
+          className={`${inputClass} text-body`}
         >
-          {SORT_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
+          {APPLICATION_SORTS.map((value) => (
+            <option key={value} value={value}>
+              {SORT_LABELS[value]}
             </option>
           ))}
         </select>

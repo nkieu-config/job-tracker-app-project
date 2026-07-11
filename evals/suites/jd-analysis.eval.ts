@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { analyzeJobDescription } from "@/lib/ai/analyze";
+import { analyzeJobDescription } from "@/server/ai/analyze";
 import { skillPRF1, macroAverage, accuracy, mean, percentile } from "../lib/metrics";
 import { paceGenerate } from "../lib/pace";
 import type { SuiteResult, RunOptions, ItemResult } from "../lib/types";

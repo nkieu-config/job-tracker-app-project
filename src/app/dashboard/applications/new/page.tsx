@@ -8,7 +8,7 @@ export default function NewApplicationPage() {
       <div>
         <Link
           href="/dashboard/applications"
-          className="text-[14px] font-sans font-bold text-ink-mute hover:text-ink transition-colors"
+          className="text-body font-sans font-bold text-ink-mute hover:text-ink transition-colors"
         >
           ← Applications
         </Link>

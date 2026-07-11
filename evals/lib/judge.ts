@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getGeminiClient, GENERATION_MODEL } from "@/lib/ai/gemini";
+import { getGeminiClient, GENERATION_MODEL } from "@/server/ai/gemini";
 
 // LLM-as-judge: a separate model call scores generated bullets against a
 // rubric. Temperature 0 for repeatability; output is Zod-validated like any

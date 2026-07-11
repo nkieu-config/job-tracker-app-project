@@ -1,15 +1,23 @@
+import { notFound } from "next/navigation";
 import { Activity, Sparkles } from "lucide-react";
-import { requireSession } from "@/lib/get-session";
-import { getAiUsageStats, type FeatureStat } from "@/lib/data/ai-usage";
+import { requireSession } from "@/server/get-session";
+import { isAdminEmail } from "@/server/admin";
+import { getAiUsageStats, type FeatureStat } from "@/server/data/ai-usage";
+import { AI_FEATURES, type AiFeature } from "@/server/observability";
+import { isOneOf } from "@/lib/guards";
 
 export const dynamic = "force-dynamic";
 
-const FEATURE_LABELS: Record<string, string> = {
+const FEATURE_LABELS: Record<AiFeature, string> = {
   analyze: "JD analysis",
   embed: "Embeddings",
   tailor: "Bullet tailoring",
   interview: "Interview prep",
 };
+
+function featureLabel(feature: string): string {
+  return isOneOf(AI_FEATURES, feature) ? FEATURE_LABELS[feature] : feature;
+}
 
 function fmtTokens(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -34,9 +42,9 @@ function Tile({
 }) {
   return (
     <div className="rounded-2xl border border-hairline bg-canvas p-6 shadow-sm">
-      <p className="text-[13px] font-sans font-medium text-ink-mute">{label}</p>
+      <p className="text-caption font-sans font-medium text-ink-mute">{label}</p>
       <p className="mt-2 font-display-md text-primary tabular-nums">{value}</p>
-      <p className="mt-1 text-[13px] font-sans text-ink-mute">{hint}</p>
+      <p className="mt-1 text-caption font-sans text-ink-mute">{hint}</p>
     </div>
   );
 }
@@ -46,10 +54,10 @@ function FeatureRow({ stat, maxCalls }: { stat: FeatureStat; maxCalls: number })
   return (
     <div className="flex items-center gap-4 rounded-xl border border-hairline bg-canvas px-5 py-4">
       <div className="w-40 shrink-0">
-        <p className="font-sans text-[15px] font-bold text-ink">
-          {FEATURE_LABELS[stat.feature] ?? stat.feature}
+        <p className="font-sans text-body font-bold text-ink">
+          {featureLabel(stat.feature)}
         </p>
-        <p className="font-sans text-[13px] text-ink-mute tabular-nums">
+        <p className="font-sans text-caption text-ink-mute tabular-nums">
           {stat.calls} call{stat.calls === 1 ? "" : "s"}
         </p>
       </div>
@@ -61,13 +69,13 @@ function FeatureRow({ stat, maxCalls }: { stat: FeatureStat; maxCalls: number })
           />
         </div>
       </div>
-      <div className="w-24 shrink-0 text-right font-sans text-[13px] tabular-nums text-ink-mute">
+      <div className="w-24 shrink-0 text-right font-sans text-caption tabular-nums text-ink-mute">
         {fmtTokens(stat.totalTokens)} tok
       </div>
-      <div className="w-20 shrink-0 text-right font-sans text-[13px] tabular-nums text-ink-mute">
+      <div className="w-20 shrink-0 text-right font-sans text-caption tabular-nums text-ink-mute">
         {Math.round(stat.avgLatencyMs)}ms
       </div>
-      <div className="w-20 shrink-0 text-right font-sans text-[13px] font-bold tabular-nums text-ink">
+      <div className="w-20 shrink-0 text-right font-sans text-caption font-bold tabular-nums text-ink">
         {fmtCost(stat.costUsd)}
       </div>
     </div>
@@ -75,7 +83,10 @@ function FeatureRow({ stat, maxCalls }: { stat: FeatureStat; maxCalls: number })
 }
 
 export default async function AiUsagePage() {
-  await requireSession();
+  const session = await requireSession();
+  if (!isAdminEmail(session.user.email)) {
+    notFound();
+  }
   const stats = await getAiUsageStats();
   const maxCalls = Math.max(1, ...stats.byFeature.map((f) => f.calls));
 
@@ -86,7 +97,7 @@ export default async function AiUsagePage() {
           <Activity size={26} className="text-primary" aria-hidden="true" />
           AI usage
         </h1>
-        <p className="mt-2 font-sans text-[16px] text-ink-mute">
+        <p className="mt-2 font-sans text-body-lg text-ink-mute">
           Token, latency, and estimated-cost observability across every Gemini
           call the app makes.
         </p>
@@ -95,10 +106,10 @@ export default async function AiUsagePage() {
       {stats.totalCalls === 0 ? (
         <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-hairline bg-canvas p-12 text-center shadow-sm">
           <Sparkles size={24} className="text-primary" aria-hidden="true" />
-          <p className="font-sans text-[16px] font-bold text-ink">
+          <p className="font-sans text-body-lg font-bold text-ink">
             No AI calls recorded yet
           </p>
-          <p className="font-sans text-[14px] text-ink-mute">
+          <p className="font-sans text-body text-ink-mute">
             Analyze a job description, compute a resume fit, or tailor bullets —
             each call is metered and will appear here.
           </p>
@@ -129,7 +140,7 @@ export default async function AiUsagePage() {
           </section>
 
           <section className="flex flex-col gap-3">
-            <h2 className="font-sans text-[13px] font-bold uppercase tracking-wider text-ink-mute">
+            <h2 className="font-sans text-caption font-bold uppercase tracking-wider text-ink-mute">
               By feature
             </h2>
             <div className="flex flex-col gap-2">
@@ -140,7 +151,7 @@ export default async function AiUsagePage() {
           </section>
 
           <section className="flex flex-col gap-3">
-            <h2 className="font-sans text-[13px] font-bold uppercase tracking-wider text-ink-mute">
+            <h2 className="font-sans text-caption font-bold uppercase tracking-wider text-ink-mute">
               Recent calls
             </h2>
             <ul className="flex flex-col gap-2">
@@ -154,21 +165,21 @@ export default async function AiUsagePage() {
                       className={`h-2 w-2 shrink-0 rounded-full ${call.ok ? "bg-semantic-success" : "bg-semantic-error"}`}
                       aria-hidden="true"
                     />
-                    <span className="font-sans text-[14px] font-bold text-ink">
-                      {FEATURE_LABELS[call.feature] ?? call.feature}
+                    <span className="font-sans text-body font-bold text-ink">
+                      {featureLabel(call.feature)}
                     </span>
-                    <span className="font-sans text-[13px] text-ink-mute">
+                    <span className="font-sans text-caption text-ink-mute">
                       {call.model}
                     </span>
                   </div>
-                  <div className="flex shrink-0 items-center gap-4 font-sans text-[13px] tabular-nums text-ink-mute">
+                  <div className="flex shrink-0 items-center gap-4 font-sans text-caption tabular-nums text-ink-mute">
                     <span>{fmtTokens(call.totalTokens)} tok</span>
                     <span>{Math.round(call.latencyMs)}ms</span>
                   </div>
                 </li>
               ))}
             </ul>
-            <p className="font-sans text-[13px] text-ink-mute">
+            <p className="font-sans text-caption text-ink-mute">
               Cost is estimated from token counts at the listed Gemini rates and
               is for observability only, not billing.
             </p>

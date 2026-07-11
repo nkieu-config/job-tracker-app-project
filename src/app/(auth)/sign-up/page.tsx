@@ -1,0 +1,138 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { signUp } from "@/lib/auth-client";
+import { DemoButton } from "@/components/auth/demo-button";
+import { inputClass, labelClass } from "@/components/ui/form-styles";
+
+export default function SignUpPage() {
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    try {
+      const { error } = await signUp.email({ name, email, password });
+      if (error) {
+        setError(error.message ?? "Could not create your account.");
+        setLoading(false);
+        return;
+      }
+      // Keep the button disabled through navigation so a second submit can't
+      // fire during the redirect.
+      router.push("/dashboard");
+    } catch {
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-1 items-center justify-center bg-canvas px-6 py-16">
+      <div className="w-full max-w-sm">
+        <div className="flex justify-center mb-8">
+            <Link href="/">
+              <div className="w-12 h-12 bg-primary rounded-md flex items-center justify-center">
+                <span className="text-on-primary font-bold text-2xl leading-none">J</span>
+              </div>
+            </Link>
+        </div>
+        <h1 className="font-display-md text-ink text-center tracking-tight mb-2">
+          Create your account
+        </h1>
+        <p className="text-center font-sans text-ink-mute mb-8">
+          Start tracking your job applications.
+        </p>
+
+        <form onSubmit={onSubmit} className="flex flex-col gap-5">
+          <label className={labelClass}>
+            Name
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              autoComplete="name"
+              className={inputClass}
+            />
+          </label>
+
+          <label className={labelClass}>
+            Email
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+              className={inputClass}
+            />
+          </label>
+
+          <label className={labelClass}>
+            Password
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+              autoComplete="new-password"
+              className={inputClass}
+            />
+            <span className="text-body font-normal font-sans text-ink-mute">
+              At least 8 characters.
+            </span>
+          </label>
+
+          {error && (
+            <p
+              role="alert"
+              className="rounded-md bg-canvas-error px-4 py-3 text-sm text-semantic-error font-medium"
+            >
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-2 inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-body-lg tracking-[0.2px] py-3.5 px-7 rounded-pill transition-colors hover:bg-primary-press disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {loading ? "Creating account…" : "Sign up"}
+          </button>
+        </form>
+
+        <div className="my-6 flex items-center gap-3 text-body font-sans text-ink-mute">
+          <span className="h-px flex-1 bg-hairline" />
+          or
+          <span className="h-px flex-1 bg-hairline" />
+        </div>
+
+        <DemoButton
+          onError={setError}
+          disabled={loading}
+          className="inline-flex w-full items-center justify-center bg-canvas text-primary font-sans font-bold text-body-lg tracking-[0.2px] py-3.5 px-7 rounded-pill border-2 border-primary transition-colors hover:bg-canvas-lavender disabled:opacity-60 disabled:cursor-not-allowed"
+        />
+
+        <p className="mt-8 text-center font-sans text-body text-ink-mute">
+          Already have an account?{" "}
+          <Link
+            href="/sign-in"
+            className="font-bold text-link-blue hover:text-link-hover hover:underline transition-colors"
+          >
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}

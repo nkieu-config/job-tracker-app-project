@@ -1,15 +1,13 @@
 import Link from "next/link";
-import { requireSession } from "@/lib/get-session";
+import { requireSession } from "@/server/get-session";
 import { formatDisplayDate } from "@/lib/format";
-import {
-  getApplications,
-  APPLICATION_SORTS,
-  type ApplicationSort,
-} from "@/lib/data/applications";
+import { getApplications } from "@/server/data/applications";
 import { ListControls } from "@/components/applications/list-controls";
 import {
+  APPLICATION_SORTS,
   APPLICATION_STATUSES,
   STATUS_LABELS,
+  type ApplicationSort,
   type ApplicationStatus,
 } from "@/lib/schemas/application";
 import { StatusBadge } from "@/components/applications/status-badge";
@@ -17,17 +15,14 @@ import {
   ApplicationsBoard,
   type BoardApplication,
 } from "@/components/applications/board";
+import { isOneOf } from "@/lib/guards";
 
 function parseStatus(value?: string): ApplicationStatus | undefined {
-  return APPLICATION_STATUSES.includes(value as ApplicationStatus)
-    ? (value as ApplicationStatus)
-    : undefined;
+  return isOneOf(APPLICATION_STATUSES, value) ? value : undefined;
 }
 
 function parseSort(value?: string): ApplicationSort {
-  return APPLICATION_SORTS.includes(value as ApplicationSort)
-    ? (value as ApplicationSort)
-    : "newest";
+  return isOneOf(APPLICATION_SORTS, value) ? value : "newest";
 }
 
 export default async function ApplicationsPage({
@@ -86,7 +81,7 @@ export default async function ApplicationsPage({
             <Link
               href="/dashboard/applications"
               aria-current={view === "board" ? "page" : undefined}
-              className={`rounded-pill px-4 py-1.5 font-sans text-[14px] font-bold transition-colors ${
+              className={`rounded-pill px-4 py-1.5 font-sans text-body font-bold transition-colors ${
                 view === "board"
                   ? "bg-primary text-on-primary"
                   : "text-ink hover:bg-canvas-lavender"
@@ -97,7 +92,7 @@ export default async function ApplicationsPage({
             <Link
               href="/dashboard/applications?view=list"
               aria-current={view === "list" ? "page" : undefined}
-              className={`rounded-pill px-4 py-1.5 font-sans text-[14px] font-bold transition-colors ${
+              className={`rounded-pill px-4 py-1.5 font-sans text-body font-bold transition-colors ${
                 view === "list"
                   ? "bg-primary text-on-primary"
                   : "text-ink hover:bg-canvas-lavender"
@@ -108,7 +103,7 @@ export default async function ApplicationsPage({
           </nav>
           <Link
             href="/dashboard/applications/new"
-            className="inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-[16px] tracking-[0.2px] py-2.5 px-5 rounded-pill transition-colors hover:bg-primary-press whitespace-nowrap"
+            className="inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-body-lg tracking-[0.2px] py-2.5 px-5 rounded-pill transition-colors hover:bg-primary-press whitespace-nowrap"
           >
             New application
           </Link>
@@ -117,7 +112,7 @@ export default async function ApplicationsPage({
 
       {view === "board" ? (
         applications.length === 0 ? (
-          <div className="mt-4 rounded-2xl border border-dashed border-hairline p-10 text-center text-[16px] font-sans text-ink-mute bg-canvas">
+          <div className="mt-4 rounded-2xl border border-dashed border-hairline p-10 text-center text-body-lg font-sans text-ink-mute bg-canvas">
             No applications yet.{" "}
             <Link
               href="/dashboard/applications/new"
@@ -130,7 +125,7 @@ export default async function ApplicationsPage({
         ) : (
           <div className="flex flex-col gap-2">
             <ApplicationsBoard applications={boardApplications} />
-            <p className="font-sans text-[13px] text-ink-mute">
+            <p className="font-sans text-caption text-ink-mute">
               Drag a card between columns to update its status.
             </p>
           </div>
@@ -150,7 +145,7 @@ export default async function ApplicationsPage({
                 <Link
                   key={f.label}
                   href={href}
-                  className={`rounded-pill px-4 py-2 text-[14px] font-bold font-sans transition-colors ${
+                  className={`rounded-pill px-4 py-2 text-body font-bold font-sans transition-colors ${
                     active
                       ? "bg-primary text-on-primary"
                       : "bg-canvas text-ink border border-hairline hover:bg-canvas-lavender"
@@ -163,7 +158,7 @@ export default async function ApplicationsPage({
           </div>
 
           {applications.length === 0 ? (
-            <div className="mt-4 rounded-2xl border border-dashed border-hairline p-10 text-center text-[16px] font-sans text-ink-mute bg-canvas">
+            <div className="mt-4 rounded-2xl border border-dashed border-hairline p-10 text-center text-body-lg font-sans text-ink-mute bg-canvas">
               {query ? (
                 <>No applications match “{query}”.</>
               ) : (
@@ -192,13 +187,13 @@ export default async function ApplicationsPage({
                       <p className="truncate font-sans font-bold text-ink">
                         {app.role}
                       </p>
-                      <p className="truncate font-sans text-[14px] text-ink-mute mt-1">
+                      <p className="truncate font-sans text-body text-ink-mute mt-1">
                         {app.company}
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center justify-between sm:justify-end gap-4 w-full sm:w-auto border-t sm:border-none border-hairline pt-3 sm:pt-0">
                       {app.deadline && (
-                        <span className="font-sans text-[14px] font-medium tabular-nums text-ink-mute">
+                        <span className="font-sans text-body font-medium tabular-nums text-ink-mute">
                           Due {formatDisplayDate(app.deadline)}
                         </span>
                       )}

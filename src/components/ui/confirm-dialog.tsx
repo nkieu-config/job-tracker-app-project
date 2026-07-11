@@ -37,8 +37,8 @@ export function ConfirmDialog({
       }}
       className="m-auto w-full max-w-sm rounded-2xl border border-hairline bg-canvas p-8 shadow-[0_20px_60px_rgba(74,21,75,0.15)] backdrop:bg-ink/40"
     >
-      <h2 className="font-sans text-[18px] font-bold text-ink">{title}</h2>
-      <p className="mt-2 font-sans text-[14px] leading-relaxed text-ink-mute">
+      <h2 className="font-sans text-title font-bold text-ink">{title}</h2>
+      <p className="mt-2 font-sans text-body leading-relaxed text-ink-mute">
         {description}
       </p>
       <div className="mt-6 flex justify-end gap-2">
@@ -46,7 +46,7 @@ export function ConfirmDialog({
           type="button"
           onClick={onCancel}
           disabled={pending}
-          className="inline-flex items-center justify-center rounded-pill bg-canvas px-5 py-2.5 font-sans text-[14px] font-bold text-ink border border-hairline transition-colors hover:bg-canvas-lavender disabled:opacity-60"
+          className="inline-flex items-center justify-center rounded-pill bg-canvas px-5 py-2.5 font-sans text-body font-bold text-ink border border-hairline transition-colors hover:bg-canvas-lavender disabled:opacity-60"
         >
           Cancel
         </button>
@@ -54,7 +54,7 @@ export function ConfirmDialog({
           type="button"
           onClick={onConfirm}
           disabled={pending}
-          className="inline-flex items-center justify-center rounded-pill bg-semantic-error px-5 py-2.5 font-sans text-[14px] font-bold text-on-primary transition-colors hover:opacity-90 disabled:opacity-60"
+          className="inline-flex items-center justify-center rounded-pill bg-semantic-error px-5 py-2.5 font-sans text-body font-bold text-on-primary transition-colors hover:opacity-90 disabled:opacity-60"
         >
           {pending ? "Working…" : confirmLabel}
         </button>

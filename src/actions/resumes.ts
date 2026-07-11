@@ -3,8 +3,8 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { del } from "@vercel/blob";
-import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/get-session";
+import { prisma } from "@/server/prisma";
+import { getSession } from "@/server/get-session";
 
 export async function deleteResume(id: string): Promise<void> {
   const session = await getSession();

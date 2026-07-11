@@ -3,28 +3,50 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/get-session";
+import { prisma } from "@/server/prisma";
+import { getSession } from "@/server/get-session";
 import {
   applicationInputSchema,
   applicationInputFromFormData,
   APPLICATION_STATUSES,
+  type ApplicationInput,
   type ApplicationStatus,
 } from "@/lib/schemas/application";
-import { analyzeJobDescription, embedText, AiError } from "@/lib/ai-client";
-import { matchSkillsSemantic } from "@/lib/semantic-skills";
-import { getResumeVersions } from "@/lib/data/resumes";
+import {
+  analyzeJobDescription,
+  embedText,
+  embedDocument,
+  AiError,
+} from "@/server/ai-client";
+import { EMBEDDING_MODEL } from "@/server/ai/models";
+import { sha256 } from "@/server/hash";
+import { matchSkillsSemantic } from "@/server/semantic-skills";
+import { getResumeTexts } from "@/server/data/resumes";
 import {
   saveJdEmbedding,
   saveResumeEmbedding,
   getResumesNeedingEmbedding,
-} from "@/lib/data/embeddings";
-import { checkAiRateLimit } from "@/lib/rate-limit";
+} from "@/server/data/embeddings";
+import { checkAiRateLimit } from "@/server/rate-limit";
 
-export type FormState = {
+export type FormState<T = ApplicationInput> = {
   error?: string;
-  fieldErrors?: Record<string, string[] | undefined>;
+  fieldErrors?: Partial<Record<keyof T, string[]>>;
+  values?: Partial<Record<keyof T, string>>;
 };
+
+function submittedValues(
+  formData: FormData,
+): Partial<Record<keyof ApplicationInput, string>> {
+  const values: Partial<Record<keyof ApplicationInput, string>> = {};
+  for (const key of Object.keys(applicationInputSchema.shape) as Array<
+    keyof ApplicationInput
+  >) {
+    const value = formData.get(key);
+    if (typeof value === "string") values[key] = value;
+  }
+  return values;
+}
 
 export async function createApplication(
   _prevState: FormState,
@@ -39,7 +61,10 @@ export async function createApplication(
     applicationInputFromFormData(formData),
   );
   if (!parsed.success) {
-    return { fieldErrors: z.flattenError(parsed.error).fieldErrors };
+    return {
+      fieldErrors: z.flattenError(parsed.error).fieldErrors,
+      values: submittedValues(formData),
+    };
   }
 
   const app = await prisma.application.create({
@@ -63,7 +88,10 @@ export async function updateApplication(
     applicationInputFromFormData(formData),
   );
   if (!parsed.success) {
-    return { fieldErrors: z.flattenError(parsed.error).fieldErrors };
+    return {
+      fieldErrors: z.flattenError(parsed.error).fieldErrors,
+      values: submittedValues(formData),
+    };
   }
 
   // Scope by userId so a user can't edit someone else's row.
@@ -130,30 +158,48 @@ export async function analyzeApplication(
     return { error: "AI rate limit reached. Please try again later." };
   }
 
+  // The resume read doesn't depend on the analysis, so it runs alongside the
+  // multi-second Gemini call rather than waiting behind it.
+  const resumesPromise = getResumeTexts(session.user.id);
+
   let analysis;
   try {
-    analysis = await analyzeJobDescription(application.jobDescription);
+    analysis = await analyzeJobDescription(
+      application.jobDescription,
+      session.user.id,
+    );
   } catch (err) {
+    await resumesPromise.catch(() => {});
     return {
       error: err instanceof AiError ? err.message : "Analysis failed.",
     };
   }
 
-  const resumes = await getResumeVersions(session.user.id);
+  const resumes = await resumesPromise;
   const resumeText = resumes.map((r) => r.content ?? "").join("\n");
   const storedAnalysis = resumeText.trim()
     ? {
         ...analysis,
         skillMatches: (
-          await matchSkillsSemantic(analysis.requiredSkills, resumeText)
+          await matchSkillsSemantic(
+            analysis.requiredSkills,
+            resumeText,
+            session.user.id,
+          )
         ).matched,
       }
     : analysis;
 
-  await prisma.application.updateMany({
+  // The row could have been deleted (or its JD emptied) during the multi-second
+  // Gemini call. Without this check the action reports success while nothing was
+  // stored, and the user sees a success state with no analysis.
+  const result = await prisma.application.updateMany({
     where: { id, userId: session.user.id },
     data: { analysis: storedAnalysis, analyzedAt: new Date() },
   });
+  if (result.count === 0) {
+    return { error: "Application not found." };
+  }
 
   revalidatePath(`/dashboard/applications/${id}`);
   return { success: true };
@@ -179,9 +225,22 @@ export async function computeResumeFit(
     return { error: "Add a job description before computing fit." };
   }
 
-  const resumes = await getResumeVersions(session.user.id);
+  const resumes = await getResumeTexts(session.user.id);
   if (!resumes.some((r) => r.content?.trim())) {
     return { error: "Upload a resume with readable text first." };
+  }
+
+  // Nothing to embed means nothing to pay for: skip the AI calls entirely, and
+  // don't spend a slice of the user's hourly AI budget on a no-op re-click.
+  // A vector is only current if the *same model* produced it from the same text.
+  const jobDescriptionHash = sha256(application.jobDescription);
+  const jdEmbeddingIsCurrent =
+    application.jdEmbeddingHash === jobDescriptionHash &&
+    application.jdEmbeddingModel === EMBEDDING_MODEL;
+  const pending = await getResumesNeedingEmbedding(session.user.id);
+  if (jdEmbeddingIsCurrent && pending.length === 0) {
+    revalidatePath(`/dashboard/applications/${applicationId}`);
+    return { success: true };
   }
 
   if (!(await checkAiRateLimit(session.user.id))) {
@@ -189,16 +248,40 @@ export async function computeResumeFit(
   }
 
   try {
-    // JD is the query; resumes are the documents (asymmetric retrieval).
-    const jdVector = await embedText(application.jobDescription, "RETRIEVAL_QUERY");
-    await saveJdEmbedding(applicationId, session.user.id, jdVector);
+    // JD is the query; resumes are the documents (asymmetric retrieval). The JD
+    // is short, so one call. Each resume is embedded as a whole document
+    // (windowed and mean-pooled) rather than truncated to its first two pages,
+    // so the fit score reflects the entire resume.
+    const [jdVector, resumeVectors] = await Promise.all([
+      jdEmbeddingIsCurrent
+        ? null
+        : embedText(
+            application.jobDescription,
+            "RETRIEVAL_QUERY",
+            session.user.id,
+          ),
+      Promise.all(
+        pending.map((resume) =>
+          embedDocument(resume.content, "RETRIEVAL_DOCUMENT", session.user.id),
+        ),
+      ),
+    ]);
 
-    // Embed any resume that doesn't have an embedding yet.
-    const pending = await getResumesNeedingEmbedding(session.user.id);
-    for (const resume of pending) {
-      const vector = await embedText(resume.content, "RETRIEVAL_DOCUMENT");
-      await saveResumeEmbedding(resume.id, session.user.id, vector);
-    }
+    await Promise.all([
+      ...(jdVector
+        ? [
+            saveJdEmbedding(
+              applicationId,
+              session.user.id,
+              jdVector,
+              jobDescriptionHash,
+            ),
+          ]
+        : []),
+      ...pending.map((resume, i) =>
+        saveResumeEmbedding(resume.id, session.user.id, resumeVectors[i]),
+      ),
+    ]);
   } catch (err) {
     return {
       error: err instanceof AiError ? err.message : "Could not compute fit.",

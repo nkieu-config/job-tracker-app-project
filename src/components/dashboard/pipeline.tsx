@@ -5,10 +5,17 @@ import {
   APPLICATION_STATUSES,
   type ApplicationStatus,
 } from "@/lib/schemas/application";
-import { STATUS_COLORS } from "@/lib/status-colors";
+import { STATUS_COLORS } from "@/components/ui/status-colors";
 
 // Funnel stages in flow order. REJECTED is a terminal outcome shown apart.
 const FUNNEL: ApplicationStatus[] = ["SAVED", "APPLIED", "INTERVIEW", "OFFER"];
+
+// The applications page only honours `status` in list view — the board shows
+// every column — so a stage link that omits `view=list` lands on an unfiltered
+// board.
+function stageHref(status: ApplicationStatus): string {
+  return `/dashboard/applications?view=list&status=${status}`;
+}
 
 function FunnelBar({
   counts,
@@ -49,13 +56,13 @@ function StageCard({
 
   return (
     <Link
-      href={`/dashboard/applications?status=${status}`}
+      href={stageHref(status)}
       style={{ animationDelay: `${index * 70}ms` }}
       className="animate-rise flex flex-1 flex-col gap-2.5 rounded-xl border border-hairline bg-canvas p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md md:min-w-0"
     >
       <div className="flex items-center gap-2">
         <span className={`h-2 w-2 rounded-full ${color.dot}`} />
-        <span className="text-[12px] font-sans font-bold uppercase tracking-wider text-ink-mute">
+        <span className="text-fine font-sans font-bold uppercase tracking-wider text-ink-mute">
           {STATUS_LABELS[status]}
         </span>
       </div>
@@ -111,15 +118,15 @@ export function Pipeline({
       </div>
 
       <Link
-        href="/dashboard/applications?status=REJECTED"
+        href={stageHref("REJECTED")}
         style={{ animationDelay: "280ms" }}
         className="animate-rise flex items-center justify-between rounded-xl border border-hairline bg-canvas px-4 py-3 transition-colors hover:bg-surface-hover"
       >
-        <span className="flex items-center gap-2 text-[12px] font-sans font-bold uppercase tracking-wider text-ink-mute">
+        <span className="flex items-center gap-2 text-fine font-sans font-bold uppercase tracking-wider text-ink-mute">
           <span className={`h-2 w-2 rounded-full ${STATUS_COLORS.REJECTED.dot}`} />
           Rejected
         </span>
-        <span className="text-[16px] font-sans font-bold tabular-nums text-ink-mute">
+        <span className="text-body-lg font-sans font-bold tabular-nums text-ink-mute">
           {counts.REJECTED}
         </span>
       </Link>

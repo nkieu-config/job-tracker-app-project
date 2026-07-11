@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useOptimistic } from "react";
 import Link from "next/link";
+import { GripVertical } from "lucide-react";
 import {
   DndContext,
   DragOverlay,
@@ -19,7 +20,8 @@ import {
   STATUS_LABELS,
   type ApplicationStatus,
 } from "@/lib/schemas/application";
-import { STATUS_COLORS } from "@/lib/status-colors";
+import { STATUS_COLORS } from "@/components/ui/status-colors";
+import { isOneOf } from "@/lib/guards";
 import { updateApplicationStatus } from "@/actions/applications";
 import { useToast } from "@/components/ui/toast";
 
@@ -34,14 +36,14 @@ export type BoardApplication = {
 function CardContent({ app }: { app: BoardApplication }) {
   return (
     <>
-      <p className="truncate font-sans text-[14px] font-bold text-ink">
+      <p className="truncate font-sans text-body font-bold text-ink">
         {app.role}
       </p>
-      <p className="mt-1 truncate font-sans text-[13px] text-ink-mute">
+      <p className="mt-1 truncate font-sans text-caption text-ink-mute">
         {app.company}
       </p>
       {app.deadline && (
-        <p className="mt-2 font-sans text-[12px] font-medium tabular-nums text-ink-mute">
+        <p className="mt-2 font-sans text-fine font-medium tabular-nums text-ink-mute">
           Due {app.deadline}
         </p>
       )}
@@ -49,26 +51,34 @@ function CardContent({ app }: { app: BoardApplication }) {
   );
 }
 
+// The drag affordance is its own button rather than the card wrapper: dnd-kit's
+// `attributes` add role="button" and tabIndex=0, and putting those on an element
+// that wraps the card's <Link> would nest one interactive control inside another
+// and give every card two tab stops.
 function BoardCard({ app, dragging }: { app: BoardApplication; dragging: boolean }) {
   const { setNodeRef, listeners, attributes, isDragging } = useDraggable({
     id: app.id,
   });
 
   return (
-    <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      className={`touch-none ${isDragging ? "opacity-40" : ""}`}
-    >
+    <div ref={setNodeRef} className={`relative ${isDragging ? "opacity-40" : ""}`}>
       <Link
         href={`/dashboard/applications/${app.id}`}
         draggable={false}
         tabIndex={dragging ? -1 : 0}
-        className="block rounded-xl border border-hairline bg-canvas px-4 py-3 shadow-sm transition-shadow hover:shadow-[0_5px_20px_rgba(0,0,0,0.08)]"
+        className="block rounded-xl border border-hairline bg-canvas py-3 pl-4 pr-10 shadow-sm transition-shadow hover:shadow-[0_5px_20px_rgba(0,0,0,0.08)]"
       >
         <CardContent app={app} />
       </Link>
+      <button
+        type="button"
+        {...listeners}
+        {...attributes}
+        aria-label={`Reorder ${app.role} at ${app.company}`}
+        className="absolute right-1 top-1 cursor-grab touch-none rounded-lg p-1.5 text-ink-mute transition-colors hover:bg-canvas-lavender hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary active:cursor-grabbing"
+      >
+        <GripVertical size={16} aria-hidden="true" />
+      </button>
     </div>
   );
 }
@@ -89,10 +99,10 @@ function BoardColumn({
     <div className="flex w-64 shrink-0 flex-col gap-3">
       <div className="flex items-center gap-2 px-1">
         <span className={`h-2 w-2 rounded-full ${colors.dot}`} aria-hidden="true" />
-        <h3 className="font-sans text-[13px] font-bold uppercase tracking-wider text-ink-mute">
+        <h3 className="font-sans text-caption font-bold uppercase tracking-wider text-ink-mute">
           {STATUS_LABELS[status]}
         </h3>
-        <span className="font-sans text-[13px] font-bold tabular-nums text-ink-mute">
+        <span className="font-sans text-caption font-bold tabular-nums text-ink-mute">
           {apps.length}
         </span>
       </div>
@@ -106,7 +116,7 @@ function BoardColumn({
           <BoardCard key={app.id} app={app} dragging={dragging} />
         ))}
         {apps.length === 0 && (
-          <p className="m-auto px-3 py-6 text-center font-sans text-[13px] text-ink-mute">
+          <p className="m-auto px-3 py-6 text-center font-sans text-caption text-ink-mute">
             {dragging ? "Drop here" : "No applications"}
           </p>
         )}
@@ -143,18 +153,25 @@ export function ApplicationsBoard({
   function handleDragEnd(event: DragEndEvent) {
     setActiveId(null);
     const id = String(event.active.id);
-    const target = event.over?.id as ApplicationStatus | undefined;
-    if (!target) return;
+    const target = event.over?.id;
+    if (!isOneOf(APPLICATION_STATUSES, target)) return;
     const app = optimisticApps.find((a) => a.id === id);
     if (!app || app.status === target) return;
 
     startTransition(async () => {
       moveOptimistic({ id, status: target });
-      const result = await updateApplicationStatus(id, target);
-      if (result.error) {
-        toast(result.error, "error");
-      } else {
-        toast(`Moved to ${STATUS_LABELS[target]}.`);
+      try {
+        const result = await updateApplicationStatus(id, target);
+        if (result.error) {
+          toast(result.error, "error");
+        } else {
+          toast(`Moved to ${STATUS_LABELS[target]}.`);
+        }
+      } catch {
+        // An error thrown inside an async transition reaches the nearest error
+        // boundary. A dropped connection shouldn't replace the whole board —
+        // the optimistic move reverts on its own once the transition settles.
+        toast("Couldn't move the card. Check your connection.", "error");
       }
     });
   }

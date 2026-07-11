@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useRef,
-  useState,
-} from "react";
+import { createContext, use, useCallback, useRef, useState } from "react";
 
 type ToastVariant = "success" | "error";
 type ToastItem = { id: number; message: string; variant: ToastVariant };
@@ -15,7 +9,7 @@ type ShowToast = (message: string, variant?: ToastVariant) => void;
 const ToastContext = createContext<ShowToast>(() => {});
 
 export function useToast(): ShowToast {
-  return useContext(ToastContext);
+  return use(ToastContext);
 }
 
 const VARIANT_CLASSES: Record<ToastVariant, string> = {
@@ -51,14 +45,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`animate-rise pointer-events-auto flex items-center justify-between gap-3 rounded-xl border px-4 py-3 font-sans text-[14px] font-bold shadow-lg ${VARIANT_CLASSES[t.variant]}`}
+            className={`animate-rise pointer-events-auto flex items-center justify-between gap-3 rounded-xl border px-4 py-3 font-sans text-body font-bold shadow-lg ${VARIANT_CLASSES[t.variant]}`}
           >
             <span>{t.message}</span>
             <button
               type="button"
               onClick={() => dismiss(t.id)}
               aria-label="Dismiss notification"
-              className="shrink-0 text-[16px] leading-none opacity-70 hover:opacity-100"
+              className="shrink-0 text-body-lg leading-none opacity-70 hover:opacity-100"
             >
               ×
             </button>

@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
-import { put } from "@vercel/blob";
-import { getSession } from "@/lib/get-session";
-import { prisma } from "@/lib/prisma";
-import { extractPdfText } from "@/lib/pdf";
+import { put, del } from "@vercel/blob";
+import { getSession } from "@/server/get-session";
+import { prisma } from "@/server/prisma";
+import { extractPdfText, PdfTooLongError } from "@/server/pdf";
+import { checkUploadRateLimit } from "@/server/rate-limit";
+import {
+  countResumeVersions,
+  MAX_RESUME_VERSIONS,
+} from "@/server/data/resumes";
+import { resumeBlobPath } from "@/lib/blob-paths";
 import {
   ACCEPTED_RESUME_TYPE,
   MAX_LABEL_LENGTH,
@@ -11,11 +17,30 @@ import {
   humanFileSize,
 } from "@/lib/schemas/resume";
 
+export const maxDuration = 30;
+
 export async function POST(request: Request) {
   // Auth boundary — route handlers are independent entry points.
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Bound the cost of uploading before reading the body: each version is billed
+  // blob storage, a PDF parse, and an embedding on the next fit computation.
+  if (!(await checkUploadRateLimit(session.user.id))) {
+    return NextResponse.json(
+      { error: "Upload rate limit reached. Please try again later." },
+      { status: 429 },
+    );
+  }
+  if ((await countResumeVersions(session.user.id)) >= MAX_RESUME_VERSIONS) {
+    return NextResponse.json(
+      {
+        error: `You've reached the limit of ${MAX_RESUME_VERSIONS} resume versions. Delete one to upload another.`,
+      },
+      { status: 409 },
+    );
   }
 
   const formData = await request.formData();
@@ -68,7 +93,10 @@ export async function POST(request: Request) {
   let content: string;
   try {
     content = await extractPdfText(bytes);
-  } catch {
+  } catch (err) {
+    if (err instanceof PdfTooLongError) {
+      return NextResponse.json({ error: err.message }, { status: 413 });
+    }
     return NextResponse.json(
       { error: "Couldn't read text from this PDF. It may be corrupted." },
       { status: 422 },
@@ -77,7 +105,7 @@ export async function POST(request: Request) {
 
   let fileUrl: string;
   try {
-    const blob = await put(`resumes/${session.user.id}/${file.name}`, file, {
+    const blob = await put(resumeBlobPath(session.user.id, file.name), file, {
       // Private: the blob URL isn't publicly reachable. Resumes are personal
       // data — they're served only through our authenticated, ownership-scoped
       // route at /api/resumes/[id]/file.
@@ -93,9 +121,17 @@ export async function POST(request: Request) {
     );
   }
 
-  const resume = await prisma.resumeVersion.create({
-    data: { userId: session.user.id, label, fileUrl, content },
-  });
+  // The blob is live but unreferenced until the row lands. If the insert fails
+  // the blob would be billed forever, so it is removed before bailing out.
+  let resume;
+  try {
+    resume = await prisma.resumeVersion.create({
+      data: { userId: session.user.id, label, fileUrl, content },
+    });
+  } catch (err) {
+    await del(fileUrl).catch(() => {});
+    throw err;
+  }
 
   return NextResponse.json({ id: resume.id }, { status: 201 });
 }

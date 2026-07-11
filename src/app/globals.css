@@ -50,6 +50,27 @@
 
   /* Slacc Layout */
   --radius-pill: 90px;
+
+  /* Slacc Type Scale */
+  --text-fine: 12px;
+  --text-caption: 13px;
+  --text-body: 14px;
+  --text-body-lg: 16px;
+  --text-title: 18px;
+
+  /* Animations */
+  --animate-rise: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 html {
@@ -62,56 +83,51 @@ body {
   font-family: var(--font-sans);
 }
 
+/* currentColor renders a white ring on the white page for `text-on-primary`
+   buttons. A dark ring separated from the element by a white halo stays
+   visible on light surfaces and on the aubergine ones alike. */
 :focus-visible:not(input):not(textarea):not(select) {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px var(--color-canvas);
 }
 
 /* Typography Overrides based on Slacc Design */
-.font-display-xxl {
+@utility font-display-xxl {
   font-size: 64px;
   font-weight: 700;
   line-height: 1.12;
   letter-spacing: -0.768px;
 }
 
-.font-display-lg {
+@utility font-display-lg {
   font-size: 50px;
   font-weight: 700;
   line-height: 1.12;
   letter-spacing: -0.6px;
 }
 
-.font-display-md {
+@utility font-display-md {
   font-size: 32px;
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.256px;
 }
 
+@utility font-display-sm {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.192px;
+}
+
 /* Pastel Mesh Gradient */
-.bg-pastel-mesh {
+@utility bg-pastel-mesh {
   background-color: var(--color-canvas-cream);
   background-image:
     radial-gradient(at 100% 0%, rgba(233, 216, 255, 0.6) 0px, transparent 50%),
     radial-gradient(at 0% 100%, rgba(255, 240, 230, 0.7) 0px, transparent 50%),
     radial-gradient(at 100% 100%, rgba(220, 240, 230, 0.5) 0px, transparent 50%);
-}
-
-/* Animations */
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-rise {
-  animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
