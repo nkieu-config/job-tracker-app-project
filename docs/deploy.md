@@ -52,8 +52,14 @@ Redeploy Vercel after env changes (new deployments only pick up new vars).
 
 ## Step 2 — Database migrations
 
+Migrations flow through the Neon branches (see
+[setup.md](./setup.md#database-branches-neon)): develop with
+`npx prisma migrate dev` against the `dev` branch — the one `.env` points at —
+then apply the reviewed migrations to production by overriding `DIRECT_URL`
+with the `production` branch's direct URL (kept as a comment in `.env`):
+
 ```bash
-npx prisma migrate deploy
+DIRECT_URL=<production-direct-url> npx prisma migrate deploy
 ```
 
 ---

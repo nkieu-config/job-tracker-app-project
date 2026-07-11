@@ -43,6 +43,29 @@ See [.env.example](../.env.example). `.env` files are gitignored.
 
 Optional knobs (`AI_USAGE_DISABLED`, `EVAL_RPM`, `EVAL_MAX_ATTEMPTS`, `EVAL_JUDGE_MODEL`, `BASE_URL`) are documented in `.env.example`.
 
+## Database branches (Neon)
+
+The Neon project (`job-tracker`, id `sparkling-field-35194973`) has two branches
+so local experiments can never touch the live demo:
+
+| Branch | Endpoint | Who uses it |
+| --- | --- | --- |
+| `production` | `ep-gentle-term-…` | Vercel — Production deployments and the live demo |
+| `dev` | `ep-super-mud-…` | Local development — what `.env` points at |
+
+`dev` is a copy-on-write branch of `production`, so it starts with all the data
+(demo account, applications, embeddings) and applied migrations. Break it
+freely; to restore it to an exact copy of production:
+
+```bash
+npx neonctl branches reset dev --project-id sparkling-field-35194973 --parent
+```
+
+The `production` connection strings are kept as comments next to
+`DATABASE_URL`/`DIRECT_URL` in `.env`. Don't delete them — the copies on Vercel
+are sensitive env vars and cannot be read back, so those comments are the only
+recoverable copy.
+
 ## Scripts
 
 ```bash
