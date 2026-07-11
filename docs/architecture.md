@@ -16,7 +16,7 @@ Next.js ── auth, CRUD, file upload, pgvector queries, AI
 ```
 
 - **One Next.js service.** Server Actions and Route Handlers handle UI, sessions, database access, file upload, rate limiting, and the AI calls. `GEMINI_API_KEY` is read only inside `server/ai/` and is never sent to the browser.
-- **`server/ai/` module.** `analyze` (structured JSON), `embeddings` (batch), and `stream` (token-by-token bullet tailoring + interview prep). The heavy Gemini logic sits behind one boundary; the rest of the app imports a thin facade (`server/ai-client.ts`).
+- **`server/ai/` module.** `analyze` (structured JSON), `embeddings` (batch), and `stream` (token-by-token bullet tailoring + interview prep). All three return domain values and throw `AiError` — none of them knows what HTTP is. The heavy Gemini logic sits behind one boundary; the rest of the app imports a thin facade (`server/ai-client.ts`).
 - **Zod schemas** in `src/lib/schemas/` are the single source of truth for the AI contract — used both to constrain the model (schema-out) and to validate its response (validate-in).
 
 ## Project layout
@@ -114,7 +114,24 @@ That index has one sharp edge. Prisma cannot express it — `type: Hnsw` is not 
 
 ### Streaming UX
 
-Bullet tailoring and interview prep stream token-by-token: Gemini's async chunk iterator is wrapped in a web `ReadableStream` inside `server/ai/stream.ts` and returned straight from the Route Handler to the browser. The user sees output begin in under a second instead of staring at a spinner for ten.
+Bullet tailoring and interview prep stream token-by-token, so the user sees output begin in under a second instead of staring at a spinner for ten.
+
+The transport is split from the generation. `server/ai/stream.ts` returns an
+`AsyncIterable<string>` of tokens and throws `AiError` — the same contract
+`analyze` and `embeddings` present behind the same seam, so a caller never has to
+ask which half of `server/ai` it is talking to. Everything HTTP-shaped lives in
+`lib/stream-protocol.ts`: the Route Handler wraps the token iterable in a web
+`ReadableStream`, maps an `AiError` to a status, and appends the end-of-stream
+status frame that lets the browser tell a completed generation from a dropped
+connection — so a truncated result can never be silently saved.
+
+That split is newer than the streaming itself. `stream.ts` used to return
+`Response` objects carrying invented 502/503 statuses — a fossil of the Express
+service that was folded in-process. It made a module that opens no socket speak
+HTTP, and the cost landed far from the cause: the Route Handler unwrapped the
+`Response` only to rebuild an identical one, and the eval harness had to hand-write
+a `Response`-to-`AiError` adapter that guessed every non-ok status as `transport`
+— so a missing API key was retried three times with backoff before failing.
 
 ### Per-request data efficiency
 

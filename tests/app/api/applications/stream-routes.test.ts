@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { AiError } from "@/lib/errors";
+import { readAiStream } from "@/lib/stream-protocol";
 
 const findFirst = vi.fn();
 vi.mock("@/server/prisma", () => ({
@@ -38,11 +40,14 @@ function req(body?: unknown): Request {
   });
 }
 
-function okStream(): Response {
-  return new Response("- generated", {
-    status: 200,
-    headers: { "Content-Type": "text/plain" },
-  });
+function tokens(...parts: string[]): AsyncIterable<string> {
+  return (async function* () {
+    for (const part of parts) yield part;
+  })();
+}
+
+async function streamed(res: Response) {
+  return readAiStream(res.body!, () => {});
 }
 
 beforeEach(() => {
@@ -51,8 +56,8 @@ beforeEach(() => {
     .mockReset()
     .mockResolvedValue({ jobDescription: "Senior TS role", role: "Engineer" });
   checkAiRateLimit.mockReset().mockResolvedValue(true);
-  tailorBulletsStream.mockReset().mockResolvedValue(okStream());
-  interviewPrepStream.mockReset().mockResolvedValue(okStream());
+  tailorBulletsStream.mockReset().mockResolvedValue(tokens("- generated"));
+  interviewPrepStream.mockReset().mockResolvedValue(tokens("- generated"));
 });
 
 describe("POST /api/applications/[id]/tailor", () => {
@@ -94,18 +99,52 @@ describe("POST /api/applications/[id]/tailor", () => {
     expect(tailorBulletsStream).not.toHaveBeenCalled();
   });
 
-  it("streams the model output on the happy path", async () => {
+  it("streams the model output, terminated by a clean status frame", async () => {
     const res = await tailorPOST(req({ experience: "x" }), params("app-1"));
     expect(res.status).toBe(200);
-    expect(await res.text()).toBe("- generated");
+    expect(await streamed(res)).toEqual({
+      text: "- generated",
+      end: { ok: true },
+    });
   });
 
-  it("propagates an upstream AI failure status", async () => {
-    tailorBulletsStream.mockResolvedValue(
-      new Response("AI is not configured.", { status: 503 }),
+  it("maps a missing key to 503, before committing to a stream", async () => {
+    tailorBulletsStream.mockRejectedValue(
+      new AiError("AI is not configured.", "config"),
     );
     const res = await tailorPOST(req({ experience: "x" }), params("app-1"));
     expect(res.status).toBe(503);
+    expect(await res.text()).toBe("AI is not configured.");
+  });
+
+  it("maps an upstream model outage to 502", async () => {
+    tailorBulletsStream.mockRejectedValue(
+      new AiError("The AI service failed. Please try again.", "transport"),
+    );
+    const res = await tailorPOST(req({ experience: "x" }), params("app-1"));
+    expect(res.status).toBe(502);
+  });
+
+  it("rethrows an unexpected error instead of dressing it up as an AI failure", async () => {
+    tailorBulletsStream.mockRejectedValue(new TypeError("undefined is not a function"));
+    await expect(
+      tailorPOST(req({ experience: "x" }), params("app-1")),
+    ).rejects.toBeInstanceOf(TypeError);
+  });
+
+  it("reports a mid-stream failure in-band, keeping the 200 it already sent", async () => {
+    tailorBulletsStream.mockResolvedValue(
+      (async function* () {
+        yield "- half";
+        throw new AiError("The AI stopped responding.", "transport");
+      })(),
+    );
+    const res = await tailorPOST(req({ experience: "x" }), params("app-1"));
+    expect(res.status).toBe(200);
+    expect(await streamed(res)).toEqual({
+      text: "- half",
+      end: { ok: false, error: "The AI stopped responding." },
+    });
   });
 });
 
@@ -134,9 +173,28 @@ describe("POST /api/applications/[id]/interview", () => {
     expect(interviewPrepStream).not.toHaveBeenCalled();
   });
 
-  it("streams the model output on the happy path", async () => {
+  it("streams the model output, terminated by a clean status frame", async () => {
     const res = await interviewPOST(req(), params("app-1"));
     expect(res.status).toBe(200);
-    expect(await res.text()).toBe("- generated");
+    expect(await streamed(res)).toEqual({
+      text: "- generated",
+      end: { ok: true },
+    });
+  });
+
+  it("maps a missing key to 503, before committing to a stream", async () => {
+    interviewPrepStream.mockRejectedValue(
+      new AiError("AI is not configured.", "config"),
+    );
+    const res = await interviewPOST(req(), params("app-1"));
+    expect(res.status).toBe(503);
+    expect(await res.text()).toBe("AI is not configured.");
+  });
+
+  it("rethrows an unexpected error instead of dressing it up as an AI failure", async () => {
+    interviewPrepStream.mockRejectedValue(new TypeError("boom"));
+    await expect(interviewPOST(req(), params("app-1"))).rejects.toBeInstanceOf(
+      TypeError,
+    );
   });
 });

@@ -2,6 +2,12 @@ import { getSession } from "@/server/get-session";
 import { prisma } from "@/server/prisma";
 import { interviewPrepStream } from "@/server/ai-client";
 import { checkAiRateLimit } from "@/server/rate-limit";
+import { AiError } from "@/lib/errors";
+import {
+  abortLinkedTo,
+  aiErrorResponse,
+  aiStreamResponse,
+} from "@/lib/stream-protocol";
 
 export const maxDuration = 30;
 
@@ -32,24 +38,20 @@ export async function POST(
     });
   }
 
-  const aiRes = await interviewPrepStream(
-    application.jobDescription,
-    application.role,
-    request.signal,
-    session.user.id,
-  );
+  const abort = abortLinkedTo(request.signal);
 
-  if (!aiRes.ok || !aiRes.body) {
-    return new Response(
-      (await aiRes.text()) || "Failed to generate interview prep.",
-      { status: aiRes.status },
+  let tokens: AsyncIterable<string>;
+  try {
+    tokens = await interviewPrepStream(
+      application.jobDescription,
+      application.role,
+      abort.signal,
+      session.user.id,
     );
+  } catch (err) {
+    if (err instanceof AiError) return aiErrorResponse(err);
+    throw err;
   }
 
-  return new Response(aiRes.body, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-store",
-    },
-  });
+  return aiStreamResponse(tokens, abort);
 }

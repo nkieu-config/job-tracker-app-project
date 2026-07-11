@@ -2,7 +2,6 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { tailorBulletsStream } from "@/server/ai/stream";
-import { readAiStream } from "@/lib/stream-protocol";
 import { AiError } from "@/lib/errors";
 import { judgeBullets, JUDGE_MODEL, judgeIsSelfJudging } from "../lib/judge";
 import { paceGenerate } from "../lib/pace";
@@ -15,17 +14,9 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 
 type TlItem = { id: string; jobDescription: string; experience: string };
 
-async function readStream(res: Response): Promise<string> {
-  if (!res.ok) {
-    throw new AiError(`The AI service returned ${res.status}.`, "transport");
-  }
-  if (!res.body) {
-    throw new AiError("The AI returned an empty response.", "empty");
-  }
-  const { text, end } = await readAiStream(res.body, () => {});
-  if (!end.ok) {
-    throw new AiError(end.error, "transport");
-  }
+async function collect(tokens: AsyncIterable<string>): Promise<string> {
+  let text = "";
+  for await (const token of tokens) text += token;
   if (!text.trim()) {
     throw new AiError("The AI returned an empty response.", "empty");
   }
@@ -63,11 +54,11 @@ export async function run(opts: RunOptions = {}): Promise<SuiteResult> {
       output = await withRetry(async () => {
         await paceGenerate();
         return timer.measure(async () => {
-          const res = await tailorBulletsStream(
+          const tokens = await tailorBulletsStream(
             it.jobDescription,
             it.experience,
           );
-          return readStream(res);
+          return collect(tokens);
         });
       });
       latencies.push(timer.latencyMs);
