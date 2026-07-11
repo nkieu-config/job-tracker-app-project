@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 22 (matches CI; 20+ works)
 - A Postgres database with the `pgvector` extension ([Neon](https://neon.tech) free tier works)
 - A [Gemini API key](https://aistudio.google.com/apikey) (free tier is enough)
 - A Vercel Blob store token (only needed for resume upload)
@@ -38,17 +38,24 @@ See [.env.example](../.env.example). `.env` files are gitignored.
 | `BETTER_AUTH_URL` | `http://localhost:3000` locally; your deployment URL in prod |
 | `BLOB_READ_WRITE_TOKEN` | From a Vercel Blob store (`vercel env pull`) |
 | `GEMINI_API_KEY` | From Google AI Studio — server-only, never exposed to the browser |
+| `ADMIN_EMAILS` | Comma-separated emails allowed to view `/dashboard/ai-usage` (optional) |
+| `CRON_SECRET` | Bearer token Vercel Cron uses to call `/api/cron/*` (optional; the route refuses to run when unset) |
+
+Optional knobs (`AI_USAGE_DISABLED`, `EVAL_RPM`, `EVAL_MAX_ATTEMPTS`, `EVAL_JUDGE_MODEL`, `BASE_URL`) are documented in `.env.example`.
 
 ## Scripts
 
 ```bash
-npm run dev         # Next.js dev server
-npm run build       # production build (web)
-npm run lint        # eslint
-npm run typecheck   # web app only
-npm run check       # typecheck
-npm test            # vitest
-npm run seed        # populate the demo account (server must be running)
+npm run dev           # Next.js dev server
+npm run build         # production build (web)
+npm run lint          # eslint
+npm run typecheck     # tsc --noEmit
+npm run check         # typecheck (alias)
+npm test              # vitest
+npm run test:coverage # vitest with per-file coverage thresholds
+npm run eval          # AI eval suites (needs GEMINI_API_KEY)
+npm run screenshots   # regenerate the README screenshots via Playwright
+npm run seed          # populate the demo account (server must be running)
 ```
 
 ## Demo account
