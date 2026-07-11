@@ -37,6 +37,24 @@ jobs:
 
       - run: npm run test:coverage
 
+      # `vitest list` only collects, so the placeholder URL is never dialled —
+      # it just un-skips the opt-in Postgres suite so the count is the full one.
+      - name: Advertised test count must match the suite
+        run: |
+          actual=$(TEST_DATABASE_URL=postgresql://placeholder npx vitest list 2>/dev/null | wc -l | tr -d ' ')
+          advertised=$( { grep -oE '[0-9]+ tests' README.md; grep -oE 'tests \([0-9]+\)' docs/manual-qa.md; } | grep -oE '[0-9]+' | sort -u )
+          if [ -z "$advertised" ]; then
+            echo '::error::No advertised test count found in README.md / docs/manual-qa.md — the drift guard has nothing to check.'
+            exit 1
+          fi
+          for n in $advertised; do
+            if [ "$n" != "$actual" ]; then
+              echo "::error::Docs advertise $n tests but the suite defines $actual. Update the counts in README.md and docs/manual-qa.md."
+              exit 1
+            fi
+          done
+          echo "Advertised test count matches the suite: $actual"
+
       - run: npm run build
         env:
           DATABASE_URL: postgresql://user:password@localhost:5432/placeholder
