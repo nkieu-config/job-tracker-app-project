@@ -1,4 +1,5 @@
 import { AiError, type AiErrorKind } from "@/lib/errors";
+import { jsonError } from "@/lib/http";
 
 export const STREAM_END_SENTINEL = "\u0000";
 
@@ -50,7 +51,7 @@ export function abortLinkedTo(signal: AbortSignal): AbortController {
 }
 
 export function aiErrorResponse(error: AiError): Response {
-  return new Response(error.message, { status: AI_ERROR_STATUS[error.kind] });
+  return jsonError(error.message, AI_ERROR_STATUS[error.kind]);
 }
 
 // Wrap a stream of model tokens in a web ReadableStream the Route Handler can

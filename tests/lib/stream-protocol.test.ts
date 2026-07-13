@@ -186,10 +186,10 @@ describe("aiErrorResponse", () => {
     expect(aiErrorResponse(new AiError("slow", "timeout")).status).toBe(504);
   });
 
-  it("sends the message as the body so the client can show it", async () => {
+  it("sends the message in the shared JSON error shape so the client can show it", async () => {
     const res = aiErrorResponse(new AiError("AI is not configured.", "config"));
 
-    expect(await res.text()).toBe("AI is not configured.");
+    expect(await res.json()).toEqual({ error: "AI is not configured." });
   });
 });
 

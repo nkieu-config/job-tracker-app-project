@@ -2,6 +2,7 @@ import { getSession } from "@/server/get-session";
 import { tailorBulletsStream } from "@/server/ai-client";
 import { aiDenial, guardAiRequest } from "@/server/ai-guard";
 import { AiError } from "@/lib/errors";
+import { jsonError } from "@/lib/http";
 import {
   abortLinkedTo,
   aiErrorResponse,
@@ -16,7 +17,7 @@ export async function POST(
 ) {
   const session = await getSession();
   if (!session) {
-    return new Response("Unauthorized", { status: 401 });
+    return jsonError("Unauthorized", 401);
   }
 
   const { id } = await params;
@@ -38,7 +39,7 @@ export async function POST(
     },
   });
   if (!guard.ok) {
-    return new Response(guard.denial.message, { status: guard.denial.status });
+    return jsonError(guard.denial.message, guard.denial.status);
   }
 
   const abort = abortLinkedTo(request.signal);

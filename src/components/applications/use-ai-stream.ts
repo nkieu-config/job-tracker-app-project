@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { readErrorMessage } from "@/lib/http";
 import { readAiStream } from "@/lib/stream-protocol";
 import { useToast } from "@/components/ui/toast";
 
@@ -60,7 +61,7 @@ export function useAiStream({
         signal: controller.signal,
       });
       if (!res.ok || !res.body) {
-        setError((await res.text()) || requestFailed);
+        setError(await readErrorMessage(res, requestFailed));
         return;
       }
       setOutput("");

@@ -114,7 +114,7 @@ describe("POST /api/applications/[id]/tailor", () => {
     );
     const res = await tailorPOST(req({ experience: "x" }), params("app-1"));
     expect(res.status).toBe(503);
-    expect(await res.text()).toBe("AI is not configured.");
+    expect(await res.json()).toEqual({ error: "AI is not configured." });
   });
 
   it("maps an upstream model outage to 502", async () => {
@@ -188,7 +188,7 @@ describe("POST /api/applications/[id]/interview", () => {
     );
     const res = await interviewPOST(req(), params("app-1"));
     expect(res.status).toBe(503);
-    expect(await res.text()).toBe("AI is not configured.");
+    expect(await res.json()).toEqual({ error: "AI is not configured." });
   });
 
   it("rethrows an unexpected error instead of dressing it up as an AI failure", async () => {

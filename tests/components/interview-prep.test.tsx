@@ -66,4 +66,38 @@ describe("InterviewPrep", () => {
     );
     expect(saveInterviewPrep).not.toHaveBeenCalled();
   });
+
+  // The routes answer a rejection with the shared JSON error shape, so the
+  // client must read the message out of it rather than showing the raw body.
+  it("surfaces the message from a rejected request", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        Response.json(
+          { error: "AI rate limit reached. Please try again later." },
+          { status: 429 },
+        ),
+      ),
+    );
+    generate();
+
+    await waitFor(() =>
+      expect(screen.getByRole("alert")).toHaveTextContent(/rate limit reached/i),
+    );
+    expect(saveInterviewPrep).not.toHaveBeenCalled();
+  });
+
+  it("falls back to its own wording when a rejection carries no message", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response("<html>502</html>", { status: 502 })),
+    );
+    generate();
+
+    await waitFor(() =>
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        /failed to generate interview prep/i,
+      ),
+    );
+  });
 });
