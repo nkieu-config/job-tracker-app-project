@@ -21,7 +21,7 @@ import {
 import { EMBEDDING_MODEL } from "@/server/ai/models";
 import { sha256 } from "@/server/hash";
 import { matchSkillsSemantic } from "@/server/semantic-skills";
-import { getResumeTexts } from "@/server/data/resumes";
+import { getResumeText, hasResumeWithText } from "@/server/data/resumes";
 import {
   countApplications,
   MAX_APPLICATIONS,
@@ -171,7 +171,7 @@ export async function analyzeApplication(
 
   // The resume read doesn't depend on the analysis, so it runs alongside the
   // multi-second Gemini call rather than waiting behind it.
-  const resumesPromise = getResumeTexts(session.user.id);
+  const resumeTextPromise = getResumeText(session.user.id);
 
   let analysis;
   try {
@@ -180,14 +180,13 @@ export async function analyzeApplication(
       session.user.id,
     );
   } catch (err) {
-    await resumesPromise.catch(() => {});
+    await resumeTextPromise.catch(() => {});
     return {
       error: err instanceof AiError ? err.message : "Analysis failed.",
     };
   }
 
-  const resumes = await resumesPromise;
-  const resumeText = resumes.map((r) => r.content ?? "").join("\n");
+  const resumeText = await resumeTextPromise;
   const storedAnalysis = resumeText.trim()
     ? {
         ...analysis,
@@ -236,8 +235,7 @@ export async function computeResumeFit(
     return { error: "Add a job description before computing fit." };
   }
 
-  const resumes = await getResumeTexts(session.user.id);
-  if (!resumes.some((r) => r.content?.trim())) {
+  if (!(await hasResumeWithText(session.user.id))) {
     return { error: "Upload a resume with readable text first." };
   }
 

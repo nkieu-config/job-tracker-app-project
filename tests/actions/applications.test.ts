@@ -42,9 +42,11 @@ vi.mock("@/server/semantic-skills", () => ({
   matchSkillsSemantic: (...a: unknown[]) => matchSkillsSemantic(...a),
 }));
 
-const getResumeTexts = vi.fn();
+const getResumeText = vi.fn();
+const hasResumeWithText = vi.fn();
 vi.mock("@/server/data/resumes", () => ({
-  getResumeTexts: (...a: unknown[]) => getResumeTexts(...a),
+  getResumeText: (...a: unknown[]) => getResumeText(...a),
+  hasResumeWithText: (...a: unknown[]) => hasResumeWithText(...a),
 }));
 
 const saveJdEmbedding = vi.fn();
@@ -100,7 +102,8 @@ beforeEach(() => {
   embedDocument.mockReset().mockResolvedValue([0.3, 0.4]);
   checkAiRateLimit.mockReset().mockResolvedValue(true);
   matchSkillsSemantic.mockReset().mockResolvedValue({ matched: [] });
-  getResumeTexts.mockReset().mockResolvedValue([]);
+  getResumeText.mockReset().mockResolvedValue("");
+  hasResumeWithText.mockReset().mockResolvedValue(true);
   saveJdEmbedding.mockReset().mockResolvedValue(undefined);
   saveResumeEmbedding.mockReset().mockResolvedValue(undefined);
   getResumesNeedingEmbedding.mockReset().mockResolvedValue([]);
@@ -245,7 +248,7 @@ describe("analyzeApplication", () => {
   });
 
   it("merges semantic skill matches when the user has resume text", async () => {
-    getResumeTexts.mockResolvedValue([{ content: "I know TypeScript" }]);
+    getResumeText.mockResolvedValue("I know TypeScript");
     matchSkillsSemantic.mockResolvedValue({ matched: ["TypeScript"] });
     await analyzeApplication("app-1", {}, new FormData());
     const write = updateMany.mock.calls[0][0];
@@ -269,14 +272,14 @@ describe("computeResumeFit", () => {
       jdEmbeddingHash: null,
       jdEmbeddingModel: null,
     });
-    getResumeTexts.mockResolvedValue([{ id: "r-1", content: "resume text" }]);
+    hasResumeWithText.mockResolvedValue(true);
     getResumesNeedingEmbedding.mockResolvedValue([
       { id: "r-1", content: "resume text" },
     ]);
   });
 
   it("requires a readable resume before embedding", async () => {
-    getResumeTexts.mockResolvedValue([{ id: "r-1", content: "   " }]);
+    hasResumeWithText.mockResolvedValue(false);
     const res = await computeResumeFit("app-1", {}, new FormData());
     expect(res.error).toMatch(/resume/i);
     expect(checkAiRateLimit).not.toHaveBeenCalled();

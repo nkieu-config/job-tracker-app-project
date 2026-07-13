@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { requireSession } from "@/server/get-session";
 import { formatDisplayDate } from "@/lib/format";
 import { getApplication } from "@/server/data/applications";
-import { getResumeTexts } from "@/server/data/resumes";
+import { getResumeText, getResumeTextMeta } from "@/server/data/resumes";
 import { storedJdAnalysisSchema } from "@/lib/schemas/jd-analysis";
 import { matchSkills } from "@/lib/skills";
 import { fitBand } from "@/components/ui/fit-score";
@@ -45,7 +45,7 @@ export default async function ApplicationDetailPage({
   // them in parallel instead of waterfalling three DB round-trips.
   const [application, resumes, fitScores] = await Promise.all([
     getApplication(id, userId),
-    getResumeTexts(userId),
+    getResumeTextMeta(userId),
     getResumeFitScores(id, userId),
   ]);
 
@@ -58,7 +58,10 @@ export default async function ApplicationDetailPage({
   const analysisResult = storedJdAnalysisSchema.safeParse(application.analysis);
   const analysis = analysisResult.success ? analysisResult.data : null;
 
-  const resumeText = resumes.map((r) => r.content ?? "").join("\n");
+  // `skillMatches` is stored by the analyzer, so the normal path already knows
+  // the answer. Only an analysis predating that field falls back to lexical
+  // matching here — the one case that needs the resume text itself, and the one
+  // case worth a second round-trip for it.
   const gap = analysis
     ? analysis.skillMatches
       ? {
@@ -69,7 +72,7 @@ export default async function ApplicationDetailPage({
             (s) => !analysis.skillMatches?.includes(s),
           ),
         }
-      : matchSkills(analysis.requiredSkills, resumeText)
+      : matchSkills(analysis.requiredSkills, await getResumeText(userId))
     : null;
   const analysisStale =
     analysis?.skillMatches !== undefined &&
@@ -309,7 +312,7 @@ export default async function ApplicationDetailPage({
           </div>
         ) : fitScores.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-hairline p-8 text-center font-sans text-body-lg text-ink-mute bg-canvas">
-            {resumes.some((r) => r.content?.trim())
+            {resumes.some((r) => r.hasText)
               ? "No fit scores yet — run “Compute resume fit” to rank your resumes against this JD."
               : "Upload a resume with readable text, then compute fit."}
           </p>
