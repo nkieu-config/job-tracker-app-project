@@ -12,7 +12,7 @@
 
 **The job hunt is a data problem. I built the tool to solve mine.** An AI-powered job-application tracker that analyzes job descriptions, scores your resume versions against them with vector embeddings, and tailors your bullets — built solo as my capstone project, used daily in my real job search.
 
-**4 AI features · 11 app pages · 8-table Postgres schema · 233 tests + a 3-suite AI eval harness · ~10k lines of strict TypeScript**
+**4 AI features · 11 app pages · 8-table Postgres schema · 250 tests + a 3-suite AI eval harness · ~10k lines of strict TypeScript**
 
 ![Dashboard showing application pipeline, response and interview rates, and upcoming deadlines](docs/screenshots/dashboard.png)
 
@@ -159,7 +159,7 @@ Full environment-variable reference, scripts and deploy guide: [docs/setup.md](d
 
 ## Testing & quality
 
-233 tests across two Vitest projects — a **Node** project for server code (ownership scoping of every Server Action, the resume upload's blob lifecycle including compensating deletes, rate limiting, embedding batch splitting, the fence that keeps a job description from being read as prompt instructions) and a **jsdom** project for components (the streaming UI's save/discard rules, accessibility invariants of the drag-and-drop board). Ten are integration tests that run against a real Postgres and skip when no database is reachable — they cover the raw SQL the mocked unit tests can't reach: the rate limiter's atomic upsert, and the predicate deciding whether a resume holds readable text. Security-critical modules — the prompt fence and the admin gate among them — are pinned to **100% coverage thresholds** in CI.
+250 tests across two Vitest projects — a **Node** project for server code (ownership scoping of every Server Action, the resume upload's blob lifecycle including compensating deletes, the page cap that stops a PDF bomb from pinning the function, rate limiting for both AI and auth, embedding batch splitting, the fence that keeps a job description from being read as prompt instructions) and a **jsdom** project for components (the streaming UI's save/discard rules, accessibility invariants of the drag-and-drop board). Ten are integration tests that run against a real Postgres and skip when no database is reachable — they cover the raw SQL the mocked unit tests can't reach: the rate limiter's atomic upsert, and the predicate deciding whether a resume holds readable text. Security-critical modules — the prompt fence, the admin gate, the AI ownership guard and the PDF page cap among them — are pinned to **100% coverage thresholds** in CI.
 
 The AI layer is tested twice, at different altitudes: unit tests mock the SDK at the module boundary, and the [eval harness](evals/) measures the real model with precision/recall, an ablation and an LLM judge.
 

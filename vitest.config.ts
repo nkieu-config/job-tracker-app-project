@@ -75,6 +75,33 @@ export default defineConfig({
           functions: 100,
           lines: 100,
         },
+        // The limiter standing between the auth endpoints and a brute-force.
+        "src/server/auth-rate-limit.ts": {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
+        // The ownership + budget boundary every AI feature enters through.
+        "src/server/ai-guard.ts": {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
+        // The page cap here is what stops a PDF bomb from pinning the function.
+        "src/server/pdf.ts": {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
+        "src/lib/http.ts": {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
         "src/server/semantic-skills.ts": {
           statements: 95,
           branches: 85,
