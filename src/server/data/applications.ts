@@ -14,6 +14,10 @@ import { zeroRecord } from "@/lib/records";
 
 export const MAX_APPLICATIONS = 500;
 
+export function countApplications(userId: string) {
+  return prisma.application.count({ where: { userId } });
+}
+
 // The board and list views render only these five columns. Selecting them
 // explicitly keeps the JD, the analysis JSON, and the tailored/interview text
 // (which run to several KB per row) out of a query that can return 500 rows.

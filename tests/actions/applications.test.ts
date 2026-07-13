@@ -3,9 +3,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const updateMany = vi.fn();
 const deleteMany = vi.fn();
 const findFirst = vi.fn();
+const create = vi.fn();
+const count = vi.fn();
 
 vi.mock("@/server/prisma", () => ({
-  prisma: { application: { updateMany, deleteMany, findFirst } },
+  prisma: { application: { updateMany, deleteMany, findFirst, create, count } },
 }));
 
 const getSession = vi.fn();
@@ -63,7 +65,9 @@ const JD_HASH = sha256(JD_TEXT);
 const { EMBEDDING_MODEL } = await import("@/server/ai/models");
 
 const OWNER = "user-owner";
+const { MAX_APPLICATIONS } = await import("@/server/data/applications");
 const {
+  createApplication,
   updateApplicationStatus,
   saveTailoredBullets,
   saveInterviewPrep,
@@ -72,10 +76,24 @@ const {
   computeResumeFit,
 } = await import("@/actions/applications");
 
+function applicationFormData(): FormData {
+  const formData = new FormData();
+  formData.set("company", "Acme");
+  formData.set("role", "Senior Engineer");
+  formData.set("status", "SAVED");
+  formData.set("jobUrl", "");
+  formData.set("jobDescription", "");
+  formData.set("deadline", "");
+  formData.set("notes", "");
+  return formData;
+}
+
 beforeEach(() => {
   updateMany.mockReset().mockResolvedValue({ count: 1 });
   deleteMany.mockReset().mockResolvedValue({ count: 1 });
   findFirst.mockReset();
+  create.mockReset().mockResolvedValue({ id: "app-new" });
+  count.mockReset().mockResolvedValue(0);
   getSession.mockReset().mockResolvedValue({ user: { id: OWNER } });
   analyzeJobDescription.mockReset();
   embedText.mockReset().mockResolvedValue([0.1, 0.2]);
@@ -89,6 +107,37 @@ beforeEach(() => {
 });
 
 const whereOf = (mock: typeof updateMany) => mock.mock.calls[0][0].where;
+
+describe("createApplication", () => {
+  it("refuses to create past MAX_APPLICATIONS and does not touch the table", async () => {
+    count.mockResolvedValue(MAX_APPLICATIONS);
+
+    const state = await createApplication({}, applicationFormData());
+
+    expect(state.error).toMatch(/limit of 500 applications/);
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it("counts only the caller's own applications against the cap", async () => {
+    count.mockResolvedValue(MAX_APPLICATIONS);
+
+    await createApplication({}, applicationFormData());
+
+    expect(count).toHaveBeenCalledWith({ where: { userId: OWNER } });
+  });
+
+  it("creates when the user is below the cap", async () => {
+    count.mockResolvedValue(MAX_APPLICATIONS - 1);
+
+    await expect(
+      createApplication({}, applicationFormData()),
+    ).rejects.toThrow(RedirectError);
+
+    expect(create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ company: "Acme", userId: OWNER }),
+    });
+  });
+});
 
 describe("ownership scoping", () => {
   it("scopes updateApplicationStatus to the caller's userId", async () => {

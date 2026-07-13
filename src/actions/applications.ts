@@ -23,6 +23,10 @@ import { sha256 } from "@/server/hash";
 import { matchSkillsSemantic } from "@/server/semantic-skills";
 import { getResumeTexts } from "@/server/data/resumes";
 import {
+  countApplications,
+  MAX_APPLICATIONS,
+} from "@/server/data/applications";
+import {
   saveJdEmbedding,
   saveResumeEmbedding,
   getResumesNeedingEmbedding,
@@ -63,6 +67,13 @@ export async function createApplication(
   if (!parsed.success) {
     return {
       fieldErrors: z.flattenError(parsed.error).fieldErrors,
+      values: submittedValues(formData),
+    };
+  }
+
+  if ((await countApplications(session.user.id)) >= MAX_APPLICATIONS) {
+    return {
+      error: `You've reached the limit of ${MAX_APPLICATIONS} applications. Delete one to add another.`,
       values: submittedValues(formData),
     };
   }
