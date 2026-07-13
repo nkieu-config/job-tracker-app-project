@@ -4,15 +4,37 @@ How the system is put together, and the reasoning behind the key decisions.
 
 ## System overview
 
-```
-Browser
-   │
-   ▼
-Next.js ── auth, CRUD, file upload, pgvector queries, AI
-   │                        │
-   │                        ├──▶ Postgres (Neon) + Vercel Blob
-   │                        │
-   │                        └──▶ server/ai/ (in-process) ──▶ Gemini API
+The README's diagram traces one AI request end to end. This one is the same
+system with the gates and seams drawn in — where a request is authorized, where
+it is metered, and which modules are allowed to hold a secret.
+
+```mermaid
+flowchart TB
+  Browser["Browser — Client Components"]
+
+  subgraph next["Next.js 16 — one deployable"]
+    Proxy["proxy.ts — optimistic cookie check<br/>fast redirects, never the only gate"]
+    Entry["Server Actions · Route Handlers<br/>every one re-verifies the session"]
+    Budget{{"hourly AI budget, per user"}}
+    AI["server/ai/ — the only holder of GEMINI_API_KEY<br/>analyze · embeddings · stream"]
+    Data["server/data/ — Prisma, every query scoped by userId"]
+    Schemas["lib/schemas/ — Zod, one contract for<br/>schema-out and validate-in"]
+  end
+
+  PG[("Postgres — Neon<br/>rows · vector(768) · HNSW")]
+  Blob[("Vercel Blob — private<br/>resume PDFs")]
+  Gemini["Gemini API"]
+
+  Browser <-->|"request · tokens streamed back"| Proxy
+  Proxy --> Entry
+  Entry --> Data
+  Entry --> Budget
+  Budget -->|"under budget"| AI
+  Schemas -.->|"constrains the prompt, validates the reply"| AI
+  AI <--> Gemini
+  AI -->|"tokens + cost"| Data
+  Data <--> PG
+  Data <--> Blob
 ```
 
 - **One Next.js service.** Server Actions and Route Handlers handle UI, sessions, database access, file upload, rate limiting, and the AI calls. `GEMINI_API_KEY` is read only inside `server/ai/` and is never sent to the browser.
@@ -21,7 +43,7 @@ Next.js ── auth, CRUD, file upload, pgvector queries, AI
 
 ## Project layout
 
-```
+```text
 job-tracker/                 # a single Next.js 16 app
 ├── src/
 │   ├── app/                 # App Router (routes) + Route Handlers
