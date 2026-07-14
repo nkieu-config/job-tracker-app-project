@@ -184,13 +184,21 @@ uses.
 
 ### Why Better Auth
 
-Sessions live as rows in my own Postgres — revocable server-side, scoped by the
-same `userId` as every other table, with no third-party auth service in the
-request path.
+Auth is a **library here, not a service**. Better Auth's tables are generated
+into my own schema through `prismaAdapter`, so `User`, `Session`, `Account` and
+`Verification` are ordinary rows next to `Application` and `ResumeVersion` —
+same database, same migrations, same `userId` the rest of the app scopes by.
+Sessions are rows rather than JWTs, so a sign-out revokes immediately instead of
+waiting out a token's expiry, and password reset and email verification are
+config hooks (`sendResetPassword`, `sendVerificationEmail`) rather than screens
+rented from a vendor.
 
-<!-- TODO: add the honest one-line reason for Better Auth over NextAuth/Clerk
-     specifically — the actual deciding factor (API shape? docs? owning the
-     session tables?). An interviewer will ask. -->
+The deciding property, in hindsight, is that its parts come apart. Better Auth's
+default rate limiting keeps its counters in memory, which is worthless on a host
+that gives each request its own instance — so the store is swapped for
+`postgresRateLimitStorage`, and the throttle survives because the counter lives
+in the database like everything else. A hosted auth provider would have left me
+with whatever throttle it shipped.
 
 ### Defense-in-depth auth
 
