@@ -10,27 +10,27 @@
 ![Prisma 7](https://img.shields.io/badge/Prisma_7-2D3748?logo=prisma&logoColor=white)
 ![Gemini 2.5](https://img.shields.io/badge/Gemini_2.5-8E75B2?logo=googlegemini&logoColor=white)
 
-**The job hunt is a data problem. I built the tool to solve mine.** An AI-powered job-application tracker that analyzes job descriptions, scores your resume versions against them with vector embeddings, and tailors your bullets — built solo as my capstone project, used daily in my real job search.
+**The job hunt is a data problem. This is the tool I built to solve mine.** An AI-powered job-application tracker that analyzes job descriptions, scores your resume versions against them with vector embeddings, and tailors your bullets — built solo as my capstone project, used daily in my real job search.
 
-**4 AI features · 11 app pages · 8-table Postgres schema · 250 tests + a 3-suite AI eval harness · ~10k lines of strict TypeScript**
+**4 AI features, every one measured · 250 tests + a 3-suite AI eval harness · ~11k lines of strict TypeScript (app, tests, evals)**
 
 ![Dashboard showing application pipeline, response and interview rates, and upcoming deadlines](docs/screenshots/dashboard.png)
 
 ## Try it in 60 seconds
 
-**🔗 Live demo: [job-tracker-app-project.vercel.app](https://job-tracker-app-project.vercel.app)** — click **Try Live Demo** on the homepage, no signup.
+**🔗 Live demo: [job-tracker-app-project.vercel.app](https://job-tracker-app-project.vercel.app)** — click **Try Live Demo** on the homepage (no signup), or sign in directly:
 
-| Field        | Value                  |
-| ------------ | ---------------------- |
-| **Email**    | `demo@jobtracker.app`  |
-| **Password** | `demotracker2026`      |
+| Field        | Value                 |
+| ------------ | --------------------- |
+| **Email**    | `demo@jobtracker.app` |
+| **Password** | `demotracker2026`     |
 
-Then open **Applications → Senior Backend Engineer (Acme Corp)**: the skill-gap chips show **5/6 skills matched** with Kubernetes flagged as the gap, **Resume fit** ranks three resume versions by cosine similarity (73% Strong fit on top), and **Tailor resume bullets** regenerates live, token by token.
+Then open **Applications → Senior Backend Engineer (Acme Corp)**: the skill-gap chips show **5 of the 6 required skills matched**, with Kubernetes flagged as the gap; **Resume fit** ranks the three resume versions by cosine similarity, putting the backend-focused one on top as a Strong fit; and **Tailor resume bullets** regenerates live, token by token.
 
 > [!NOTE]
 > The demo account is shared and public — anything you change is visible to other visitors until the nightly reseed, and all AI actions on it draw from one 30-calls-per-hour budget.
 
-Prefer to run it yourself? Two commands and a `.env` — see [Quick start](#quick-start).
+Prefer to run it yourself? A `.env` and a few commands — see [Quick start](#quick-start).
 
 ## Why I built this
 
@@ -38,7 +38,7 @@ I was a graduating student staring down my first job search, tracking twenty app
 
 So for my graduation project I built the tool I wished I had: a tracker where the pipeline is a Kanban board instead of spreadsheet rows, and where the tedious parts — skill-gap analysis, resume-to-JD matching, bullet rewriting, interview prep — are done by AI in seconds instead of by me at 1 a.m.
 
-The rule I held myself to: **an AI feature that isn't measured doesn't ship.** That's why this repo contains an evaluation harness with precision/recall numbers, not just prompts — and why I can tell you the semantic matching layer is worth exactly +8.3 points of recall.
+The rule I held myself to: **an AI feature that isn't measured doesn't ship.** That's why this repo contains an evaluation harness with precision/recall numbers, not just prompts — and why I can tell you the semantic matching layer is worth +8.3 points of recall on my eval set.
 
 The result is the app I now use to run the very job search it was built for. If you're reading this as a recruiter: the product *is* the cover letter.
 
@@ -60,12 +60,12 @@ flowchart LR
   GEM -.->|"token stream"| UI
 ```
 
-Full deep-dive — system design, decision rationale, challenges-and-solutions log: [docs/architecture.md](docs/architecture.md).
+Full deep-dive — system design, data model, decision rationale, challenges-and-solutions log: [docs/architecture.md](docs/architecture.md).
 
 ## Feature tour
 
-| Module               | What it does                                                                                                                    |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Module               | What it does                                                                                                                      |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | **Kanban pipeline**  | Drag-and-drop board (Saved → Applied → Interview → Offer → Rejected), optimistic updates, URL-synced list with search/filter/sort |
 | **Dashboard**        | Response, interview and offer rates, pipeline funnel, upcoming deadlines                                                          |
 | **JD analysis**      | Gemini extracts required skills, nice-to-haves and seniority, then flags which skills your resumes are missing                    |
@@ -75,7 +75,7 @@ Full deep-dive — system design, decision rationale, challenges-and-solutions l
 | **Resume versions**  | PDF upload (content-type and magic-byte checked), text extraction, private Vercel Blob storage                                    |
 | **AI observability** | Admin page tracking tokens and cost per AI feature; a shared hourly AI budget per user                                            |
 
-The pipeline is a board, not a spreadsheet — drag a card and the move persists optimistically:
+Drag a card and the move persists optimistically:
 
 ![Kanban board with applications grouped by status](docs/screenshots/board.png)
 
@@ -112,7 +112,7 @@ Every image on this page is generated from the seeded demo by Playwright — `np
 - **Vector search in the database, not the app.** Embeddings live in Postgres `vector(768)` columns behind an HNSW index; resume ranking is one raw-SQL cosine-distance query, not an application-side similarity loop.
 - **AI behind one boundary.** All Gemini access lives in a single `server/ai/` module called only from server code, so the API key never reaches the client and there is exactly one place to meter, validate and mock.
 - **Streaming end to end.** Gemini's chunk iterator is piped straight into a Route Handler `ReadableStream` → browser, with an end-of-stream status frame so a dropped connection can never silently persist a truncated result.
-- **Production paper cuts, actually fixed.** Serverless connection exhaustion (now a capped `pg` pool, drained before each Fluid instance suspends), a broken transitive kysely release pinned with an npm override, Prisma 7's engine removal, Next 16's `middleware` → `proxy` rename — the full list with solutions is in [docs/architecture.md](docs/architecture.md#challenges--solutions).
+- **Production paper cuts, actually fixed.** Serverless connection exhaustion (now a capped `pg` pool, drained before each Fluid instance suspends), a broken transitive Kysely release pinned with an npm override, Prisma 7's engine removal, Next 16's `middleware` → `proxy` rename — the full list with solutions is in [docs/architecture.md](docs/architecture.md#challenges--solutions).
 
 ### AI eval scorecard
 
@@ -120,28 +120,30 @@ Regenerated with `npm run eval`, on real model calls:
 
 - **Skill matching** — the embedding layer lifts recall from 86.1% to **94.4%** (+8.3 points; F1 90.5% → **95.5%**) over lexical-only matching, in a controlled ablation.
 - **JD analysis** — **94.0% F1** on skill extraction (precision 94.8%, recall 93.4%), 93.3% seniority accuracy, **100% schema validity** across 15 labeled job descriptions.
-- **Bullet tailoring** — LLM-as-judge scores of **5/5** on relevance, grounding and formatting with a **0% hallucination rate** on the items the free-tier daily quota allowed (3 of 6; excluded items are reported, never silently scored).
+- **Bullet tailoring** — LLM-as-judge scores of **5/5** on relevance, grounding and formatting, with **zero hallucinations** across the 3 of 6 items the free-tier daily quota allowed (excluded items are reported, never silently scored).
 
 Full methodology and per-suite results: [evals/](evals/).
 
 ## Tech stack
 
-| Layer     | Choice                                                                                      |
-| --------- | -------------------------------------------------------------------------------------------- |
-| Framework | Next.js 16 (App Router, Server Actions, Route Handlers) + TypeScript strict                  |
-| AI        | Gemini 2.5 Flash + `gemini-embedding-001`, called in-process from `server/ai/`               |
-| Database  | PostgreSQL (Neon) + Prisma 7 + pgvector                                                      |
-| Auth      | Better Auth (sessions in Postgres)                                                           |
-| UI        | Tailwind CSS v4, semantic design tokens ([design system](docs/design.md))                    |
-| Storage   | Vercel Blob (private)                                                                        |
-| Quality   | Zod validation end-to-end · Vitest + Testing Library · AI eval harness · Playwright tooling  |
-| Infra     | Vercel + GitHub Actions                                                                      |
+| Layer     | Choice                                                                              | Why                                                                                    |
+| --------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Framework | Next.js 16 (App Router, Server Actions, Route Handlers) + TypeScript strict         | One framework covers server-rendered pages, mutations and token streaming              |
+| AI        | Gemini 2.5 Flash + `gemini-embedding-001`, called in-process from `server/ai/`      | Native JSON-schema output, one vendor for generation + embeddings, free tier is enough |
+| Database  | PostgreSQL (Neon) + Prisma 7 + pgvector                                             | Vectors live beside the relational rows — ranking is one SQL query, not a second store |
+| Auth      | Better Auth (sessions in Postgres)                                                  | Sessions in my own database, scoped by the same `userId` as everything else            |
+| UI        | Tailwind CSS v4, semantic design tokens ([design system](docs/design.md))           | Tokens keep 13 pages consistent without pulling in a component library                 |
+| Storage   | Vercel Blob (private)                                                               | Resume PDFs are private by default, served only through an ownership-scoped route      |
+| Quality   | Zod validation end-to-end · Vitest + Testing Library · AI eval harness · Playwright | The same Zod schemas validate forms, Server Actions and the model's JSON output        |
+| Infra     | Vercel + GitHub Actions                                                             | Zero-ops deploys from `main`; CI gates every push                                      |
 
 ## Quick start
 
+Prerequisites: Node.js 20+ (CI runs 22), a PostgreSQL database with the `pgvector` extension (a free [Neon](https://neon.tech) project works), and a [Gemini API key](https://aistudio.google.com/apikey) (the free tier is enough).
+
 ```bash
 npm install
-cp .env.example .env    # set DATABASE_URL, GEMINI_API_KEY, ...
+cp .env.example .env    # set DATABASE_URL, DIRECT_URL, BETTER_AUTH_SECRET, GEMINI_API_KEY, ...
 npx prisma migrate dev
 npm run dev             # http://localhost:3000
 ```
@@ -159,7 +161,13 @@ Full environment-variable reference, scripts and deploy guide: [docs/setup.md](d
 
 ## Testing & quality
 
-250 tests across two Vitest projects — a **Node** project for server code (ownership scoping of every Server Action, the resume upload's blob lifecycle including compensating deletes, the page cap that stops a PDF bomb from pinning the function, rate limiting for both AI and auth, embedding batch splitting, the fence that keeps a job description from being read as prompt instructions) and a **jsdom** project for components (the streaming UI's save/discard rules, accessibility invariants of the drag-and-drop board). Ten are integration tests that run against a real Postgres and skip when no database is reachable — they cover the raw SQL the mocked unit tests can't reach: the rate limiter's atomic upsert, and the predicate deciding whether a resume holds readable text. Security-critical modules — the prompt fence, the admin gate, the AI ownership guard and the PDF page cap among them — are pinned to **100% coverage thresholds** in CI.
+250 tests across two Vitest projects:
+
+- **Node (server)** — ownership scoping of every Server Action, the resume upload's blob lifecycle including compensating deletes, the page cap that stops a PDF bomb from pinning the function, rate limiting for both AI and auth, embedding batch splitting, and the fence that keeps a job description from being read as prompt instructions.
+- **jsdom (components)** — the streaming UI's save/discard rules and the accessibility invariants of the drag-and-drop board.
+- **Integration (10 of the 250)** — run against a real Postgres and skip when no database is reachable. They cover the raw SQL the mocked unit tests can't reach: the rate limiter's atomic upsert, and the predicate deciding whether a resume holds readable text.
+
+Security-critical modules — the prompt fence, the admin gate, the AI ownership guard and the PDF page cap among them — are pinned to **100% coverage thresholds** in CI.
 
 The AI layer is tested twice, at different altitudes: unit tests mock the SDK at the module boundary, and the [eval harness](evals/) measures the real model with precision/recall, an ablation and an LLM judge.
 
@@ -179,18 +187,18 @@ npm run screenshots     # regenerate README screenshots via Playwright
 
 ## Documentation
 
-| Doc                                          | What's inside                                          |
-| -------------------------------------------- | ------------------------------------------------------- |
-| [docs/architecture.md](docs/architecture.md) | System design, key decisions, challenges & solutions    |
-| [docs/setup.md](docs/setup.md)               | Local setup, env vars, scripts, demo account            |
-| [docs/deploy.md](docs/deploy.md)             | Step-by-step deploy: Neon → Vercel                      |
-| [docs/manual-qa.md](docs/manual-qa.md)       | 14-step click-through smoke test                        |
-| [evals/](evals/)                             | AI evaluation harness — methodology + scorecard         |
-| [docs/design.md](docs/design.md)             | Design system: tokens, typography, components           |
+| Doc                                          | What's inside                                                    |
+| -------------------------------------------- | ---------------------------------------------------------------- |
+| [docs/architecture.md](docs/architecture.md) | System design, data model, key decisions, challenges & solutions |
+| [docs/setup.md](docs/setup.md)               | Local setup, env vars, scripts, demo account                     |
+| [docs/deploy.md](docs/deploy.md)             | Step-by-step deploy: Neon → Vercel                               |
+| [docs/manual-qa.md](docs/manual-qa.md)       | 14-step click-through smoke test                                 |
+| [evals/](evals/)                             | AI evaluation harness — methodology + scorecard                  |
+| [docs/design.md](docs/design.md)             | Design system: tokens, typography, components                    |
 
 ## Honest limitations
 
-Deliberate scope choices for a portfolio-scale deployment:
+Deliberate scope choices — plus one quota constraint — for a portfolio-scale deployment:
 
 - **The tailoring eval is a 3-of-6 sample** — the Gemini free tier caps generation at 20 requests/day, and running jd-analysis (15 calls, captured in full) first left only part of a day's budget; the remaining items need a paid key or another day's quota.
 - **No browser e2e suite yet** — the Playwright foundation exists (login/settle helpers in `e2e/`, already driving the automated screenshots) but specs haven't been written on it.
