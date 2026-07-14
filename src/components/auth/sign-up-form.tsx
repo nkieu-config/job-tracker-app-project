@@ -80,7 +80,7 @@ export function SignUpForm() {
         {error && (
           <p
             role="alert"
-            className="rounded-md bg-canvas-error px-4 py-3 text-sm text-semantic-error font-medium"
+            className="rounded-lg bg-canvas-error px-4 py-3 text-body text-semantic-error font-medium"
           >
             {error}
           </p>

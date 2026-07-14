@@ -61,7 +61,7 @@ export default function Home() {
           <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center shrink-0">
             <span className="text-on-primary font-bold text-xl leading-none">J</span>
           </div>
-          <span className="font-display-md text-primary text-2xl tracking-tight">Job Tracker</span>
+          <span className="font-display-sm text-primary tracking-tight">Job Tracker</span>
         </div>
         <nav className="hidden md:flex items-center gap-8 font-sans font-medium text-ink">
           <Link href="#features" className="hover:text-primary transition-colors">
@@ -218,7 +218,7 @@ export default function Home() {
           >
             Start tracking now
           </Link>
-        <div className="mt-16 pt-8 border-t border-primary-tint w-full max-w-5xl flex flex-col md:flex-row justify-between items-center text-on-aubergine-mute text-sm font-sans">
+        <div className="mt-16 pt-8 border-t border-primary-tint w-full max-w-5xl flex flex-col md:flex-row justify-between items-center text-on-aubergine-mute text-body font-sans">
           <p>© 2026 Job Tracker. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
             <a

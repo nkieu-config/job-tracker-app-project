@@ -118,7 +118,7 @@ export function ApplicationForm({
           rows={6}
           className={inputClass}
         />
-        <div className="text-caption font-sans text-ink bg-canvas-lavender px-3 py-2 rounded-md border border-hairline flex items-start gap-2 mt-1 shadow-sm">
+        <div className="text-caption font-sans text-ink bg-canvas-lavender px-3 py-2 rounded-lg border border-hairline flex items-start gap-2 mt-1 shadow-sm">
           <Sparkles size={14} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
           <span><b>Pro Tip:</b> Paste the full job description here to unlock AI Skills Analysis and Resume Fit Scoring!</span>
         </div>

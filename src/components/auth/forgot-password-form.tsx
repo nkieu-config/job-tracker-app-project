@@ -35,7 +35,7 @@ export function ForgotPasswordForm() {
     return (
       <p
         role="status"
-        className="rounded-md bg-canvas-lavender px-4 py-3 text-center font-sans text-body text-ink"
+        className="rounded-lg bg-canvas-lavender px-4 py-3 text-center font-sans text-body text-ink"
       >
         If an account exists for <b>{email}</b>, we&apos;ve sent it a reset
         link. It expires in 1 hour.
@@ -60,7 +60,7 @@ export function ForgotPasswordForm() {
       {error && (
         <p
           role="alert"
-          className="rounded-md bg-canvas-error px-4 py-3 text-sm text-semantic-error font-medium"
+          className="rounded-lg bg-canvas-error px-4 py-3 text-body text-semantic-error font-medium"
         >
           {error}
         </p>

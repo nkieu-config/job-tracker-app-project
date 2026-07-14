@@ -276,7 +276,7 @@ export default async function ApplicationDetailPage({
             )}
 
             {analysisStale && (
-              <p className="rounded-xl bg-semantic-warning-tint px-4 py-3 text-body font-sans font-medium text-ink">
+              <p className="rounded-lg bg-semantic-warning-tint px-4 py-3 text-body font-sans font-medium text-ink">
                 You&rsquo;ve uploaded resumes since this analysis — re-analyze
                 to refresh the skill matching.
               </p>

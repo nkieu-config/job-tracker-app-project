@@ -45,7 +45,7 @@ export function SignInForm({
       {passwordWasReset && !error && (
         <p
           role="status"
-          className="mb-5 rounded-md bg-canvas-lavender px-4 py-3 text-center font-sans text-body text-ink"
+          className="mb-5 rounded-lg bg-canvas-lavender px-4 py-3 text-center font-sans text-body text-ink"
         >
           Your password has been updated. Sign in with it below.
         </p>
@@ -89,7 +89,7 @@ export function SignInForm({
         {error && (
           <p
             role="alert"
-            className="rounded-md bg-canvas-error px-4 py-3 text-sm text-semantic-error font-medium"
+            className="rounded-lg bg-canvas-error px-4 py-3 text-body text-semantic-error font-medium"
           >
             {error}
           </p>

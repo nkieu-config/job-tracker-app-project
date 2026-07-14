@@ -28,7 +28,7 @@ export default async function DashboardLayout({
                 J
               </span>
             </div>
-            <span className="font-display-md text-2xl tracking-tight text-primary">
+            <span className="font-display-sm tracking-tight text-primary">
               Job Tracker
             </span>
           </Link>
