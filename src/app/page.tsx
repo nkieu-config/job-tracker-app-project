@@ -8,6 +8,7 @@ import {
   MessagesSquare,
 } from "lucide-react";
 import { DemoButton } from "@/components/auth/demo-button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const MOCK_COLUMNS = [
   {
@@ -77,6 +78,7 @@ export default function Home() {
           </a>
         </nav>
         <div className="flex items-center gap-4">
+          <ThemeToggle />
           <Link
             href="/sign-in"
             className="hidden sm:inline-flex items-center justify-center font-sans font-bold text-body-lg text-ink hover:text-primary transition-colors"

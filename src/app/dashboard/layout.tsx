@@ -4,6 +4,7 @@ import { getSession } from "@/server/get-session";
 import { isAdminEmail } from "@/server/admin";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default async function DashboardLayout({
   children,
@@ -40,7 +41,10 @@ export default async function DashboardLayout({
           <span className="truncate px-2 text-caption text-ink-mute">
             {session.user.email}
           </span>
-          <SignOutButton />
+          <div className="flex items-center gap-2">
+            <SignOutButton />
+            <ThemeToggle className="ml-auto" />
+          </div>
         </div>
       </aside>
 
@@ -56,7 +60,10 @@ export default async function DashboardLayout({
           <nav aria-label="Main" className="min-w-0">
             <DashboardNav orientation="horizontal" isAdmin={isAdmin} />
           </nav>
-          <SignOutButton />
+          <div className="flex shrink-0 items-center gap-2">
+            <ThemeToggle />
+            <SignOutButton />
+          </div>
         </header>
 
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-8 lg:py-12">

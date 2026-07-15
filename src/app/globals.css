@@ -1,8 +1,151 @@
 @import "tailwindcss";
 
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:not([data-theme="light"], [data-theme="light"] *)) {
+      @slot;
+    }
+  }
+}
+
 :root {
+  color-scheme: light;
+
   --background: #ffffff;
-  --foreground: #1d1d1d; /* ink */
+  --foreground: #1d1d1d;
+
+  --primary: #4a154b;
+  --primary-deep: #481a54;
+  --primary-press: #611f69;
+  --primary-tint: #592466;
+  --on-primary: #ffffff;
+
+  --ink: #1d1d1d;
+  --ink-mute: #696969;
+
+  --link-blue: #1264a3;
+  --link-hover: #3860be;
+
+  --canvas: #ffffff;
+  --canvas-cream: #f4ede4;
+  --canvas-lavender: #f9f0ff;
+  --canvas-lavender-hover: #ebdcf5;
+  --canvas-error: #fdf0f0;
+
+  --surface-elev: #ffffff;
+  --surface-aubergine: #4a154b;
+  --surface-hover: #f5eded;
+  --on-aubergine-mute: #d9bdde;
+
+  --hairline: #e6e6e6;
+  --hairline-strong: #000000;
+
+  --semantic-error: #cc4117;
+  --semantic-error-tint: #fdebea;
+  --semantic-error-hover: #fad8d6;
+  --semantic-success: #007a5a;
+  --semantic-success-tint: #e2f1ea;
+  --semantic-warning: #d69f12;
+  --semantic-warning-tint: #fcf2db;
+
+  --mesh-1: rgba(233, 216, 255, 0.6);
+  --mesh-2: rgba(255, 240, 230, 0.7);
+  --mesh-3: rgba(220, 240, 230, 0.5);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --background: #16121c;
+    --foreground: #e8e5ee;
+
+    --primary: #8a4d93;
+    --primary-deep: #6a3372;
+    --primary-press: #9a5aa3;
+    --primary-tint: #3a2f45;
+    --on-primary: #ffffff;
+
+    --ink: #e8e5ee;
+    --ink-mute: #a49eae;
+
+    --link-blue: #7cb8ef;
+    --link-hover: #9dccf4;
+
+    --canvas: #2a2335;
+    --canvas-cream: #211b28;
+    --canvas-lavender: #221c2b;
+    --canvas-lavender-hover: #322a3d;
+    --canvas-error: #2b1a1e;
+
+    --surface-elev: #2a2335;
+    --surface-aubergine: #3a1140;
+    --surface-hover: #322a3d;
+    --on-aubergine-mute: #d9bdde;
+
+    --hairline: #39323f;
+    --hairline-strong: #ffffff;
+
+    --semantic-error: #f08a6c;
+    --semantic-error-tint: #3a1e1a;
+    --semantic-error-hover: #4c2820;
+    --semantic-success: #4cbf95;
+    --semantic-success-tint: #17302a;
+    --semantic-warning: #e6b23c;
+    --semantic-warning-tint: #342a17;
+
+    --mesh-1: rgba(90, 55, 120, 0.4);
+    --mesh-2: rgba(70, 45, 80, 0.35);
+    --mesh-3: rgba(40, 60, 72, 0.3);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --background: #16121c;
+  --foreground: #e8e5ee;
+
+  --primary: #8a4d93;
+  --primary-deep: #6a3372;
+  --primary-press: #9a5aa3;
+  --primary-tint: #3a2f45;
+  --on-primary: #ffffff;
+
+  --ink: #e8e5ee;
+  --ink-mute: #a49eae;
+
+  --link-blue: #7cb8ef;
+  --link-hover: #9dccf4;
+
+  --canvas: #2a2335;
+  --canvas-cream: #211b28;
+  --canvas-lavender: #221c2b;
+  --canvas-lavender-hover: #322a3d;
+  --canvas-error: #2b1a1e;
+
+  --surface-elev: #2a2335;
+  --surface-aubergine: #3a1140;
+  --surface-hover: #322a3d;
+  --on-aubergine-mute: #d9bdde;
+
+  --hairline: #39323f;
+  --hairline-strong: #ffffff;
+
+  --semantic-error: #f08a6c;
+  --semantic-error-tint: #3a1e1a;
+  --semantic-error-hover: #4c2820;
+  --semantic-success: #4cbf95;
+  --semantic-success-tint: #17302a;
+  --semantic-warning: #e6b23c;
+  --semantic-warning-tint: #342a17;
+
+  --mesh-1: rgba(90, 55, 120, 0.4);
+  --mesh-2: rgba(70, 45, 80, 0.35);
+  --mesh-3: rgba(40, 60, 72, 0.3);
 }
 
 @theme inline {
@@ -11,42 +154,42 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   /* Slacc Colors */
-  --color-primary: #4a154b;
-  --color-primary-deep: #481a54;
-  --color-primary-press: #611f69;
-  --color-primary-tint: #592466;
-  --color-on-primary: #ffffff;
+  --color-primary: var(--primary);
+  --color-primary-deep: var(--primary-deep);
+  --color-primary-press: var(--primary-press);
+  --color-primary-tint: var(--primary-tint);
+  --color-on-primary: var(--on-primary);
 
-  --color-ink: #1d1d1d;
-  --color-ink-mute: #696969;
+  --color-ink: var(--ink);
+  --color-ink-mute: var(--ink-mute);
 
-  --color-link-blue: #1264a3;
-  --color-link-hover: #3860be;
+  --color-link-blue: var(--link-blue);
+  --color-link-hover: var(--link-hover);
 
-  --color-canvas: #ffffff;
-  --color-canvas-cream: #f4ede4;
-  --color-canvas-lavender: #f9f0ff;
+  --color-canvas: var(--canvas);
+  --color-canvas-cream: var(--canvas-cream);
+  --color-canvas-lavender: var(--canvas-lavender);
 
-  --color-surface-elev: #ffffff;
-  --color-surface-aubergine: #4a154b;
-  --color-on-aubergine-mute: #d9bdde;
+  --color-surface-elev: var(--surface-elev);
+  --color-surface-aubergine: var(--surface-aubergine);
+  --color-on-aubergine-mute: var(--on-aubergine-mute);
 
-  --color-hairline: #e6e6e6;
-  --color-hairline-strong: #000000;
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
 
-  --color-semantic-error: #cc4117;
-  --color-semantic-error-tint: #fdebea;
-  --color-semantic-error-hover: #fad8d6;
+  --color-semantic-error: var(--semantic-error);
+  --color-semantic-error-tint: var(--semantic-error-tint);
+  --color-semantic-error-hover: var(--semantic-error-hover);
 
-  --color-semantic-success: #007a5a;
-  --color-semantic-success-tint: #e2f1ea;
+  --color-semantic-success: var(--semantic-success);
+  --color-semantic-success-tint: var(--semantic-success-tint);
 
-  --color-semantic-warning: #d69f12;
-  --color-semantic-warning-tint: #fcf2db;
+  --color-semantic-warning: var(--semantic-warning);
+  --color-semantic-warning-tint: var(--semantic-warning-tint);
 
-  --color-canvas-lavender-hover: #ebdcf5;
-  --color-canvas-error: #fdf0f0;
-  --color-surface-hover: #f5eded;
+  --color-canvas-lavender-hover: var(--canvas-lavender-hover);
+  --color-canvas-error: var(--canvas-error);
+  --color-surface-hover: var(--surface-hover);
 
   /* Slacc Layout */
   --radius-pill: 90px;
@@ -71,10 +214,6 @@
       transform: translateY(0);
     }
   }
-}
-
-html {
-  color-scheme: light;
 }
 
 body {
@@ -125,9 +264,9 @@ body {
 @utility bg-pastel-mesh {
   background-color: var(--color-canvas-cream);
   background-image:
-    radial-gradient(at 100% 0%, rgba(233, 216, 255, 0.6) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(255, 240, 230, 0.7) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(220, 240, 230, 0.5) 0px, transparent 50%);
+    radial-gradient(at 100% 0%, var(--mesh-1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, var(--mesh-2) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, var(--mesh-3) 0px, transparent 50%);
 }
 
 @media (prefers-reduced-motion: reduce) {
