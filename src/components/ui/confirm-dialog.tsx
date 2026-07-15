@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { cardClass } from "@/components/ui/card";
 
@@ -22,6 +22,8 @@ export function ConfirmDialog({
   onCancel: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+  const descId = useId();
 
   useEffect(() => {
     const dialog = ref.current;
@@ -33,6 +35,8 @@ export function ConfirmDialog({
   return (
     <dialog
       ref={ref}
+      aria-labelledby={titleId}
+      aria-describedby={descId}
       onCancel={(e) => {
         e.preventDefault();
         if (!pending) onCancel();
@@ -41,8 +45,13 @@ export function ConfirmDialog({
         "m-auto w-full max-w-sm p-8 shadow-[0_20px_60px_rgba(74,21,75,0.15)] backdrop:bg-ink/40",
       )}
     >
-      <h2 className="font-sans text-title font-bold text-ink">{title}</h2>
-      <p className="mt-2 font-sans text-body leading-relaxed text-ink-mute">
+      <h2 id={titleId} className="font-sans text-title font-bold text-ink">
+        {title}
+      </h2>
+      <p
+        id={descId}
+        className="mt-2 font-sans text-body leading-relaxed text-ink-mute"
+      >
         {description}
       </p>
       <div className="mt-6 flex justify-end gap-2">
