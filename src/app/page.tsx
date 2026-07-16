@@ -141,7 +141,7 @@ export default function Home() {
               {FEATURES.map((feature, i) => (
                 <Reveal key={feature.title} delay={i * 70}>
                   <div className="flex gap-4">
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-canvas-lavender text-primary">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
                       <feature.icon size={18} aria-hidden="true" />
                     </span>
                     <div>
