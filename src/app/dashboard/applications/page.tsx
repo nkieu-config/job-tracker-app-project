@@ -30,7 +30,8 @@ export const metadata: Metadata = {
   title: "Applications",
 };
 
-const LIST_GRID = "grid grid-cols-[minmax(0,1fr)_150px_130px] items-center gap-4";
+const LIST_GRID =
+  "grid grid-cols-[minmax(0,1fr)_84px_104px] items-center gap-3 sm:grid-cols-[minmax(0,1fr)_150px_130px] sm:gap-4";
 
 function parseStatus(value?: string): ApplicationStatus | undefined {
   return isOneOf(APPLICATION_STATUSES, value) ? value : undefined;
@@ -202,7 +203,7 @@ export default async function ApplicationsPage({
             )
           ) : (
             <div className="mt-4 overflow-x-auto rounded-2xl border border-hairline bg-canvas">
-              <div className="min-w-140">
+              <div className="min-w-0">
                 <div
                   className={`${LIST_GRID} border-b border-hairline px-4 py-2.5`}
                 >
