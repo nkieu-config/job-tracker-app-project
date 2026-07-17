@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { deleteResume } from "@/actions/resumes";
+import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useToast } from "@/components/ui/toast";
 
@@ -23,13 +24,9 @@ export function DeleteResumeButton({ id }: { id: string }) {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        disabled={pending}
-        className="inline-flex items-center justify-center bg-semantic-error-tint text-semantic-error font-sans font-bold text-body tracking-[0.144px] py-2.5 px-5 rounded-pill transition-colors hover:bg-semantic-error-hover disabled:opacity-60"
-      >
+      <Button variant="danger" onClick={() => setOpen(true)} disabled={pending}>
         {pending ? "Deleting…" : "Delete"}
-      </button>
+      </Button>
       <ConfirmDialog
         open={open}
         title="Delete this resume version?"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { inputClass } from "@/components/ui/form-styles";
 import { saveTailoredBullets } from "@/actions/applications";
 import { useAiStream } from "@/components/applications/use-ai-stream";
@@ -51,13 +52,9 @@ export function TailorBullets({
           aria-label="Experience to tailor"
           className={inputClass}
         />
-        <button
-          type="submit"
-          disabled={loading}
-          className="inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-body-lg tracking-[0.2px] py-2.5 px-5 rounded-pill transition-colors hover:bg-primary-press disabled:opacity-60"
-        >
+        <Button type="submit" disabled={loading}>
           {loading ? "Tailoring…" : output ? "Regenerate bullets" : "Tailor bullets"}
-        </button>
+        </Button>
       </form>
 
       {error && (
@@ -77,13 +74,9 @@ export function TailorBullets({
           </div>
           {output && !loading && (
             <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={copyOutput}
-                className="inline-flex items-center justify-center bg-canvas text-ink font-sans font-bold text-body py-2 px-4 rounded-pill border border-hairline transition-colors hover:bg-canvas-lavender"
-              >
+              <Button variant="ghost" size="sm" onClick={copyOutput}>
                 Copy bullets
-              </button>
+              </Button>
             </div>
           )}
         </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
 import { inputClass, labelClass } from "@/components/ui/form-styles";
 
 export function ForgotPasswordForm() {
@@ -66,13 +67,9 @@ export function ForgotPasswordForm() {
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="mt-2 inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-body-lg tracking-[0.2px] py-3.5 px-7 rounded-pill transition-colors hover:bg-primary-press disabled:opacity-60 disabled:cursor-not-allowed"
-      >
+      <Button type="submit" size="lg" disabled={loading} className="mt-2">
         {loading ? "Sending…" : "Send reset link"}
-      </button>
+      </Button>
     </form>
   );
 }

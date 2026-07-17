@@ -19,16 +19,13 @@ repository root (default). `vercel.json` sets the install/build commands.
 
 ### Environment variables
 
-| Variable | Notes |
+Set the variables [setup.md](./setup.md#environment-variables) lists — that table
+is the reference. Two of them behave differently in production:
+
+| Variable | In production |
 | --- | --- |
-| `GEMINI_API_KEY` | Google AI Studio key (server-only) |
-| `DATABASE_URL` | Neon **pooled** endpoint — what the app uses at runtime |
-| `DIRECT_URL` | Neon **direct** endpoint — used only by `prisma migrate` |
-| `BETTER_AUTH_SECRET` | random string — `openssl rand -base64 32` |
-| `BETTER_AUTH_URL` | your deployment URL, e.g. `https://job-tracker-app-project.vercel.app` |
-| `BLOB_READ_WRITE_TOKEN` | Vercel Blob |
-| `ADMIN_EMAILS` | comma-separated emails allowed to view `/dashboard/ai-usage` (optional; empty means nobody) |
-| `CRON_SECRET` | bearer token Vercel Cron sends to `/api/cron/*` — the rate-limit sweep in `vercel.json` (optional; the route refuses to run when unset) |
+| `BETTER_AUTH_URL` | Your deployment URL, not `localhost`. Better Auth rejects a request whose origin doesn't match this, so a stale value fails every sign-in with "Invalid origin". |
+| `DATABASE_URL` | Must be the **pooled** endpoint — see the warning below. |
 
 Redeploy Vercel after env changes (new deployments only pick up new vars).
 

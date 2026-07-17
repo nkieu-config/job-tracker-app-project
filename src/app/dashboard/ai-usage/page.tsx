@@ -6,6 +6,8 @@ import { isAdminEmail } from "@/server/admin";
 import { getAiUsageStats, type FeatureStat } from "@/server/data/ai-usage";
 import { AI_FEATURES, type AiFeature } from "@/server/observability";
 import { isOneOf } from "@/lib/guards";
+import { Card } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const dynamic = "force-dynamic";
 
@@ -46,23 +48,25 @@ function Tile({
   hint: string;
 }) {
   return (
-    <div className="rounded-2xl border border-hairline bg-canvas p-6 shadow-sm">
+    <Card className="p-6 shadow-sm">
       <p className="text-caption font-sans font-medium text-ink-mute">{label}</p>
-      <p className="mt-2 font-display-md text-primary tabular-nums">{value}</p>
+      <p className="mt-2 font-display-md font-mono tabular-nums text-primary">
+        {value}
+      </p>
       <p className="mt-1 text-caption font-sans text-ink-mute">{hint}</p>
-    </div>
+    </Card>
   );
 }
 
 function FeatureRow({ stat, maxCalls }: { stat: FeatureStat; maxCalls: number }) {
   const pct = maxCalls ? Math.max(Math.round((stat.calls / maxCalls) * 100), 4) : 0;
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-hairline bg-canvas px-5 py-4">
-      <div className="w-40 shrink-0">
+    <div className="flex flex-col gap-3 rounded-xl border border-hairline bg-canvas px-5 py-4 sm:flex-row sm:items-center sm:gap-4">
+      <div className="sm:w-40 sm:shrink-0">
         <p className="font-sans text-body font-bold text-ink">
           {featureLabel(stat.feature)}
         </p>
-        <p className="font-sans text-caption text-ink-mute tabular-nums">
+        <p className="font-mono text-caption tabular-nums text-ink-mute">
           {stat.calls} call{stat.calls === 1 ? "" : "s"}
         </p>
       </div>
@@ -74,14 +78,16 @@ function FeatureRow({ stat, maxCalls }: { stat: FeatureStat; maxCalls: number })
           />
         </div>
       </div>
-      <div className="w-24 shrink-0 text-right font-sans text-caption tabular-nums text-ink-mute">
-        {fmtTokens(stat.totalTokens)} tok
-      </div>
-      <div className="w-20 shrink-0 text-right font-sans text-caption tabular-nums text-ink-mute">
-        {Math.round(stat.avgLatencyMs)}ms
-      </div>
-      <div className="w-20 shrink-0 text-right font-sans text-caption font-bold tabular-nums text-ink">
-        {fmtCost(stat.costUsd)}
+      <div className="flex items-center justify-between gap-4 font-mono text-caption tabular-nums text-ink-mute sm:justify-end">
+        <span className="sm:w-24 sm:text-right">
+          {fmtTokens(stat.totalTokens)} tok
+        </span>
+        <span className="sm:w-20 sm:text-right">
+          {Math.round(stat.avgLatencyMs)}ms
+        </span>
+        <span className="font-bold text-ink sm:w-20 sm:text-right">
+          {fmtCost(stat.costUsd)}
+        </span>
       </div>
     </div>
   );
@@ -109,16 +115,14 @@ export default async function AiUsagePage() {
       </div>
 
       {stats.totalCalls === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-hairline bg-canvas p-12 text-center shadow-sm">
-          <Sparkles size={24} className="text-primary" aria-hidden="true" />
-          <p className="font-sans text-body-lg font-bold text-ink">
-            No AI calls recorded yet
-          </p>
-          <p className="font-sans text-body text-ink-mute">
-            Analyze a job description, compute a resume fit, or tailor bullets —
-            each call is metered and will appear here.
-          </p>
-        </div>
+        <EmptyState
+          icon={<Sparkles size={24} className="text-primary" aria-hidden="true" />}
+          title="No AI calls recorded yet"
+          className="p-12 shadow-sm"
+        >
+          Analyze a job description, compute a resume fit, or tailor bullets —
+          each call is metered and will appear here.
+        </EmptyState>
       ) : (
         <>
           <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -165,19 +169,19 @@ export default async function AiUsagePage() {
                   key={call.id}
                   className="flex items-center justify-between gap-4 rounded-xl border border-hairline bg-canvas px-5 py-3"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
                     <span
                       className={`h-2 w-2 shrink-0 rounded-full ${call.ok ? "bg-semantic-success" : "bg-semantic-error"}`}
                       aria-hidden="true"
                     />
-                    <span className="font-sans text-body font-bold text-ink">
+                    <span className="shrink-0 font-sans text-body font-bold text-ink">
                       {featureLabel(call.feature)}
                     </span>
-                    <span className="font-sans text-caption text-ink-mute">
+                    <span className="truncate font-sans text-caption text-ink-mute">
                       {call.model}
                     </span>
                   </div>
-                  <div className="flex shrink-0 items-center gap-4 font-sans text-caption tabular-nums text-ink-mute">
+                  <div className="flex shrink-0 items-center gap-4 font-mono text-caption tabular-nums text-ink-mute">
                     <span>{fmtTokens(call.totalTokens)} tok</span>
                     <span>{Math.round(call.latencyMs)}ms</span>
                   </div>

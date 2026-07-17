@@ -4,6 +4,8 @@ import { getSession } from "@/server/get-session";
 import { isAdminEmail } from "@/server/admin";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { SkipLink } from "@/components/ui/skip-link";
 
 export default async function DashboardLayout({
   children,
@@ -20,6 +22,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex flex-1 bg-canvas-lavender font-sans">
+      <SkipLink />
       <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col justify-between border-r border-hairline bg-canvas px-4 py-6 lg:flex">
         <div className="flex flex-col gap-8">
           <Link href="/dashboard" className="flex items-center gap-2 px-2">
@@ -40,7 +43,10 @@ export default async function DashboardLayout({
           <span className="truncate px-2 text-caption text-ink-mute">
             {session.user.email}
           </span>
-          <SignOutButton />
+          <div className="flex items-center gap-2">
+            <SignOutButton />
+            <ThemeToggle className="ml-auto" />
+          </div>
         </div>
       </aside>
 
@@ -56,10 +62,17 @@ export default async function DashboardLayout({
           <nav aria-label="Main" className="min-w-0">
             <DashboardNav orientation="horizontal" isAdmin={isAdmin} />
           </nav>
-          <SignOutButton />
+          <div className="flex shrink-0 items-center gap-2">
+            <ThemeToggle />
+            <SignOutButton />
+          </div>
         </header>
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-8 lg:py-12">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-8 lg:py-12 focus:outline-none"
+        >
           {children}
         </main>
       </div>

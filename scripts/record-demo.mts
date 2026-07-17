@@ -85,8 +85,10 @@ await page.evaluate(() => {
   }
 });
 
-await section.evaluate((el) => el.scrollIntoView({ block: "start" }));
-await page.evaluate(() => window.scrollBy(0, -32));
+await section.evaluate((el) => {
+  const top = el.getBoundingClientRect().top + window.scrollY - 32;
+  window.scrollTo({ top, behavior: "instant" });
+});
 await page.waitForTimeout(600);
 
 const generate = section.getByRole("button", {

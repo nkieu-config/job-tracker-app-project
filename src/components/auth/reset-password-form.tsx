@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { Button, buttonClass } from "@/components/ui/button";
 import { inputClass, labelClass } from "@/components/ui/form-styles";
 
 export function ResetPasswordForm({ token }: { token: string | null }) {
@@ -50,10 +51,7 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
         >
           This reset link is invalid or has expired.
         </p>
-        <Link
-          href="/forgot-password"
-          className="inline-flex items-center justify-center rounded-pill bg-primary px-7 py-3.5 font-sans text-body-lg font-bold tracking-[0.2px] text-on-primary transition-colors hover:bg-primary-press"
-        >
+        <Link href="/forgot-password" className={buttonClass({ size: "lg" })}>
           Request a new link
         </Link>
       </div>
@@ -100,13 +98,9 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="mt-2 inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-body-lg tracking-[0.2px] py-3.5 px-7 rounded-pill transition-colors hover:bg-primary-press disabled:opacity-60 disabled:cursor-not-allowed"
-      >
+      <Button type="submit" size="lg" disabled={loading} className="mt-2">
         {loading ? "Updating…" : "Update password"}
-      </button>
+      </Button>
     </form>
   );
 }

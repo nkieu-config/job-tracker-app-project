@@ -7,6 +7,7 @@ import {
   APPLICATION_STATUSES,
   STATUS_LABELS,
 } from "@/lib/schemas/application";
+import { Button, buttonClass } from "@/components/ui/button";
 import { inputClass, labelClass } from "@/components/ui/form-styles";
 import type { FormState } from "@/actions/applications";
 
@@ -20,9 +21,17 @@ export type ApplicationFormValues = {
   notes?: string;
 };
 
-function FieldError({ messages }: { messages?: string[] }) {
+function FieldError({ name, messages }: { name: string; messages?: string[] }) {
   if (!messages?.length) return null;
-  return <span className="text-fine font-sans text-semantic-error">{messages[0]}</span>;
+  return (
+    <span
+      id={`${name}-error`}
+      role="alert"
+      className="text-fine font-sans text-semantic-error"
+    >
+      {messages[0]}
+    </span>
+  );
 }
 
 export function ApplicationForm({
@@ -52,9 +61,11 @@ export function ApplicationForm({
             name="company"
             defaultValue={values.company}
             required
+            aria-invalid={fe?.company ? true : undefined}
+            aria-describedby={fe?.company ? "company-error" : undefined}
             className={inputClass}
           />
-          <FieldError messages={fe?.company} />
+          <FieldError name="company" messages={fe?.company} />
         </label>
 
         <label className={labelClass}>
@@ -63,9 +74,11 @@ export function ApplicationForm({
             name="role"
             defaultValue={values.role}
             required
+            aria-invalid={fe?.role ? true : undefined}
+            aria-describedby={fe?.role ? "role-error" : undefined}
             className={inputClass}
           />
-          <FieldError messages={fe?.role} />
+          <FieldError name="role" messages={fe?.role} />
         </label>
 
         <label className={labelClass}>
@@ -73,6 +86,8 @@ export function ApplicationForm({
           <select
             name="status"
             defaultValue={values.status ?? "SAVED"}
+            aria-invalid={fe?.status ? true : undefined}
+            aria-describedby={fe?.status ? "status-error" : undefined}
             className={inputClass}
           >
             {APPLICATION_STATUSES.map((s) => (
@@ -81,7 +96,7 @@ export function ApplicationForm({
               </option>
             ))}
           </select>
-          <FieldError messages={fe?.status} />
+          <FieldError name="status" messages={fe?.status} />
         </label>
 
         <label className={labelClass}>
@@ -90,9 +105,11 @@ export function ApplicationForm({
             type="date"
             name="deadline"
             defaultValue={values.deadline}
+            aria-invalid={fe?.deadline ? true : undefined}
+            aria-describedby={fe?.deadline ? "deadline-error" : undefined}
             className={inputClass}
           />
-          <FieldError messages={fe?.deadline} />
+          <FieldError name="deadline" messages={fe?.deadline} />
         </label>
       </div>
 
@@ -103,9 +120,11 @@ export function ApplicationForm({
           name="jobUrl"
           defaultValue={values.jobUrl}
           placeholder="https://…"
+          aria-invalid={fe?.jobUrl ? true : undefined}
+          aria-describedby={fe?.jobUrl ? "jobUrl-error" : undefined}
           className={inputClass}
         />
-        <FieldError messages={fe?.jobUrl} />
+        <FieldError name="jobUrl" messages={fe?.jobUrl} />
       </label>
 
       <label className={labelClass}>
@@ -116,13 +135,17 @@ export function ApplicationForm({
           name="jobDescription"
           defaultValue={values.jobDescription}
           rows={6}
+          aria-invalid={fe?.jobDescription ? true : undefined}
+          aria-describedby={
+            fe?.jobDescription ? "jobDescription-error" : undefined
+          }
           className={inputClass}
         />
         <div className="text-caption font-sans text-ink bg-canvas-lavender px-3 py-2 rounded-lg border border-hairline flex items-start gap-2 mt-1 shadow-sm">
           <Sparkles size={14} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
           <span><b>Pro Tip:</b> Paste the full job description here to unlock AI Skills Analysis and Resume Fit Scoring!</span>
         </div>
-        <FieldError messages={fe?.jobDescription} />
+        <FieldError name="jobDescription" messages={fe?.jobDescription} />
       </label>
 
       <label className={labelClass}>
@@ -131,9 +154,11 @@ export function ApplicationForm({
           name="notes"
           defaultValue={values.notes}
           rows={3}
+          aria-invalid={fe?.notes ? true : undefined}
+          aria-describedby={fe?.notes ? "notes-error" : undefined}
           className={inputClass}
         />
-        <FieldError messages={fe?.notes} />
+        <FieldError name="notes" messages={fe?.notes} />
       </label>
 
       {state.error && (
@@ -146,16 +171,12 @@ export function ApplicationForm({
       )}
 
       <div className="flex items-center gap-3">
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-body-lg tracking-[0.2px] py-3.5 px-7 rounded-pill transition-colors hover:bg-primary-press disabled:opacity-60"
-        >
+        <Button type="submit" size="lg" disabled={pending}>
           {pending ? "Saving…" : submitLabel}
-        </button>
+        </Button>
         <Link
           href={cancelHref}
-          className="inline-flex items-center justify-center bg-canvas-lavender text-ink font-sans font-bold text-body-lg tracking-[0.2px] py-3.5 px-7 rounded-pill transition-colors hover:bg-canvas-lavender-hover"
+          className={buttonClass({ variant: "secondary", size: "lg" })}
         >
           Cancel
         </Link>

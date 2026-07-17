@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signUp } from "@/lib/auth-client";
 import { DemoButton } from "@/components/auth/demo-button";
+import { Button, buttonClass } from "@/components/ui/button";
 import { inputClass, labelClass } from "@/components/ui/form-styles";
 
 export function SignUpForm() {
@@ -86,13 +87,9 @@ export function SignUpForm() {
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="mt-2 inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-body-lg tracking-[0.2px] py-3.5 px-7 rounded-pill transition-colors hover:bg-primary-press disabled:opacity-60 disabled:cursor-not-allowed"
-        >
+        <Button type="submit" size="lg" disabled={loading} className="mt-2">
           {loading ? "Creating account…" : "Sign up"}
-        </button>
+        </Button>
       </form>
 
       <div className="my-6 flex items-center gap-3 text-body font-sans text-ink-mute">
@@ -104,7 +101,11 @@ export function SignUpForm() {
       <DemoButton
         onError={setError}
         disabled={loading}
-        className="inline-flex w-full items-center justify-center bg-canvas text-primary font-sans font-bold text-body-lg tracking-[0.2px] py-3.5 px-7 rounded-pill border-2 border-primary transition-colors hover:bg-canvas-lavender disabled:opacity-60 disabled:cursor-not-allowed"
+        className={buttonClass({
+          variant: "outline",
+          size: "lg",
+          className: "w-full",
+        })}
       />
     </>
   );

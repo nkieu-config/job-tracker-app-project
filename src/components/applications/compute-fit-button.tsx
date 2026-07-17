@@ -3,6 +3,7 @@
 import { useActionState, useEffect } from "react";
 import { Sparkles } from "lucide-react";
 import { computeResumeFit, type FitState } from "@/actions/applications";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
 export function ComputeFitButton({
@@ -25,14 +26,10 @@ export function ComputeFitButton({
 
   return (
     <form action={formAction} className="flex flex-col gap-2">
-      <button
-        type="submit"
-        disabled={pending}
-        className="inline-flex items-center justify-center gap-2 bg-canvas text-ink font-sans font-bold text-body tracking-[0.144px] py-2.5 px-5 rounded-pill border border-hairline transition-colors hover:bg-canvas-lavender disabled:opacity-60"
-      >
+      <Button type="submit" variant="ghost" disabled={pending}>
         <Sparkles size={16} aria-hidden="true" />
         {pending ? "Computing…" : label}
-      </button>
+      </Button>
       {state.error && (
         <p role="alert" className="text-body font-sans text-semantic-error">
           {state.error}

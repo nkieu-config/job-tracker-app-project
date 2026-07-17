@@ -66,9 +66,7 @@ function StageCard({
           {STATUS_LABELS[status]}
         </span>
       </div>
-      <span
-        className={`font-display-md tabular-nums ${color.num}`}
-      >
+      <span className={`font-display-md font-mono tabular-nums ${color.num}`}>
         {count}
       </span>
       <div className="mt-auto h-1.5 w-full overflow-hidden rounded-full bg-hairline">
@@ -126,7 +124,7 @@ export function Pipeline({
           <span className={`h-2 w-2 rounded-full ${STATUS_COLORS.REJECTED.dot}`} />
           Rejected
         </span>
-        <span className="text-body-lg font-sans font-bold tabular-nums text-ink-mute">
+        <span className="text-body-lg font-mono font-semibold tabular-nums text-ink-mute">
           {counts.REJECTED}
         </span>
       </Link>

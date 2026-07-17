@@ -4,9 +4,11 @@ import type { NextConfig } from "next";
 // script-src still needs 'unsafe-inline'. The remaining directives are what
 // actually constrain this app: nothing may frame it, submit its forms
 // elsewhere, load plugins, or rewrite <base>.
+const isDev = process.env.NODE_ENV === "development";
+
 const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",

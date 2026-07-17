@@ -1,237 +1,309 @@
 import Link from "next/link";
-import {
-  LayoutDashboard,
-  Briefcase,
-  FileText,
-  Sparkles,
-  Target,
-  MessagesSquare,
-} from "lucide-react";
+import Image from "next/image";
+import { Sparkles, Target, MessagesSquare, PenLine } from "lucide-react";
 import { DemoButton } from "@/components/auth/demo-button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { SkipLink } from "@/components/ui/skip-link";
+import { Reveal } from "@/components/ui/reveal";
+import { buttonClass } from "@/components/ui/button";
+import { Badge, Dot, type BadgeTone } from "@/components/ui/badge";
 
-const MOCK_COLUMNS = [
-  {
-    label: "Saved",
-    dot: "bg-zinc-400",
-    cards: [{ role: "Platform Engineer", company: "Initech" }],
-  },
-  {
-    label: "Applied",
-    dot: "bg-blue-500",
-    cards: [
-      { role: "Frontend Engineer", company: "Hooli" },
-      { role: "Full-stack Developer", company: "Pied Piper" },
-    ],
-  },
-  {
-    label: "Interview",
-    dot: "bg-amber-500",
-    cards: [{ role: "Backend Engineer", company: "Aviato" }],
-  },
-  {
-    label: "Offer",
-    dot: "bg-green-500",
-    cards: [{ role: "Software Engineer", company: "Raviga" }],
-  },
+const FIT_ROWS: {
+  label: string;
+  pct: number;
+  tone: BadgeTone;
+  best?: boolean;
+}[] = [
+  { label: "resume_backend_v3.pdf", pct: 82, tone: "success", best: true },
+  { label: "resume_fullstack.pdf", pct: 71, tone: "warning" },
+  { label: "resume_general.pdf", pct: 54, tone: "error" },
 ];
 
 const FEATURES = [
   {
     icon: Sparkles,
-    title: "AI job-description analysis",
-    body: "Paste a JD and Gemini extracts required skills, seniority, and a summary — then semantically matches every skill against your resume to reveal your gaps.",
+    title: "Job-description analysis",
+    body: "Paste a JD and AI pulls out the required skills, seniority, and a summary — then flags the gaps against your resume.",
   },
   {
     icon: Target,
-    title: "Resume fit scoring",
-    body: "Every resume version is embedded and ranked against the job with pgvector cosine similarity, labeled Strong / Moderate / Weak so you always send the right one.",
+    title: "Résumé fit scoring",
+    body: "Every resume version is ranked against the job with pgvector cosine similarity — labelled Strong, Moderate, or Weak.",
+  },
+  {
+    icon: PenLine,
+    title: "Tailored bullets",
+    body: "Rewrites an experience into resume bullets tuned to the job, streamed live and saved to the application.",
   },
   {
     icon: MessagesSquare,
-    title: "Interview prep & tailored bullets",
-    body: "Generate likely technical and behavioral questions from the JD, and rewrite your experience into tailored resume bullets — streamed live, saved to the application.",
+    title: "Interview prep",
+    body: "Generates likely technical and behavioral questions from the JD, with pointers on what a strong answer covers.",
   },
+];
+
+const STATS = [
+  { value: "4", label: "AI features, every one measured" },
+  { value: "250+", label: "automated tests" },
+  { value: "3", label: "AI eval suites" },
 ];
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-canvas">
-      <header className="flex items-center justify-between px-4 py-4 md:px-12 lg:px-24 bg-canvas z-10 relative">
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center shrink-0">
-            <span className="text-on-primary font-bold text-xl leading-none">J</span>
+    <div className="flex min-h-screen flex-col bg-canvas">
+      <SkipLink />
+      <header className="relative z-10 flex items-center justify-between border-b border-hairline px-4 py-3 md:px-10">
+        <div className="flex shrink-0 items-center gap-2">
+          <div className="flex size-7 items-center justify-center rounded-md bg-primary">
+            <span className="font-bold leading-none text-on-primary">J</span>
           </div>
-          <span className="font-display-sm text-primary tracking-tight">Job Tracker</span>
+          <span className="font-sans text-body-lg font-semibold tracking-tight text-ink">
+            Job Tracker
+          </span>
         </div>
-        <nav className="hidden md:flex items-center gap-8 font-sans font-medium text-ink">
-          <Link href="#features" className="hover:text-primary transition-colors">
+        <nav className="hidden items-center gap-7 font-sans text-body font-medium text-ink-mute md:flex">
+          <Link href="#features" className="transition-colors hover:text-ink">
             Features
           </Link>
           <a
-            href="https://github.com/nkieu-config/job-tracker-app-project"
+            href="https://github.com/nkieu-config/job-tracker"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-primary transition-colors"
+            className="transition-colors hover:text-ink"
           >
-            GitHub
+            Source
           </a>
         </nav>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
           <Link
             href="/sign-in"
-            className="hidden sm:inline-flex items-center justify-center font-sans font-bold text-body-lg text-ink hover:text-primary transition-colors"
+            className="hidden font-sans text-body font-medium text-ink-mute transition-colors hover:text-ink sm:inline"
           >
             Sign in
           </Link>
-          <Link
-            href="/sign-up"
-            className="inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-body sm:text-body-lg tracking-[0.2px] py-2.5 px-5 sm:py-3.5 sm:px-7 rounded-pill transition-colors hover:bg-primary-press whitespace-nowrap"
-          >
-            Try For Free
-          </Link>
+          <DemoButton label="Live demo" className={buttonClass({ size: "sm" })} />
         </div>
       </header>
 
-      <main className="flex-1">
-        <section className="flex flex-col items-center bg-pastel-mesh pt-16 pb-24 px-6 overflow-hidden relative">
-          <div className="max-w-[1000px] w-full flex flex-col items-center text-center z-10">
-            <h1 className="font-display-xxl text-ink mb-6 max-w-4xl">
-              Track your applications.<br />Land your dream job.
-            </h1>
-            <p className="font-sans text-title text-ink max-w-2xl leading-[1.55] mb-10">
-              Drag your pipeline forward on a kanban board while AI analyzes job
-              descriptions, scores your resumes, and preps you for the interview.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <Link
-                href="/sign-up"
-                className="w-full sm:w-auto inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-body-lg sm:text-title py-3.5 sm:py-4.5 px-6 sm:px-9 rounded-pill shadow-[0_5px_20px_rgba(0,0,0,0.1)] transition-transform hover:scale-105 whitespace-nowrap"
-              >
-                Get started for free
-              </Link>
-              <DemoButton
-                label="Try Live Demo"
-                className="w-full sm:w-auto inline-flex items-center justify-center bg-canvas-lavender text-primary border-2 border-primary font-sans font-bold text-body-lg sm:text-title py-3 sm:py-4 px-6 sm:px-9 rounded-pill transition-transform hover:scale-105 whitespace-nowrap"
-              />
+      <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
+        <section className="border-b border-hairline px-4 py-16 md:px-10 md:py-24">
+          <div className="mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+            <div className="flex flex-col items-start">
+              <h1 className="font-display-lg text-balance text-ink">
+                Track every application. Send the résumé that{" "}
+                <span className="text-primary">fits</span>.
+              </h1>
+              <p className="mt-6 max-w-xl font-sans text-title leading-relaxed text-ink-mute">
+                A job-application tracker with AI built in. Paste a job
+                description — it extracts the required skills, scores every
+                resume version against them, and drafts your interview prep.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <DemoButton
+                  label="Try the live demo"
+                  className={buttonClass({ size: "lg" })}
+                />
+                <a
+                  href="https://github.com/nkieu-config/job-tracker"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={buttonClass({ variant: "ghost", size: "lg" })}
+                >
+                  View source
+                </a>
+              </div>
+              <p className="mt-6 font-sans text-caption text-ink-mute">
+                No signup for the demo · every AI feature is measured, not
+                assumed · open source
+              </p>
             </div>
-          </div>
 
-          <div className="mt-16 w-full max-w-5xl bg-canvas rounded-2xl shadow-[0_20px_60px_rgba(74,21,75,0.1)] border border-hairline overflow-hidden z-10 flex flex-col">
-            <div className="h-12 border-b border-hairline flex items-center px-4 gap-2 bg-canvas-lavender">
-              <div className="w-3 h-3 rounded-full bg-semantic-error-tint border border-semantic-error"></div>
-              <div className="w-3 h-3 rounded-full bg-semantic-warning-tint border border-semantic-warning"></div>
-              <div className="w-3 h-3 rounded-full bg-semantic-success-tint border border-semantic-success"></div>
-            </div>
-            <div className="flex gap-6 bg-canvas p-4 text-left md:p-8">
-              <div className="hidden md:flex w-44 shrink-0 flex-col gap-2 border-r border-hairline pr-6">
-                <div className="flex items-center gap-3 px-3 py-2 rounded-md text-ink-mute text-body font-medium">
-                  <LayoutDashboard size={16} aria-hidden="true" /> Overview
-                </div>
-                <div className="flex items-center gap-3 px-3 py-2 rounded-md bg-canvas-lavender text-primary font-bold text-body">
-                  <Briefcase size={16} aria-hidden="true" /> Applications
-                </div>
-                <div className="flex items-center gap-3 px-3 py-2 text-ink-mute text-body font-medium">
-                  <FileText size={16} aria-hidden="true" /> Resumes
-                </div>
-              </div>
-              <div className="flex min-w-0 flex-1 flex-col gap-4">
-                <h2 className="font-display-sm text-ink">Applications</h2>
-                <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                  {MOCK_COLUMNS.map((column) => (
-                    <div key={column.label} className="flex flex-col gap-2">
-                      <div className="flex items-center gap-2 px-1">
-                        <span
-                          className={`h-2 w-2 rounded-full ${column.dot}`}
-                          aria-hidden="true"
-                        />
-                        <span className="text-fine font-bold uppercase tracking-wider text-ink-mute">
-                          {column.label}
-                        </span>
-                      </div>
-                      <div className="flex min-h-28 flex-col gap-2 rounded-xl bg-canvas-cream/50 p-2">
-                        {column.cards.map((card, i) => (
-                          <div
-                            key={card.role}
-                            className={`rounded-lg border border-hairline bg-canvas px-3 py-2 shadow-sm ${
-                              column.label === "Interview" && i === 0
-                                ? "rotate-2 border-primary shadow-[0_8px_20px_rgba(74,21,75,0.15)]"
-                                : ""
-                            }`}
-                          >
-                            <p className="truncate text-fine font-bold text-ink">
-                              {card.role}
-                            </p>
-                            <p className="truncate text-fine text-ink-mute">
-                              {card.company}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <FitPanel />
           </div>
         </section>
 
-        <section id="features" className="scroll-mt-24 bg-canvas px-6 py-24 md:px-12">
-          <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-12">
-            <div className="max-w-2xl text-center">
-              <h2 className="font-display-lg text-ink">
-                Your job hunt, with an AI copilot
+        <section
+          id="features"
+          className="scroll-mt-16 border-b border-hairline px-4 py-16 md:px-10 md:py-24"
+        >
+          <div className="mx-auto w-full max-w-6xl">
+            <Reveal className="max-w-2xl">
+              <h2 className="font-display-md text-balance text-ink">
+                The tedious parts, handled
               </h2>
-              <p className="mt-4 font-sans text-title leading-[1.55] text-ink-mute">
-                Four AI features built on Gemini and pgvector do the tedious
-                parts, so you can focus on interviews.
+              <p className="mt-3 font-sans text-body-lg leading-relaxed text-ink-mute">
+                Four AI features on Gemini and pgvector do the reading and
+                ranking, so you spend your time on the interview.
               </p>
-            </div>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-              {FEATURES.map((feature) => (
-                <div
-                  key={feature.title}
-                  className="flex flex-col gap-4 rounded-2xl border border-hairline bg-canvas-lavender p-8"
-                >
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-on-primary">
-                    <feature.icon size={22} aria-hidden="true" />
-                  </span>
-                  <h3 className="font-sans text-title font-bold text-ink">
-                    {feature.title}
-                  </h3>
-                  <p className="font-sans text-body-lg leading-relaxed text-ink-mute">
-                    {feature.body}
-                  </p>
-                </div>
+            </Reveal>
+            <div className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2">
+              {FEATURES.map((feature, i) => (
+                <Reveal key={feature.title} delay={i * 70}>
+                  <div className="flex gap-4">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
+                      <feature.icon size={18} aria-hidden="true" />
+                    </span>
+                    <div>
+                      <h3 className="font-sans text-body-lg font-semibold text-ink">
+                        {feature.title}
+                      </h3>
+                      <p className="mt-1.5 font-sans text-body leading-relaxed text-ink-mute">
+                        {feature.body}
+                      </p>
+                    </div>
+                  </div>
+                </Reveal>
               ))}
             </div>
           </div>
         </section>
+
+        <section className="border-b border-hairline px-4 py-16 md:px-10 md:py-24">
+          <div className="mx-auto w-full max-w-6xl">
+            <Reveal className="max-w-2xl">
+              <h2 className="font-display-md text-balance text-ink">
+                Your whole pipeline on one board
+              </h2>
+              <p className="mt-3 font-sans text-body-lg leading-relaxed text-ink-mute">
+                Drag a role from Saved to Offer. Deadlines surface as they
+                approach; rejected roles fold away.
+              </p>
+            </Reveal>
+            <Reveal delay={80} className="mt-10">
+              <div className="overflow-hidden rounded-2xl border border-hairline bg-canvas shadow-[0_20px_60px_rgba(74,21,75,0.10)]">
+                <div className="flex h-9 items-center gap-1.5 border-b border-hairline px-4">
+                  <span className="size-2.5 rounded-full bg-hairline" />
+                  <span className="size-2.5 rounded-full bg-hairline" />
+                  <span className="size-2.5 rounded-full bg-hairline" />
+                </div>
+                <Image
+                  src="/landing/board-light.png"
+                  alt="The Job Tracker board, with roles grouped into Saved, Applied, Interview and Offer columns"
+                  width={2560}
+                  height={1600}
+                  className="block h-auto w-full dark:hidden"
+                />
+                <Image
+                  src="/landing/board-dark.png"
+                  alt=""
+                  aria-hidden="true"
+                  width={2560}
+                  height={1600}
+                  className="hidden h-auto w-full dark:block"
+                />
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        <section className="px-4 py-16 md:px-10 md:py-24">
+          <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
+            <Reveal className="max-w-md">
+              <h2 className="font-display-md text-balance text-ink">
+                AI you can trust, because it&rsquo;s measured
+              </h2>
+              <p className="mt-3 font-sans text-body-lg leading-relaxed text-ink-mute">
+                Every model call runs through its own eval harness. The rule
+                this project held to: an AI feature that isn&rsquo;t measured
+                doesn&rsquo;t ship.
+              </p>
+            </Reveal>
+            <Reveal delay={80}>
+              <dl className="flex gap-10">
+                {STATS.map((stat) => (
+                  <div key={stat.label} className="max-w-32">
+                    <dt className="font-display-sm font-mono tabular-nums text-primary">
+                      {stat.value}
+                    </dt>
+                    <dd className="mt-1 font-sans text-caption leading-snug text-ink-mute">
+                      {stat.label}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </Reveal>
+          </div>
+        </section>
       </main>
 
-      <footer className="bg-surface-aubergine text-on-primary py-24 px-6 md:px-12 flex flex-col items-center text-center">
-        <h2 className="font-display-lg mb-8 max-w-3xl">
-          Ready to simplify your job search?
-        </h2>
-        <Link
-            href="/sign-up"
-            className="inline-flex items-center justify-center bg-canvas text-primary font-sans font-bold text-body-lg sm:text-title py-3.5 sm:py-4.5 px-8 sm:px-12 rounded-pill shadow-lg transition-transform hover:scale-105 whitespace-nowrap"
-          >
-            Start tracking now
-          </Link>
-        <div className="mt-16 pt-8 border-t border-primary-tint w-full max-w-5xl flex flex-col md:flex-row justify-between items-center text-on-aubergine-mute text-body font-sans">
-          <p>© 2026 Job Tracker. All rights reserved.</p>
-          <div className="flex gap-6 mt-4 md:mt-0">
+      <footer className="border-t border-hairline bg-canvas-lavender px-4 py-16 md:px-10">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-10">
+          <div className="flex flex-col gap-5">
+            <h2 className="max-w-xl font-display-md text-balance text-ink">
+              Start tracking — no signup required
+            </h2>
+            <div className="flex flex-wrap items-center gap-3">
+              <DemoButton
+                label="Try the live demo"
+                className={buttonClass({ size: "lg" })}
+              />
+              <Link
+                href="/sign-up"
+                className={buttonClass({ variant: "ghost", size: "lg" })}
+              >
+                Create an account
+              </Link>
+            </div>
+          </div>
+          <div className="flex flex-col justify-between gap-3 border-t border-hairline pt-6 font-sans text-caption text-ink-mute sm:flex-row">
+            <p>© 2026 Job Tracker</p>
             <a
-              href="https://github.com/nkieu-config/job-tracker-app-project"
+              href="https://github.com/nkieu-config/job-tracker"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-on-primary underline"
+              className="font-medium underline-offset-4 transition-colors hover:text-ink hover:underline"
             >
               View source on GitHub
             </a>
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function FitPanel() {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-hairline bg-canvas shadow-[0_24px_70px_rgba(74,21,75,0.14)]">
+      <div className="flex items-center justify-between border-b border-hairline px-4 py-2.5">
+        <span className="font-mono text-fine text-ink-mute">resume-fit</span>
+        <span className="flex items-center gap-1.5 font-sans text-fine text-ink-mute">
+          <Sparkles size={12} className="text-primary" aria-hidden="true" />
+          pgvector · cosine
+        </span>
+      </div>
+      <div className="flex flex-col gap-3 p-5">
+        <div className="flex items-baseline justify-between gap-2">
+          <h3 className="font-sans text-fine font-medium uppercase tracking-wide text-ink-mute">
+            Résumé fit
+          </h3>
+          <span className="font-mono text-fine text-ink-mute">
+            Senior Backend Engineer
+          </span>
+        </div>
+        {FIT_ROWS.map((row) => (
+          <div
+            key={row.label}
+            className="flex items-center justify-between gap-3 rounded-lg border border-hairline px-3 py-2.5"
+          >
+            <div className="flex min-w-0 items-center gap-2">
+              <Dot tone={row.tone} />
+              <span className="truncate font-mono text-caption text-ink">
+                {row.label}
+              </span>
+              {row.best && (
+                <Badge tone="primary" size="sm">
+                  Best fit
+                </Badge>
+              )}
+            </div>
+            <span className="font-mono text-body font-semibold tabular-nums text-ink">
+              {row.pct}%
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

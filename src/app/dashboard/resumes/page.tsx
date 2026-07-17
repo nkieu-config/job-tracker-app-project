@@ -5,6 +5,7 @@ import { FileText } from "lucide-react";
 import { formatDisplayDate } from "@/lib/format";
 import { getResumeSummaries } from "@/server/data/resumes";
 import { ResumeUploadForm } from "@/components/resumes/resume-upload-form";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const metadata: Metadata = {
   title: "Resumes",
@@ -32,12 +33,15 @@ export default async function ResumesPage() {
           Your versions
         </h2>
         {resumes.length === 0 ? (
-          <div className="mt-4 rounded-2xl border border-dashed border-hairline p-10 text-center bg-canvas flex flex-col items-center justify-center">
-            <FileText size={32} className="mb-3 text-ink-mute" aria-hidden="true" />
-            <p className="font-sans text-body-lg text-ink-mute">
-              No resumes uploaded yet. Upload your first resume above to unlock AI Fit Scoring.
-            </p>
-          </div>
+          <EmptyState
+            className="mt-4"
+            icon={
+              <FileText size={32} className="text-ink-mute" aria-hidden="true" />
+            }
+          >
+            No resumes uploaded yet. Upload your first resume above to unlock AI
+            Fit Scoring.
+          </EmptyState>
         ) : (
           <ul className="mt-4 flex flex-col gap-3">
             {resumes.map((resume) => (
@@ -49,7 +53,7 @@ export default async function ResumesPage() {
                   <span className="truncate font-sans font-bold text-ink">
                     {resume.label}
                   </span>
-                  <span className="shrink-0 font-sans text-body text-ink-mute">
+                  <span className="shrink-0 font-mono text-caption tabular-nums text-ink-mute">
                     {formatDisplayDate(resume.createdAt)}
                   </span>
                 </Link>

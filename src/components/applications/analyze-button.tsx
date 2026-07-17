@@ -3,6 +3,7 @@
 import { useActionState, useEffect } from "react";
 import { Sparkles } from "lucide-react";
 import { analyzeApplication, type AnalyzeState } from "@/actions/applications";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
 export function AnalyzeButton({
@@ -25,14 +26,10 @@ export function AnalyzeButton({
 
   return (
     <form action={formAction} className="flex flex-col gap-2">
-      <button
-        type="submit"
-        disabled={pending}
-        className="inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-sans font-bold text-body tracking-[0.144px] py-2.5 px-5 rounded-pill transition-colors hover:bg-primary-press disabled:opacity-60"
-      >
+      <Button type="submit" disabled={pending}>
         <Sparkles size={16} aria-hidden="true" />
         {pending ? "Analyzing…" : label}
-      </button>
+      </Button>
       {state.error && (
         <p
           role="alert"

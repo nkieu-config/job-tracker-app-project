@@ -2,6 +2,7 @@
 
 import { Sparkles } from "lucide-react";
 import { saveInterviewPrep } from "@/actions/applications";
+import { Button } from "@/components/ui/button";
 import { useAiStream } from "@/components/applications/use-ai-stream";
 
 export function InterviewPrep({
@@ -23,19 +24,14 @@ export function InterviewPrep({
   return (
     <div className="flex flex-col gap-3">
       <div>
-        <button
-          type="button"
-          onClick={() => generate()}
-          disabled={loading}
-          className="inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-sans font-bold text-body tracking-[0.144px] py-2.5 px-5 rounded-pill transition-colors hover:bg-primary-press disabled:opacity-60"
-        >
+        <Button onClick={() => generate()} disabled={loading}>
           <Sparkles size={16} aria-hidden="true" />
           {loading
             ? "Preparing…"
             : output
               ? "Regenerate prep sheet"
               : "Generate prep sheet"}
-        </button>
+        </Button>
       </div>
 
       {error && (
@@ -55,13 +51,9 @@ export function InterviewPrep({
           </div>
           {output && !loading && (
             <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={copyOutput}
-                className="inline-flex items-center justify-center bg-canvas text-ink font-sans font-bold text-body py-2 px-4 rounded-pill border border-hairline transition-colors hover:bg-canvas-lavender"
-              >
+              <Button variant="ghost" size="sm" onClick={copyOutput}>
                 Copy prep sheet
-              </button>
+              </Button>
             </div>
           )}
         </div>

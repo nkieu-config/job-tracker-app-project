@@ -1,14 +1,8 @@
 # Job Tracker 💼
 
-[![CI](https://github.com/nkieu-config/job-tracker-app-project/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nkieu-config/job-tracker-app-project/actions/workflows/ci.yml)
+[![CI](https://github.com/nkieu-config/job-tracker/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nkieu-config/job-tracker/actions/workflows/ci.yml)
 [![Live demo](https://img.shields.io/badge/demo-live-brightgreen?logo=vercel&logoColor=white)](https://job-tracker-app-project.vercel.app)
 [![License: view-only](https://img.shields.io/badge/license-view--only-informational.svg)](LICENSE)
-
-![Next.js 16](https://img.shields.io/badge/Next.js_16-000000?logo=nextdotjs&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
-![Postgres + pgvector](https://img.shields.io/badge/Postgres-pgvector-4169E1?logo=postgresql&logoColor=white)
-![Prisma 7](https://img.shields.io/badge/Prisma_7-2D3748?logo=prisma&logoColor=white)
-![Gemini 2.5](https://img.shields.io/badge/Gemini_2.5-8E75B2?logo=googlegemini&logoColor=white)
 
 **The job hunt is a data problem. This is the tool I built to solve mine.** An AI-powered job-application tracker that analyzes job descriptions, scores your resume versions against them with vector embeddings, and tailors your bullets — built solo as my capstone project, used daily in my real job search.
 
@@ -38,7 +32,7 @@ I was a graduating student staring down my first job search, tracking twenty app
 
 So for my graduation project I built the tool I wished I had: a tracker where the pipeline is a Kanban board instead of spreadsheet rows, and where the tedious parts — skill-gap analysis, resume-to-JD matching, bullet rewriting, interview prep — are done by AI in seconds instead of by me at 1 a.m.
 
-The rule I held myself to: **an AI feature that isn't measured doesn't ship.** That's why this repo contains an evaluation harness with precision/recall numbers, not just prompts — and why I can tell you the semantic matching layer is worth +8.3 points of recall on my eval set.
+The rule I held myself to: **an AI feature that isn't measured doesn't ship.** That's why this repo contains an evaluation harness with precision/recall numbers, not just prompts.
 
 The result is the app I now use to run the very job search it was built for. If you're reading this as a recruiter: the product *is* the cover letter.
 
@@ -62,52 +56,10 @@ flowchart LR
 
 Full deep-dive — system design, data model, decision rationale, challenges-and-solutions log: [docs/architecture.md](docs/architecture.md).
 
-## Feature tour
-
-| Module               | What it does                                                                                                                      |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| **Kanban pipeline**  | Drag-and-drop board (Saved → Applied → Interview → Offer → Rejected), optimistic updates, URL-synced list with search/filter/sort |
-| **Dashboard**        | Response, interview and offer rates, pipeline funnel, upcoming deadlines                                                          |
-| **JD analysis**      | Gemini extracts required skills, nice-to-haves and seniority, then flags which skills your resumes are missing                    |
-| **Resume fit**       | Ranks every resume version against the JD by pgvector cosine similarity, labeled with Strong/Moderate/Weak bands                  |
-| **Bullet tailoring** | Rewrites your experience into JD-tuned resume bullets, streamed token-by-token, saved per application                             |
-| **Interview prep**   | Streamed prep sheet — likely technical and behavioral questions, each with what a strong answer covers                            |
-| **Resume versions**  | PDF upload (content-type and magic-byte checked), text extraction, private Vercel Blob storage                                    |
-| **AI observability** | Admin page tracking tokens and cost per AI feature; a shared hourly AI budget per user                                            |
-
-Drag a card and the move persists optimistically:
-
-![Kanban board with applications grouped by status](docs/screenshots/board.png)
-
-Two of the AI features stream. Here is bullet tailoring as it actually runs — a real recording of the demo account, not a mockup:
-
-![Resume bullets streaming in token by token as the model rewrites experience against the job description](docs/screenshots/tailor-streaming.gif)
-
-And the four AI features, all of them on one application:
-
-| JD analysis & skill gap | Resume fit ranking |
-| --- | --- |
-| ![Required skills tagged as matched or missing against the resume](docs/screenshots/jd-analysis.png) | ![Resume versions ranked by cosine similarity to the job description](docs/screenshots/resume-fit.png) |
-
-| Bullet tailoring (streamed) | Interview prep (streamed) |
-| --- | --- |
-| ![Resume bullets tailored to the job description](docs/screenshots/tailor.png) | ![Generated prep sheet with likely technical and behavioral questions](docs/screenshots/interview-prep.png) |
-
-<details>
-<summary>📸 One more — the landing page, before you sign in</summary>
-
-The design system in [docs/design.md](docs/design.md), as actually rendered:
-
-![Job Tracker landing page — hero, the four AI features, and the closing call to action](docs/screenshots/landing.png)
-
-</details>
-
-Every image on this page is generated from the seeded demo by Playwright — `npm run screenshots` for the stills, `npm run record-demo` for the streaming clip — so none of them can drift from the real UI.
-
 ## Engineering decisions I'd defend in an interview
 
 - **The LLM is treated as untrusted input.** The JSON schema Gemini must follow is *derived from* a Zod schema, and the response is re-validated with that same schema — one source of truth for prompting and validation, defined once in `src/lib/schemas/`.
-- **The AI is measured, not assumed.** An [evaluation harness](evals/) scores each AI feature with real metrics — precision/recall/F1 on skill extraction, a controlled ablation of the embedding layer, and an LLM-as-judge pass with a hallucination check on tailored bullets.
+- **The AI is measured, not assumed.** Every feature has to clear an [evaluation harness](evals/) — real metrics, a controlled ablation, and an LLM judge — before it ships. Scorecard below.
 - **Defense-in-depth auth.** Middleware does an optimistic cookie check, but every page, Server Action and route handler independently re-verifies the session and scopes queries by `userId` — a design that survives CVE-2025-29927, the Next.js middleware bypass.
 - **Vector search in the database, not the app.** Embeddings live in Postgres `vector(768)` columns behind an HNSW index; resume ranking is one raw-SQL cosine-distance query, not an application-side similarity loop.
 - **AI behind one boundary.** All Gemini access lives in a single `server/ai/` module called only from server code, so the API key never reaches the client and there is exactly one place to meter, validate and mock.
@@ -124,6 +76,46 @@ Regenerated with `npm run eval`, on real model calls:
 
 Full methodology and per-suite results: [evals/](evals/).
 
+## Feature tour
+
+| Module               | What it does                                                                                                                      |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Kanban pipeline**  | Drag-and-drop board (Saved → Applied → Interview → Offer → Rejected), optimistic updates, URL-synced list with search/filter/sort |
+| **Dashboard**        | Response, interview and offer rates, pipeline funnel, upcoming deadlines                                                          |
+| **JD analysis**      | Gemini extracts required skills, nice-to-haves and seniority, then flags which skills your resumes are missing                    |
+| **Resume fit**       | Ranks every resume version against the JD by pgvector cosine similarity, labeled with Strong/Moderate/Weak bands                  |
+| **Bullet tailoring** | Rewrites your experience into JD-tuned resume bullets, streamed token-by-token, saved per application                             |
+| **Interview prep**   | Streamed prep sheet — likely technical and behavioral questions, each with what a strong answer covers                            |
+| **Resume versions**  | PDF upload (content-type and magic-byte checked), text extraction, private Vercel Blob storage                                    |
+| **AI observability** | Admin page tracking tokens and cost per AI feature; a shared hourly AI budget per user                                            |
+
+Two of the AI features stream. Here is bullet tailoring as it actually runs — a real recording of the demo account, not a mockup:
+
+![Resume bullets streaming in token by token as the model rewrites experience against the job description](docs/screenshots/tailor-streaming.gif)
+
+<details>
+<summary>📸 More screenshots — the board, all four AI features, and the landing page</summary>
+
+Drag a card and the move persists optimistically:
+
+![Kanban board with applications grouped by status](docs/screenshots/board.png)
+
+| JD analysis & skill gap | Resume fit ranking |
+| --- | --- |
+| ![Required skills tagged as matched or missing against the resume](docs/screenshots/jd-analysis.png) | ![Resume versions ranked by cosine similarity to the job description](docs/screenshots/resume-fit.png) |
+
+| Bullet tailoring (streamed) | Interview prep (streamed) |
+| --- | --- |
+| ![Resume bullets tailored to the job description](docs/screenshots/tailor.png) | ![Generated prep sheet with likely technical and behavioral questions](docs/screenshots/interview-prep.png) |
+
+The design system in [docs/design.md](docs/design.md), as actually rendered:
+
+![Job Tracker landing page — hero, the four AI features, and the closing call to action](docs/screenshots/landing.png)
+
+</details>
+
+Every image on this page is generated from the seeded demo by Playwright — `npm run screenshots` for the stills, `npm run record-demo` for the streaming clip — so none of them can drift from the real UI.
+
 ## Tech stack
 
 | Layer     | Choice                                                                              | Why                                                                                    |
@@ -138,6 +130,9 @@ Full methodology and per-suite results: [evals/](evals/).
 | Infra     | Vercel + GitHub Actions                                                             | Zero-ops deploys from `main`; CI gates every push                                      |
 
 ## Quick start
+
+<details>
+<summary>Run it locally — prerequisites, install, seed</summary>
 
 Prerequisites: Node.js 20+ (CI runs 22), a PostgreSQL database with the `pgvector` extension (a free [Neon](https://neon.tech) project works), and a [Gemini API key](https://aistudio.google.com/apikey) (the free tier is enough).
 
@@ -157,6 +152,8 @@ npm run seed            # creates/resets the demo account with sample data
 > [!NOTE]
 > The seed only resets the demo account's own rows, so it is safe to re-run; other users' data is never touched.
 
+</details>
+
 Full environment-variable reference, scripts and deploy guide: [docs/setup.md](docs/setup.md) and [docs/deploy.md](docs/deploy.md).
 
 ## Testing & quality
@@ -169,7 +166,7 @@ Full environment-variable reference, scripts and deploy guide: [docs/setup.md](d
 
 Security-critical modules — the prompt fence, the admin gate, the AI ownership guard and the PDF page cap among them — are pinned to **100% coverage thresholds** in CI.
 
-The AI layer is tested twice, at different altitudes: unit tests mock the SDK at the module boundary, and the [eval harness](evals/) measures the real model with precision/recall, an ablation and an LLM judge.
+The AI layer is tested twice, at different altitudes: unit tests mock the SDK at the module boundary; the [eval harness](evals/) measures the real model.
 
 ```bash
 npm test                # both unit projects

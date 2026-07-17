@@ -7,6 +7,8 @@ import {
   MAX_RESUME_BYTES,
   humanFileSize,
 } from "@/lib/schemas/resume";
+import { Button } from "@/components/ui/button";
+import { cardClass } from "@/components/ui/card";
 import { inputClass, labelClass } from "@/components/ui/form-styles";
 
 export function ResumeUploadForm() {
@@ -66,10 +68,7 @@ export function ResumeUploadForm() {
   }
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="flex flex-col gap-6 rounded-2xl border border-hairline bg-canvas p-8"
-    >
+    <form onSubmit={onSubmit} className={cardClass("flex flex-col gap-6 p-8")}>
       <label className={labelClass}>
         Label
         <input
@@ -104,13 +103,9 @@ export function ResumeUploadForm() {
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-body-lg tracking-[0.2px] py-3.5 px-7 rounded-pill transition-colors hover:bg-primary-press disabled:opacity-60"
-      >
+      <Button type="submit" size="lg" disabled={loading}>
         {loading ? "Uploading & parsing…" : "Upload resume"}
-      </button>
+      </Button>
     </form>
   );
 }

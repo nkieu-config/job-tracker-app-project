@@ -1,55 +1,166 @@
 @import "tailwindcss";
 
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:not([data-theme="light"], [data-theme="light"] *)) {
+      @slot;
+    }
+  }
+}
+
 :root {
+  color-scheme: light;
+
   --background: #ffffff;
-  --foreground: #1d1d1d; /* ink */
+  --foreground: #221a26;
+
+  --primary: #4a154b;
+  --primary-press: #611f69;
+  --on-primary: #ffffff;
+
+  --ink: #221a26;
+  --ink-mute: #5f5566;
+
+  --link-blue: #1264a3;
+  --link-hover: #3860be;
+
+  --canvas: #ffffff;
+  --canvas-lavender: #f4f0f5;
+  --canvas-lavender-hover: #ece6ef;
+  --canvas-error: #fdf0f0;
+
+  --surface-hover: #f5eded;
+
+  --hairline: #e5dde9;
+
+  --semantic-error: #bd3a12;
+  --semantic-error-tint: #fdebea;
+  --semantic-error-hover: #fad8d6;
+  --semantic-error-solid: #bd3a12;
+  --semantic-success: #007a5a;
+  --semantic-success-tint: #e2f1ea;
+  --semantic-warning: #8a6500;
+  --semantic-warning-tint: #fcf2db;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --background: #141017;
+    --foreground: #e8e5ee;
+
+    --primary: #8a4d93;
+    --primary-press: #9a5aa3;
+    --on-primary: #ffffff;
+
+    --ink: #e8e5ee;
+    --ink-mute: #a49eae;
+
+    --link-blue: #7cb8ef;
+    --link-hover: #9dccf4;
+
+    --canvas: #1d1722;
+    --canvas-lavender: #141017;
+    --canvas-lavender-hover: #252030;
+    --canvas-error: #2b1a1e;
+
+    --surface-hover: #252030;
+
+    --hairline: #39323f;
+
+    --semantic-error: #f08a6c;
+    --semantic-error-tint: #3a1e1a;
+    --semantic-error-hover: #4c2820;
+    --semantic-error-solid: #c0442a;
+    --semantic-success: #4cbf95;
+    --semantic-success-tint: #17302a;
+    --semantic-warning: #e6b23c;
+    --semantic-warning-tint: #342a17;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --background: #141017;
+  --foreground: #e8e5ee;
+
+  --primary: #8a4d93;
+  --primary-press: #9a5aa3;
+  --on-primary: #ffffff;
+
+  --ink: #e8e5ee;
+  --ink-mute: #a49eae;
+
+  --link-blue: #7cb8ef;
+  --link-hover: #9dccf4;
+
+  --canvas: #1d1722;
+  --canvas-lavender: #141017;
+  --canvas-lavender-hover: #252030;
+  --canvas-error: #2b1a1e;
+
+  --surface-hover: #252030;
+
+  --hairline: #39323f;
+
+  --semantic-error: #f08a6c;
+  --semantic-error-tint: #3a1e1a;
+  --semantic-error-hover: #4c2820;
+  --semantic-success: #4cbf95;
+  --semantic-success-tint: #17302a;
+  --semantic-warning: #e6b23c;
+  --semantic-warning-tint: #342a17;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
+    monospace;
 
   /* Slacc Colors */
-  --color-primary: #4a154b;
-  --color-primary-deep: #481a54;
-  --color-primary-press: #611f69;
-  --color-primary-tint: #592466;
-  --color-on-primary: #ffffff;
+  --color-primary: var(--primary);
+  --color-primary-press: var(--primary-press);
+  --color-on-primary: var(--on-primary);
 
-  --color-ink: #1d1d1d;
-  --color-ink-mute: #696969;
+  --color-ink: var(--ink);
+  --color-ink-mute: var(--ink-mute);
 
-  --color-link-blue: #1264a3;
-  --color-link-hover: #3860be;
+  --color-link-blue: var(--link-blue);
+  --color-link-hover: var(--link-hover);
 
-  --color-canvas: #ffffff;
-  --color-canvas-cream: #f4ede4;
-  --color-canvas-lavender: #f9f0ff;
+  --color-canvas: var(--canvas);
+  --color-canvas-lavender: var(--canvas-lavender);
 
-  --color-surface-elev: #ffffff;
-  --color-surface-aubergine: #4a154b;
-  --color-on-aubergine-mute: #d9bdde;
+  --color-hairline: var(--hairline);
 
-  --color-hairline: #e6e6e6;
-  --color-hairline-strong: #000000;
+  --color-semantic-error: var(--semantic-error);
+  --color-semantic-error-tint: var(--semantic-error-tint);
+  --color-semantic-error-hover: var(--semantic-error-hover);
+  --color-semantic-error-solid: var(--semantic-error-solid);
 
-  --color-semantic-error: #cc4117;
-  --color-semantic-error-tint: #fdebea;
-  --color-semantic-error-hover: #fad8d6;
+  --color-semantic-success: var(--semantic-success);
+  --color-semantic-success-tint: var(--semantic-success-tint);
 
-  --color-semantic-success: #007a5a;
-  --color-semantic-success-tint: #e2f1ea;
+  --color-semantic-warning: var(--semantic-warning);
+  --color-semantic-warning-tint: var(--semantic-warning-tint);
 
-  --color-semantic-warning: #d69f12;
-  --color-semantic-warning-tint: #fcf2db;
+  --color-canvas-lavender-hover: var(--canvas-lavender-hover);
+  --color-canvas-error: var(--canvas-error);
+  --color-surface-hover: var(--surface-hover);
 
-  --color-canvas-lavender-hover: #ebdcf5;
-  --color-canvas-error: #fdf0f0;
-  --color-surface-hover: #f5eded;
-
-  /* Slacc Layout */
-  --radius-pill: 90px;
+  /* Radius scale — tightened, aubergine-console feel; no 90px pills */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 7px;
+  --radius-xl: 9px;
+  --radius-2xl: 12px;
 
   /* Slacc Type Scale */
   --text-fine: 12px;
@@ -73,10 +184,6 @@
   }
 }
 
-html {
-  color-scheme: light;
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
@@ -93,13 +200,6 @@ body {
 }
 
 /* Typography Overrides based on Slacc Design */
-@utility font-display-xxl {
-  font-size: 64px;
-  font-weight: 700;
-  line-height: 1.12;
-  letter-spacing: -0.768px;
-}
-
 @utility font-display-lg {
   font-size: 50px;
   font-weight: 700;
@@ -121,17 +221,24 @@ body {
   letter-spacing: -0.192px;
 }
 
-/* Pastel Mesh Gradient */
-@utility bg-pastel-mesh {
-  background-color: var(--color-canvas-cream);
-  background-image:
-    radial-gradient(at 100% 0%, rgba(233, 216, 255, 0.6) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(255, 240, 230, 0.7) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(220, 240, 230, 0.5) 0px, transparent 50%);
+.reveal {
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+
+.reveal[data-reveal="hidden"] {
+  opacity: 0;
+  transform: translateY(20px);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-rise {
-    animation: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

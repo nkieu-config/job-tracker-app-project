@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Briefcase } from "lucide-react";
 import { requireSession } from "@/server/get-session";
-import { formatDisplayDate } from "@/lib/format";
+import { formatDisplayDate, deadlineTone } from "@/lib/format";
+import { DEADLINE_TONE_CLASS } from "@/components/ui/deadline";
 import { getApplications } from "@/server/data/applications";
 import { ListControls } from "@/components/applications/list-controls";
 import {
@@ -17,10 +19,19 @@ import {
   type BoardApplication,
 } from "@/components/applications/board";
 import { isOneOf } from "@/lib/guards";
+import { buttonClass } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import {
+  SegmentedControl,
+  filterChipClass,
+} from "@/components/ui/segmented-control";
 
 export const metadata: Metadata = {
   title: "Applications",
 };
+
+const LIST_GRID =
+  "grid grid-cols-[minmax(0,1fr)_84px_104px] items-center gap-3 sm:grid-cols-[minmax(0,1fr)_150px_130px] sm:gap-4";
 
 function parseStatus(value?: string): ApplicationStatus | undefined {
   return isOneOf(APPLICATION_STATUSES, value) ? value : undefined;
@@ -64,7 +75,9 @@ export default async function ApplicationsPage({
     role: app.role,
     company: app.company,
     status: app.status,
-    deadline: app.deadline ? formatDisplayDate(app.deadline) : null,
+    deadline: app.deadline
+      ? { label: formatDisplayDate(app.deadline), tone: deadlineTone(app.deadline) }
+      : null,
   }));
 
   const filters: { label: string; value?: ApplicationStatus }[] = [
@@ -79,36 +92,24 @@ export default async function ApplicationsPage({
           Applications
         </h1>
         <div className="flex items-center gap-3">
-          <nav
-            aria-label="View"
-            className="flex rounded-pill border border-hairline bg-canvas p-1"
-          >
-            <Link
-              href="/dashboard/applications"
-              aria-current={view === "board" ? "page" : undefined}
-              className={`rounded-pill px-4 py-1.5 font-sans text-body font-bold transition-colors ${
-                view === "board"
-                  ? "bg-primary text-on-primary"
-                  : "text-ink hover:bg-canvas-lavender"
-              }`}
-            >
-              Board
-            </Link>
-            <Link
-              href="/dashboard/applications?view=list"
-              aria-current={view === "list" ? "page" : undefined}
-              className={`rounded-pill px-4 py-1.5 font-sans text-body font-bold transition-colors ${
-                view === "list"
-                  ? "bg-primary text-on-primary"
-                  : "text-ink hover:bg-canvas-lavender"
-              }`}
-            >
-              List
-            </Link>
-          </nav>
+          <SegmentedControl
+            ariaLabel="View"
+            items={[
+              {
+                label: "Board",
+                href: "/dashboard/applications",
+                active: view === "board",
+              },
+              {
+                label: "List",
+                href: "/dashboard/applications?view=list",
+                active: view === "list",
+              },
+            ]}
+          />
           <Link
             href="/dashboard/applications/new"
-            className="inline-flex items-center justify-center bg-primary text-on-primary font-sans font-bold text-body-lg tracking-[0.2px] py-2.5 px-5 rounded-pill transition-colors hover:bg-primary-press whitespace-nowrap"
+            className={buttonClass()}
           >
             New application
           </Link>
@@ -117,16 +118,24 @@ export default async function ApplicationsPage({
 
       {view === "board" ? (
         applications.length === 0 ? (
-          <div className="mt-4 rounded-2xl border border-dashed border-hairline p-10 text-center text-body-lg font-sans text-ink-mute bg-canvas">
-            No applications yet.{" "}
-            <Link
-              href="/dashboard/applications/new"
-              className="font-bold text-link-blue underline-offset-4 hover:underline"
-            >
-              Add one
-            </Link>
-            .
-          </div>
+          <EmptyState
+            className="mt-4"
+            icon={
+              <Briefcase size={32} className="text-ink-mute" aria-hidden="true" />
+            }
+            title="No applications yet"
+            action={
+              <Link
+                href="/dashboard/applications/new"
+                className={buttonClass()}
+              >
+                New application
+              </Link>
+            }
+          >
+            Track your first job application — add the role, paste the job
+            description, and let AI do the rest.
+          </EmptyState>
         ) : (
           <div className="flex flex-col gap-2">
             <ApplicationsBoard applications={boardApplications} />
@@ -150,11 +159,7 @@ export default async function ApplicationsPage({
                 <Link
                   key={f.label}
                   href={href}
-                  className={`rounded-pill px-4 py-2 text-body font-bold font-sans transition-colors ${
-                    active
-                      ? "bg-primary text-on-primary"
-                      : "bg-canvas text-ink border border-hairline hover:bg-canvas-lavender"
-                  }`}
+                  className={filterChipClass({ active })}
                 >
                   {f.label}
                 </Link>
@@ -163,51 +168,87 @@ export default async function ApplicationsPage({
           </div>
 
           {applications.length === 0 ? (
-            <div className="mt-4 rounded-2xl border border-dashed border-hairline p-10 text-center text-body-lg font-sans text-ink-mute bg-canvas">
-              {query ? (
-                <>No applications match “{query}”.</>
-              ) : (
-                <>
-                  No applications{" "}
-                  {status ? `with status “${STATUS_LABELS[status]}”` : "yet"}.{" "}
+            query ? (
+              <EmptyState className="mt-4">
+                No applications match “{query}”.
+              </EmptyState>
+            ) : (
+              <EmptyState
+                className="mt-4"
+                icon={
+                  <Briefcase
+                    size={32}
+                    className="text-ink-mute"
+                    aria-hidden="true"
+                  />
+                }
+                title={
+                  status
+                    ? `No ${STATUS_LABELS[status].toLowerCase()} applications`
+                    : "No applications yet"
+                }
+                action={
                   <Link
                     href="/dashboard/applications/new"
-                    className="font-bold text-link-blue underline-offset-4 hover:underline"
+                    className={buttonClass()}
                   >
-                    Add one
+                    New application
                   </Link>
-                  .
-                </>
-              )}
-            </div>
+                }
+              >
+                {status
+                  ? "Nothing here with this status yet."
+                  : "Add your first application to get started."}
+              </EmptyState>
+            )
           ) : (
-            <ul className="mt-4 flex flex-col gap-3">
-              {applications.map((app) => (
-                <li key={app.id}>
-                  <Link
-                    href={`/dashboard/applications/${app.id}`}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-hairline bg-canvas px-6 py-4 transition-shadow hover:shadow-[0_5px_20px_rgba(0,0,0,0.05)]"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate font-sans font-bold text-ink">
-                        {app.role}
-                      </p>
-                      <p className="truncate font-sans text-body text-ink-mute mt-1">
-                        {app.company}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 items-center justify-between sm:justify-end gap-4 w-full sm:w-auto border-t sm:border-none border-hairline pt-3 sm:pt-0">
-                      {app.deadline && (
-                        <span className="font-sans text-body font-medium tabular-nums text-ink-mute">
-                          Due {formatDisplayDate(app.deadline)}
-                        </span>
-                      )}
-                      <StatusBadge status={app.status} />
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <div className="mt-4 overflow-x-auto rounded-2xl border border-hairline bg-canvas">
+              <div className="min-w-0">
+                <div
+                  className={`${LIST_GRID} border-b border-hairline px-4 py-2.5`}
+                >
+                  <span className="font-sans text-fine font-medium uppercase tracking-wide text-ink-mute">
+                    Role
+                  </span>
+                  <span className="font-sans text-fine font-medium uppercase tracking-wide text-ink-mute">
+                    Status
+                  </span>
+                  <span className="text-right font-sans text-fine font-medium uppercase tracking-wide text-ink-mute">
+                    Deadline
+                  </span>
+                </div>
+                <ul>
+                  {applications.map((app) => {
+                    const tone = app.deadline ? deadlineTone(app.deadline) : null;
+                    return (
+                      <li key={app.id}>
+                        <Link
+                          href={`/dashboard/applications/${app.id}`}
+                          className={`group ${LIST_GRID} border-b border-hairline px-4 py-3 transition-colors last:border-0 hover:bg-canvas-lavender`}
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate font-sans text-body font-bold text-ink group-hover:text-primary">
+                              {app.role}
+                            </p>
+                            <p className="truncate font-sans text-caption text-ink-mute">
+                              {app.company}
+                            </p>
+                          </div>
+                          <StatusBadge status={app.status} />
+                          <span
+                            className={`text-right font-mono text-caption tabular-nums ${
+                              tone ? DEADLINE_TONE_CLASS[tone] : "text-ink-mute"
+                            }`}
+                          >
+                            {app.deadline ? formatDisplayDate(app.deadline) : "—"}
+                          </span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
           )}
         </>
       )}

@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { cardClass } from "@/components/ui/card";
 
 export function ConfirmDialog({
   open,
@@ -20,6 +22,8 @@ export function ConfirmDialog({
   onCancel: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+  const descId = useId();
 
   useEffect(() => {
     const dialog = ref.current;
@@ -31,33 +35,32 @@ export function ConfirmDialog({
   return (
     <dialog
       ref={ref}
+      aria-labelledby={titleId}
+      aria-describedby={descId}
       onCancel={(e) => {
         e.preventDefault();
         if (!pending) onCancel();
       }}
-      className="m-auto w-full max-w-sm rounded-2xl border border-hairline bg-canvas p-8 shadow-[0_20px_60px_rgba(74,21,75,0.15)] backdrop:bg-ink/40"
+      className={cardClass(
+        "m-auto w-full max-w-sm p-8 shadow-[0_20px_60px_rgba(74,21,75,0.15)] backdrop:bg-ink/40",
+      )}
     >
-      <h2 className="font-sans text-title font-bold text-ink">{title}</h2>
-      <p className="mt-2 font-sans text-body leading-relaxed text-ink-mute">
+      <h2 id={titleId} className="font-sans text-title font-bold text-ink">
+        {title}
+      </h2>
+      <p
+        id={descId}
+        className="mt-2 font-sans text-body leading-relaxed text-ink-mute"
+      >
         {description}
       </p>
       <div className="mt-6 flex justify-end gap-2">
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={pending}
-          className="inline-flex items-center justify-center rounded-pill bg-canvas px-5 py-2.5 font-sans text-body font-bold text-ink border border-hairline transition-colors hover:bg-canvas-lavender disabled:opacity-60"
-        >
+        <Button variant="ghost" onClick={onCancel} disabled={pending}>
           Cancel
-        </button>
-        <button
-          type="button"
-          onClick={onConfirm}
-          disabled={pending}
-          className="inline-flex items-center justify-center rounded-pill bg-semantic-error px-5 py-2.5 font-sans text-body font-bold text-on-primary transition-colors hover:opacity-90 disabled:opacity-60"
-        >
+        </Button>
+        <Button variant="danger-solid" onClick={onConfirm} disabled={pending}>
           {pending ? "Working…" : confirmLabel}
-        </button>
+        </Button>
       </div>
     </dialog>
   );
