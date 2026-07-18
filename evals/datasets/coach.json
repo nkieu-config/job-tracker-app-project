@@ -1,0 +1,71 @@
+[
+  {
+    "id": "coach-healthy-senior",
+    "snapshot": {
+      "total": 15,
+      "analyzedCount": 10,
+      "statusCounts": { "SAVED": 2, "APPLIED": 5, "INTERVIEW": 3, "OFFER": 1, "REJECTED": 4 },
+      "rates": { "applied": 13, "responseRate": 0.615, "interviewRate": 0.308, "offerRate": 0.077 },
+      "topMissingSkills": [
+        { "skill": "Kubernetes", "count": 6 },
+        { "skill": "GraphQL", "count": 3 },
+        { "skill": "Terraform", "count": 2 }
+      ],
+      "seniorityMix": { "intern": 0, "junior": 0, "mid": 3, "senior": 6, "lead": 1, "unknown": 0 }
+    }
+  },
+  {
+    "id": "coach-cold-pipeline",
+    "snapshot": {
+      "total": 20,
+      "analyzedCount": 14,
+      "statusCounts": { "SAVED": 3, "APPLIED": 12, "INTERVIEW": 0, "OFFER": 0, "REJECTED": 5 },
+      "rates": { "applied": 17, "responseRate": 0.294, "interviewRate": 0, "offerRate": 0 },
+      "topMissingSkills": [
+        { "skill": "System Design", "count": 8 },
+        { "skill": "Kubernetes", "count": 5 },
+        { "skill": "AWS", "count": 4 }
+      ],
+      "seniorityMix": { "intern": 0, "junior": 0, "mid": 4, "senior": 10, "lead": 0, "unknown": 0 }
+    }
+  },
+  {
+    "id": "coach-early",
+    "snapshot": {
+      "total": 3,
+      "analyzedCount": 2,
+      "statusCounts": { "SAVED": 1, "APPLIED": 2, "INTERVIEW": 0, "OFFER": 0, "REJECTED": 0 },
+      "rates": { "applied": 2, "responseRate": 0, "interviewRate": 0, "offerRate": 0 },
+      "topMissingSkills": [
+        { "skill": "TypeScript", "count": 1 },
+        { "skill": "Docker", "count": 1 }
+      ],
+      "seniorityMix": { "intern": 0, "junior": 1, "mid": 1, "senior": 0, "lead": 0, "unknown": 0 }
+    }
+  },
+  {
+    "id": "coach-strong-conversion",
+    "snapshot": {
+      "total": 11,
+      "analyzedCount": 9,
+      "statusCounts": { "SAVED": 0, "APPLIED": 3, "INTERVIEW": 4, "OFFER": 2, "REJECTED": 2 },
+      "rates": { "applied": 11, "responseRate": 0.727, "interviewRate": 0.545, "offerRate": 0.182 },
+      "topMissingSkills": [
+        { "skill": "GraphQL", "count": 4 },
+        { "skill": "Rust", "count": 2 }
+      ],
+      "seniorityMix": { "intern": 0, "junior": 0, "mid": 5, "senior": 4, "lead": 0, "unknown": 0 }
+    }
+  },
+  {
+    "id": "coach-no-gaps",
+    "snapshot": {
+      "total": 9,
+      "analyzedCount": 6,
+      "statusCounts": { "SAVED": 1, "APPLIED": 4, "INTERVIEW": 2, "OFFER": 1, "REJECTED": 1 },
+      "rates": { "applied": 8, "responseRate": 0.5, "interviewRate": 0.375, "offerRate": 0.125 },
+      "topMissingSkills": [],
+      "seniorityMix": { "intern": 0, "junior": 0, "mid": 4, "senior": 2, "lead": 0, "unknown": 0 }
+    }
+  }
+]

@@ -7,6 +7,7 @@ export const AI_FEATURES = [
   "embed",
   "tailor",
   "interview",
+  "coach",
 ] as const;
 
 export type AiFeature = (typeof AI_FEATURES)[number];

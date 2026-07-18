@@ -97,6 +97,7 @@ async function shootSection(heading: string, file: string, maxHeight?: number) {
 // aspect as the board shot that follows, so the two full-width images agree.
 await settle(page);
 await shootFullPage(page, "dashboard.png", CONTEXT_OPTIONS.viewport.height);
+await shootSection("Activity", "activity.png");
 
 await page.goto("/dashboard/applications");
 await settle(page);

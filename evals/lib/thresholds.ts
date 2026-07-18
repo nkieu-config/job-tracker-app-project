@@ -29,6 +29,15 @@ export const THRESHOLDS: Record<string, Threshold[]> = {
     { metric: "formatting /5", min: 3.5 },
     { metric: "hallucination rate", max: 0.2 },
   ],
+  coach: [
+    { metric: "relevance /5", min: 3.5 },
+    { metric: "grounded /5", min: 4 },
+    { metric: "actionable /5", min: 3.5 },
+    // The focus skill it names must be a gap actually in the data. This is a
+    // model-free check, so hold it high.
+    { metric: "focus grounded", min: 0.8 },
+    { metric: "hallucination rate", max: 0.2 },
+  ],
 };
 
 function format(value: number): string {

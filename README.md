@@ -62,6 +62,7 @@ Full deep-dive — system design, data model, decision rationale, challenges-and
 - **The AI is measured, not assumed.** Every feature has to clear an [evaluation harness](evals/) — real metrics, a controlled ablation, and an LLM judge — before it ships. Scorecard below.
 - **Defense-in-depth auth.** Middleware does an optimistic cookie check, but every page, Server Action and route handler independently re-verifies the session and scopes queries by `userId` — a design that survives CVE-2025-29927, the Next.js middleware bypass.
 - **Vector search in the database, not the app.** Embeddings live in Postgres `vector(768)` columns behind an HNSW index; resume ranking is one raw-SQL cosine-distance query, not an application-side similarity loop.
+- **Charts are hand-rolled SVG, not a charting library.** The dashboard's weekly-activity bars and fit ranking are built from primitives (pure bucketing/scale helpers, unit-tested) so they inherit the design tokens — theme-aware in light and dark, keyboard-navigable with an `sr-only` data table — and add zero KB to the bundle.
 - **AI behind one boundary.** All Gemini access lives in a single `server/ai/` module called only from server code, so the API key never reaches the client and there is exactly one place to meter, validate and mock.
 - **Streaming end to end.** Gemini's chunk iterator is piped straight into a Route Handler `ReadableStream` → browser, with an end-of-stream status frame so a dropped connection can never silently persist a truncated result.
 - **Production paper cuts, actually fixed.** Serverless connection exhaustion (now a capped `pg` pool, drained before each Fluid instance suspends), a broken transitive Kysely release pinned with an npm override, Prisma 7's engine removal, Next 16's `middleware` → `proxy` rename — the full list with solutions is in [docs/architecture.md](docs/architecture.md#challenges--solutions).
@@ -81,7 +82,7 @@ Full methodology and per-suite results: [evals/](evals/).
 | Module               | What it does                                                                                                                      |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | **Kanban pipeline**  | Drag-and-drop board (Saved → Applied → Interview → Offer → Rejected), optimistic updates, URL-synced list with search/filter/sort |
-| **Dashboard**        | Response, interview and offer rates, pipeline funnel, upcoming deadlines                                                          |
+| **Dashboard**        | Response, interview and offer rates, pipeline funnel, weekly-activity chart, resume-fit ranking, upcoming deadlines               |
 | **JD analysis**      | Gemini extracts required skills, nice-to-haves and seniority, then flags which skills your resumes are missing                    |
 | **Resume fit**       | Ranks every resume version against the JD by pgvector cosine similarity, labeled with Strong/Moderate/Weak bands                  |
 | **Bullet tailoring** | Rewrites your experience into JD-tuned resume bullets, streamed token-by-token, saved per application                             |
@@ -95,6 +96,10 @@ Two of the AI features stream. Here is bullet tailoring as it actually runs — 
 
 <details>
 <summary>📸 More screenshots — the board, all four AI features, and the landing page</summary>
+
+The dashboard's Activity section — weekly application bars and a resume-fit ranking, both hand-rolled SVG:
+
+![Weekly activity chart by status and a resume-fit ranking of applications](docs/screenshots/activity.png)
 
 Drag a card and the move persists optimistically:
 

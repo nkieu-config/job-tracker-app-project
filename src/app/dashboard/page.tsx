@@ -5,7 +5,19 @@ import { requireSession } from "@/server/get-session";
 import { formatDisplayDate, deadlineTone } from "@/lib/format";
 import { DEADLINE_TONE_CLASS } from "@/components/ui/deadline";
 import { getStatusCounts, getUpcomingDeadlines } from "@/server/data/applications";
+import {
+  getWeeklyActivity,
+  getBestFitPerApplication,
+  getPipelineSnapshot,
+} from "@/server/data/insights";
+import { prisma } from "@/server/prisma";
+import { coachSnapshotHash, MIN_ANALYZED_FOR_COACH } from "@/server/coach";
+import { coachAdviceSchema } from "@/lib/schemas/coach";
 import { Pipeline } from "@/components/dashboard/pipeline";
+import { ActivityChart } from "@/components/dashboard/activity-chart";
+import { FitRanking } from "@/components/dashboard/fit-ranking";
+import { SkillGapCard } from "@/components/dashboard/skill-gap-card";
+import { PipelineCoach } from "@/components/dashboard/pipeline-coach";
 import { StatusBadge } from "@/components/applications/status-badge";
 import { buttonClass } from "@/components/ui/button";
 import { Card, cardClass } from "@/components/ui/card";
@@ -51,10 +63,24 @@ export default async function DashboardPage() {
   const session = await requireSession();
   const userId = session.user.id;
 
-  const [counts, upcoming] = await Promise.all([
-    getStatusCounts(userId),
-    getUpcomingDeadlines(userId),
-  ]);
+  const [counts, upcoming, weeklyActivity, bestFit, snapshot, coachUser] =
+    await Promise.all([
+      getStatusCounts(userId),
+      getUpcomingDeadlines(userId),
+      getWeeklyActivity(userId),
+      getBestFitPerApplication(userId),
+      getPipelineSnapshot(userId),
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: { coachAdvice: true, coachHash: true, coachAt: true },
+      }),
+    ]);
+
+  const coachParsed = coachAdviceSchema.safeParse(coachUser?.coachAdvice);
+  const advice = coachParsed.success ? coachParsed.data : null;
+  const coachIsStale =
+    advice !== null && coachUser?.coachHash !== coachSnapshotHash(snapshot);
+  const canCoach = snapshot.analyzedCount >= MIN_ANALYZED_FOR_COACH;
 
   const total = Object.values(counts).reduce((a, b) => a + b, 0);
   const applied =
@@ -145,6 +171,69 @@ export default async function DashboardPage() {
               Pipeline
             </h2>
             <Pipeline counts={counts} />
+          </section>
+
+          <section>
+            <h2 className="mb-4 font-sans font-bold text-title text-ink">
+              Activity
+            </h2>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <Card className="p-6 shadow-sm">
+                <h3 className="font-sans text-body font-bold text-ink">
+                  Weekly activity
+                </h3>
+                <p className="mb-4 mt-1 font-sans text-caption text-ink-mute">
+                  Applications added, last 12 weeks
+                </p>
+                <ActivityChart weeks={weeklyActivity} />
+              </Card>
+
+              <Card className="flex flex-col p-6 shadow-sm">
+                <h3 className="font-sans text-body font-bold text-ink">
+                  Resume fit
+                </h3>
+                <p className="mb-4 mt-1 font-sans text-caption text-ink-mute">
+                  Best resume match per application
+                </p>
+                {bestFit.length === 0 ? (
+                  <EmptyState className="flex-1 justify-center border-0 bg-transparent p-0">
+                    Analyze a job description and compute resume fit to see how
+                    your resumes stack up.
+                  </EmptyState>
+                ) : (
+                  <FitRanking points={bestFit} />
+                )}
+              </Card>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="mb-4 font-sans font-bold text-title text-ink">
+              Coaching
+            </h2>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <Card className="flex flex-col p-6 shadow-sm">
+                <h3 className="font-sans text-body font-bold text-ink">
+                  Skills to focus on
+                </h3>
+                <p className="mb-4 mt-1 font-sans text-caption text-ink-mute">
+                  Most common gaps across your analyzed roles
+                </p>
+                <SkillGapCard
+                  gaps={snapshot.topMissingSkills}
+                  analyzedCount={snapshot.analyzedCount}
+                />
+              </Card>
+
+              <Card className="p-6 shadow-sm">
+                <PipelineCoach
+                  advice={advice}
+                  generatedAt={coachUser?.coachAt?.toISOString() ?? null}
+                  isStale={coachIsStale}
+                  canGenerate={canCoach}
+                />
+              </Card>
+            </div>
           </section>
         </>
       )}

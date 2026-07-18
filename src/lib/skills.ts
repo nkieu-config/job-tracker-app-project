@@ -38,6 +38,12 @@ function containsTerm(haystack: string, term: string): boolean {
   return pattern.test(haystack);
 }
 
+export function canonicalSkill(skill: string): string {
+  const needle = skill.trim().toLowerCase();
+  const group = aliasIndex.get(needle);
+  return group ? group[0] : needle;
+}
+
 export function matchSkills(
   requiredSkills: string[],
   resumeText: string,

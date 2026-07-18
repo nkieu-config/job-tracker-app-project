@@ -7,6 +7,7 @@ import type { RunOptions, SuiteResult } from "./lib/types";
 import * as jdAnalysis from "./suites/jd-analysis.eval";
 import * as skillMatch from "./suites/skill-match.eval";
 import * as tailoring from "./suites/tailoring.eval";
+import * as coach from "./suites/coach.eval";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 config({ path: path.resolve(here, "../.env") });
@@ -14,7 +15,7 @@ process.env.AI_USAGE_DISABLED = "1";
 
 type Suite = { name: string; run: (opts: RunOptions) => Promise<SuiteResult> };
 
-const SUITES: Suite[] = [jdAnalysis, skillMatch, tailoring];
+const SUITES: Suite[] = [jdAnalysis, skillMatch, tailoring, coach];
 const BY_NAME = new Map(SUITES.map((s) => [s.name, s]));
 
 // `--n=abc` is NaN, which is falsy-ish enough to silently disable the limit and

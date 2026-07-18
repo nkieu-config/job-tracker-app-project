@@ -20,6 +20,7 @@ const FEATURE_LABELS: Record<AiFeature, string> = {
   embed: "Embeddings",
   tailor: "Bullet tailoring",
   interview: "Interview prep",
+  coach: "Pipeline coach",
 };
 
 function featureLabel(feature: string): string {

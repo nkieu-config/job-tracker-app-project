@@ -28,6 +28,66 @@ const responseJsonSchema = (() => {
   return schema;
 })();
 
+const coachRubricSchema = z.object({
+  relevance: z.number().min(1).max(5),
+  grounded: z.number().min(1).max(5),
+  actionable: z.number().min(1).max(5),
+  fabricated: z.boolean(),
+  fabricatedItems: z.array(z.string()),
+});
+
+export type CoachRubric = z.infer<typeof coachRubricSchema>;
+
+const coachResponseJsonSchema = (() => {
+  const schema = z.toJSONSchema(coachRubricSchema) as Record<string, unknown>;
+  delete schema["$schema"];
+  return schema;
+})();
+
+// LLM-as-judge for the pipeline coach. The model sees the exact snapshot the
+// advice was written from (as JSON) so it can flag any number or skill in the
+// advice that isn't in the data.
+export async function judgeCoach(
+  snapshotJson: string,
+  advice: string,
+): Promise<{ rubric: CoachRubric; tokens: number }> {
+  const ai = getGeminiClient();
+
+  const prompt = `You are a strict evaluator of AI-generated job-search coaching. The coach was given ONLY the pipeline data below (as JSON) and produced the ADVICE. Score the ADVICE on a 1-5 integer scale.
+
+- relevance: does the advice speak to THIS pipeline's situation, not generic tips? (5 = specific to the data, 1 = boilerplate).
+- grounded: are all figures and skills it cites actually present in the data? (5 = every claim traceable to the data, 1 = mostly invented).
+- actionable: are the recommendations concrete next steps the candidate can act on? (5 = clearly actionable, 1 = vague).
+- fabricated: true if the advice states ANY number, skill, company, or fact not present in the pipeline data.
+- fabricatedItems: list each invented specific (empty if none).
+
+Judge only what is written.
+
+PIPELINE DATA (JSON):
+"""
+${snapshotJson}
+"""
+
+ADVICE:
+"""
+${advice}
+"""`;
+
+  const res = await ai.models.generateContent({
+    model: JUDGE_MODEL,
+    contents: prompt,
+    config: {
+      responseMimeType: "application/json",
+      responseJsonSchema: coachResponseJsonSchema,
+      temperature: 0,
+    },
+  });
+
+  const rubric = coachRubricSchema.parse(JSON.parse(res.text ?? "{}"));
+  const tokens = res.usageMetadata?.totalTokenCount ?? 0;
+  return { rubric, tokens };
+}
+
 export async function judgeBullets(
   jobDescription: string,
   experience: string,
