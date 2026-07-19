@@ -6,6 +6,7 @@ import { formatDisplayDate, deadlineTone } from "@/lib/format";
 import { getApplication } from "@/server/data/applications";
 import { getResumeText, getResumeTextMeta } from "@/server/data/resumes";
 import { storedJdAnalysisSchema } from "@/lib/schemas/jd-analysis";
+import { analysisCacheHash } from "@/server/analysis-cache";
 import { matchSkills } from "@/lib/skills";
 import { fitBand } from "@/components/ui/fit-score";
 import { buttonClass } from "@/components/ui/button";
@@ -79,12 +80,23 @@ export default async function ApplicationDetailPage({
         }
       : matchSkills(analysis.requiredSkills, await getResumeText(userId))
     : null;
-  const analysisStale =
+  const hasJd = Boolean(application.jobDescription?.trim());
+
+  const resumesChangedSinceAnalysis =
     analysis?.skillMatches !== undefined &&
     application.analyzedAt !== null &&
     resumes.some((r) => r.createdAt > application.analyzedAt!);
-
-  const hasJd = Boolean(application.jobDescription?.trim());
+  const jdChangedSinceAnalysis =
+    analysis !== null &&
+    hasJd &&
+    application.analysisHash !== null &&
+    application.analysisHash !==
+      analysisCacheHash(application.jobDescription!.trim());
+  const staleAnalysisNotice = jdChangedSinceAnalysis
+    ? "This analysis no longer matches the current job description — re-analyze to refresh it."
+    : resumesChangedSinceAnalysis
+      ? "You’ve uploaded resumes since this analysis — re-analyze to refresh the skill matching."
+      : null;
   const sections: Section[] = [
     ...(application.jobDescription
       ? [{ id: "job-description", label: "Job description" }]
@@ -322,10 +334,9 @@ export default async function ApplicationDetailPage({
                   </p>
                 )}
 
-                {analysisStale && (
+                {staleAnalysisNotice && (
                   <p className="rounded-lg bg-semantic-warning-tint px-3 py-2 font-sans text-caption font-medium text-ink">
-                    You&rsquo;ve uploaded resumes since this analysis — re-analyze
-                    to refresh the skill matching.
+                    {staleAnalysisNotice}
                   </p>
                 )}
               </div>

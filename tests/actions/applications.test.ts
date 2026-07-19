@@ -70,6 +70,7 @@ const { EMBEDDING_MODEL } = await import("@/server/ai/models");
 
 const OWNER = "user-owner";
 const { MAX_APPLICATIONS } = await import("@/server/data/applications");
+const { analysisCacheHash } = await import("@/server/analysis-cache");
 const {
   createApplication,
   updateApplicationStatus,
@@ -292,6 +293,85 @@ describe("analyzeApplication", () => {
     const write = updateMany.mock.calls[0][0];
     expect(write.where).toEqual({ id: "app-1", userId: OWNER });
     expect(write.data.analysis.requiredSkills).toEqual(["TypeScript"]);
+    expect(write.data.analysisHash).toBe(analysisCacheHash(JD_TEXT));
+  });
+
+  const CACHED_ANALYSIS = {
+    summary: "role",
+    seniority: "senior",
+    requiredSkills: ["TypeScript", "Kubernetes"],
+    niceToHave: [],
+    skillMatches: ["TypeScript"],
+  };
+
+  const cachedApp = () => ({
+    id: "app-1",
+    userId: OWNER,
+    jobDescription: JD_TEXT,
+    analysisHash: analysisCacheHash(JD_TEXT),
+    analysis: CACHED_ANALYSIS,
+  });
+
+  it("skips the model call and refreshes skill matches on an unchanged JD", async () => {
+    findFirst.mockResolvedValue(cachedApp());
+    getResumeText.mockResolvedValue("TypeScript and Kubernetes daily");
+    matchSkillsSemantic.mockResolvedValue({
+      matched: ["TypeScript", "Kubernetes"],
+    });
+
+    const res = await analyzeApplication("app-1", {}, new FormData());
+
+    expect(res).toEqual({ success: true });
+    expect(analyzeJobDescription).not.toHaveBeenCalled();
+    expect(matchSkillsSemantic).toHaveBeenCalledWith(
+      ["TypeScript", "Kubernetes"],
+      "TypeScript and Kubernetes daily",
+      OWNER,
+    );
+    const write = updateMany.mock.calls[0][0];
+    expect(write.data.analysis.skillMatches).toEqual([
+      "TypeScript",
+      "Kubernetes",
+    ]);
+  });
+
+  it("is a free no-op on an unchanged JD with no resume text", async () => {
+    findFirst.mockResolvedValue(cachedApp());
+    getResumeText.mockResolvedValue("");
+
+    const res = await analyzeApplication("app-1", {}, new FormData());
+
+    expect(res).toEqual({ success: true });
+    expect(checkAiRateLimit).not.toHaveBeenCalled();
+    expect(analyzeJobDescription).not.toHaveBeenCalled();
+    expect(matchSkillsSemantic).not.toHaveBeenCalled();
+    const write = updateMany.mock.calls[0][0];
+    expect(write.data.analysis.skillMatches).toBeUndefined();
+  });
+
+  it("still enforces the AI budget before refreshing matches on a cache hit", async () => {
+    findFirst.mockResolvedValue(cachedApp());
+    getResumeText.mockResolvedValue("resume text");
+    checkAiRateLimit.mockResolvedValue(false);
+
+    const res = await analyzeApplication("app-1", {}, new FormData());
+
+    expect(res.error).toMatch(/rate limit/i);
+    expect(matchSkillsSemantic).not.toHaveBeenCalled();
+    expect(updateMany).not.toHaveBeenCalled();
+  });
+
+  it("re-runs the full analysis when the stored hash doesn't match", async () => {
+    findFirst.mockResolvedValue({ ...cachedApp(), analysisHash: "stale" });
+    const res = await analyzeApplication("app-1", {}, new FormData());
+    expect(res).toEqual({ success: true });
+    expect(analyzeJobDescription).toHaveBeenCalled();
+  });
+
+  it("re-runs the full analysis when the cached analysis fails validation", async () => {
+    findFirst.mockResolvedValue({ ...cachedApp(), analysis: { bad: true } });
+    await analyzeApplication("app-1", {}, new FormData());
+    expect(analyzeJobDescription).toHaveBeenCalled();
   });
 
   it("merges semantic skill matches when the user has resume text", async () => {

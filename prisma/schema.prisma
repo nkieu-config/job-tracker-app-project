@@ -101,6 +101,7 @@ model Application {
   notes          String?
   analysis       Json?
   analyzedAt     DateTime?
+  analysisHash   String?
   jdEmbedding    Unsupported("vector(768)")?
   jdEmbeddingHash String?
   jdEmbeddingModel String?

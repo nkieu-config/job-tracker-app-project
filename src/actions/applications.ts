@@ -13,6 +13,12 @@ import {
   type ApplicationStatus,
 } from "@/lib/schemas/application";
 import {
+  jdAnalysisSchema,
+  storedJdAnalysisSchema,
+  type StoredJdAnalysis,
+} from "@/lib/schemas/jd-analysis";
+import { analysisCacheHash } from "@/server/analysis-cache";
+import {
   analyzeJobDescription,
   embedText,
   embedDocument,
@@ -33,7 +39,6 @@ import {
   getResumesNeedingEmbedding,
 } from "@/server/data/embeddings";
 import {
-  guardAiRequest,
   requireAiBudget,
   requireApplicationWithJd,
 } from "@/server/ai-guard";
@@ -191,6 +196,26 @@ export async function updateApplicationStatus(
 
 export type AnalyzeState = { error?: string; success?: boolean };
 
+// The row could have been deleted (or its JD emptied) during the multi-second
+// Gemini call. Without this check the action reports success while nothing was
+// stored, and the user sees a success state with no analysis.
+async function persistAnalysis(
+  id: string,
+  userId: string,
+  analysis: StoredJdAnalysis,
+  analysisHash: string,
+): Promise<AnalyzeState> {
+  const result = await prisma.application.updateMany({
+    where: { id, userId },
+    data: { analysis, analysisHash, analyzedAt: new Date() },
+  });
+  if (result.count === 0) {
+    return { error: "Application not found." };
+  }
+  revalidatePath(`/dashboard/applications/${id}`);
+  return { success: true };
+}
+
 export async function analyzeApplication(
   id: string,
   _prevState: AnalyzeState,
@@ -199,11 +224,50 @@ export async function analyzeApplication(
   const session = await getSession();
   if (!session) redirect("/sign-in");
 
-  const guard = await guardAiRequest(id, session.user.id, {
-    verb: "analyzing",
-  });
-  if (!guard.ok) {
-    return { error: guard.denial.message };
+  const found = await requireApplicationWithJd(
+    id,
+    session.user.id,
+    "analyzing",
+  );
+  if (!found.ok) {
+    return { error: found.denial.message };
+  }
+  const { application, jobDescription } = found;
+
+  const hash = analysisCacheHash(jobDescription);
+  const cached =
+    application.analysisHash === hash
+      ? storedJdAnalysisSchema.safeParse(application.analysis)
+      : null;
+
+  if (cached?.success) {
+    const extraction = jdAnalysisSchema.parse(cached.data);
+    const resumeText = await getResumeText(session.user.id);
+
+    if (!resumeText.trim()) {
+      return persistAnalysis(id, session.user.id, extraction, hash);
+    }
+
+    const denied = await requireAiBudget(session.user.id);
+    if (denied) {
+      return { error: denied.message };
+    }
+    const { matched } = await matchSkillsSemantic(
+      extraction.requiredSkills,
+      resumeText,
+      session.user.id,
+    );
+    return persistAnalysis(
+      id,
+      session.user.id,
+      { ...extraction, skillMatches: matched },
+      hash,
+    );
+  }
+
+  const denied = await requireAiBudget(session.user.id);
+  if (denied) {
+    return { error: denied.message };
   }
 
   // The resume read doesn't depend on the analysis, so it runs alongside the
@@ -212,10 +276,7 @@ export async function analyzeApplication(
 
   let analysis;
   try {
-    analysis = await analyzeJobDescription(
-      guard.jobDescription,
-      session.user.id,
-    );
+    analysis = await analyzeJobDescription(jobDescription, session.user.id);
   } catch (err) {
     await resumeTextPromise.catch(() => {});
     return {
@@ -237,19 +298,7 @@ export async function analyzeApplication(
       }
     : analysis;
 
-  // The row could have been deleted (or its JD emptied) during the multi-second
-  // Gemini call. Without this check the action reports success while nothing was
-  // stored, and the user sees a success state with no analysis.
-  const result = await prisma.application.updateMany({
-    where: { id, userId: session.user.id },
-    data: { analysis: storedAnalysis, analyzedAt: new Date() },
-  });
-  if (result.count === 0) {
-    return { error: "Application not found." };
-  }
-
-  revalidatePath(`/dashboard/applications/${id}`);
-  return { success: true };
+  return persistAnalysis(id, session.user.id, storedAnalysis, hash);
 }
 
 export type FitState = { error?: string; success?: boolean };

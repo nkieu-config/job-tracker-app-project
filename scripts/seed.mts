@@ -19,6 +19,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import type { ArgType } from "@prisma/driver-adapter-utils";
 import { DEMO_EMAIL, DEMO_PASSWORD } from "@/lib/constants/demo";
+import { analysisCacheHash } from "@/server/analysis-cache";
 
 // Prisma 7 wants a descriptor object per bound argument, not a type-name
 // string. The old .mjs script passed strings and only worked because mapArg
@@ -193,6 +194,9 @@ for (const app of apps) {
 
 // 5. Pre-baked AI results so every feature demos instantly, no API key needed.
 //    skillMatches mirrors what the semantic matcher would store at analyze time.
+const jdHash = (id: string) =>
+  analysisCacheHash(apps.find((a) => a.id === id)!.jd!.trim());
+
 const analysis = {
   summary: "Senior backend role designing and scaling core REST APIs on Kubernetes and AWS.",
   seniority: "senior",
@@ -201,9 +205,9 @@ const analysis = {
   skillMatches: ["TypeScript", "Node.js", "PostgreSQL", "REST APIs", "AWS"],
 };
 await ex(
-  `UPDATE "application" SET analysis = $1::jsonb, "analyzedAt" = now() WHERE id = $2`,
-  [JSON.stringify(analysis), "demo_app_1"],
-  [TEXT, TEXT],
+  `UPDATE "application" SET analysis = $1::jsonb, "analysisHash" = $2, "analyzedAt" = now() WHERE id = $3`,
+  [JSON.stringify(analysis), jdHash("demo_app_1"), "demo_app_1"],
+  [TEXT, TEXT, TEXT],
 );
 
 const frontendAnalysis = {
@@ -214,9 +218,9 @@ const frontendAnalysis = {
   skillMatches: ["React", "Next.js", "Tailwind CSS", "Redux", "Figma"],
 };
 await ex(
-  `UPDATE "application" SET analysis = $1::jsonb, "analyzedAt" = now() WHERE id = $2`,
-  [JSON.stringify(frontendAnalysis), "demo_app_4"],
-  [TEXT, TEXT],
+  `UPDATE "application" SET analysis = $1::jsonb, "analysisHash" = $2, "analyzedAt" = now() WHERE id = $3`,
+  [JSON.stringify(frontendAnalysis), jdHash("demo_app_4"), "demo_app_4"],
+  [TEXT, TEXT, TEXT],
 );
 
 const tailoredExperience = "Maintained node.js services at Globex, fixed bugs and helped with deployments.";
@@ -268,9 +272,9 @@ const aviatoAnalysis = {
   skillMatches: ["React", "Node.js", "PostgreSQL", "AWS"],
 };
 await ex(
-  `UPDATE "application" SET analysis = $1::jsonb, "analyzedAt" = now() WHERE id = $2`,
-  [JSON.stringify(aviatoAnalysis), "demo_app_8"],
-  [TEXT, TEXT],
+  `UPDATE "application" SET analysis = $1::jsonb, "analysisHash" = $2, "analyzedAt" = now() WHERE id = $3`,
+  [JSON.stringify(aviatoAnalysis), jdHash("demo_app_8"), "demo_app_8"],
+  [TEXT, TEXT, TEXT],
 );
 
 const aviatoInterviewPrep = `Technical questions

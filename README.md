@@ -39,7 +39,7 @@ The result is the app I now use to run the very job search it was built for. If 
 ## What happens when you analyze one job description
 
 1. A Server Action re-verifies your session (middleware is never the only gate) and checks the per-user hourly AI budget before any model call.
-2. `server/ai` calls Gemini with a JSON schema **derived from a Zod schema**, then re-validates the response with that same schema — malformed model output becomes a recoverable error message, never a crashed page.
+2. `server/ai` calls Gemini with a JSON schema **derived from a Zod schema**, then re-validates the response with that same schema — malformed model output becomes a recoverable error message, never a crashed page. The stored result carries a content-hash fingerprint (description + model + prompt version), so re-analyzing an unchanged description skips the model call and only refreshes the skill matching.
 3. Extracted skills are matched against your resumes in two layers: word-boundary + alias matching first, then embedding similarity for paraphrases — "GitHub Actions pipelines" counts as CI/CD. That second layer's contribution is measured, not assumed.
 4. Computing fit embeds the JD and any new resume versions in one batched call, stores them in `vector(768)` columns, and ranks versions with a single cosine-distance SQL query behind an HNSW index.
 5. Every model call is recorded — tokens and cost roll up per feature on an admin AI-usage page.
