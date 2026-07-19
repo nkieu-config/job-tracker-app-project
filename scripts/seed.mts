@@ -20,6 +20,10 @@ import pg from "pg";
 import type { ArgType } from "@prisma/driver-adapter-utils";
 import { DEMO_EMAIL, DEMO_PASSWORD } from "@/lib/constants/demo";
 import { analysisCacheHash } from "@/server/analysis-cache";
+import { buildPipelineSnapshot } from "@/lib/insights";
+import { coachSnapshotHash } from "@/server/coach";
+import type { StoredJdAnalysis } from "@/lib/schemas/jd-analysis";
+import type { ApplicationStatus } from "@/lib/schemas/application";
 
 // Prisma 7 wants a descriptor object per bound argument, not a type-name
 // string. The old .mjs script passed strings and only worked because mapArg
@@ -274,6 +278,50 @@ const aviatoAnalysis = {
 await ex(
   `UPDATE "application" SET analysis = $1::jsonb, "analysisHash" = $2, "analyzedAt" = now() WHERE id = $3`,
   [JSON.stringify(aviatoAnalysis), jdHash("demo_app_8"), "demo_app_8"],
+  [TEXT, TEXT, TEXT],
+);
+
+// Pre-baked pipeline-coach advice, grounded in exactly the demo data above:
+// Kubernetes is the only required skill the resumes don't cover (demo_app_1),
+// and the response/interview rates below come from the seeded statuses. The
+// hash is computed from the same snapshot the dashboard builds, so the demo
+// shows the coach populated and current — not a "regenerate" prompt.
+const analysisById: Record<string, unknown> = {
+  demo_app_1: analysis,
+  demo_app_4: frontendAnalysis,
+  demo_app_8: aviatoAnalysis,
+};
+const coachSnapshot = buildPipelineSnapshot(
+  apps.map((a) => ({
+    status: a.status as ApplicationStatus,
+    analysis: (analysisById[a.id] as StoredJdAnalysis) ?? null,
+  })),
+);
+const coachAdvice = {
+  headline:
+    "A healthy response rate and strong interview conversion — Kubernetes is the one gap holding the senior backend roles back.",
+  focusSkill: "Kubernetes",
+  recommendations: [
+    {
+      title: "Close the Kubernetes gap",
+      detail:
+        "It's the only required skill your resumes don't cover, and it keeps coming up on the senior backend roles you're interviewing for. A small hands-on project would remove the objection.",
+    },
+    {
+      title: "Keep the volume up",
+      detail:
+        "Five of your eight applications past the saved stage drew a response and three reached an interview — the top of the funnel is working, so keep applying rather than over-polishing each one.",
+    },
+    {
+      title: "Convert what's in flight",
+      detail:
+        "With two roles in the interview stage and an offer already in hand, interview prep for the live applications is where the next win most likely comes from.",
+    },
+  ],
+};
+await ex(
+  `UPDATE "user" SET "coachAdvice" = $1::jsonb, "coachHash" = $2, "coachAt" = now() WHERE id = $3`,
+  [JSON.stringify(coachAdvice), coachSnapshotHash(coachSnapshot), userId],
   [TEXT, TEXT, TEXT],
 );
 

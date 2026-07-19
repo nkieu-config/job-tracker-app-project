@@ -6,7 +6,7 @@
 
 **The job hunt is a data problem. This is the tool I built to solve mine.** An AI-powered job-application tracker that analyzes job descriptions, scores your resume versions against them with vector embeddings, and tailors your bullets — built solo as my capstone project, used daily in my real job search.
 
-**4 AI features, every one measured · 250 tests + a 3-suite AI eval harness · ~11k lines of strict TypeScript (app, tests, evals)**
+**6 AI features, 5 with eval suites · 314 tests + a 5-suite AI eval harness · ~14k lines of strict TypeScript (app, tests, evals)**
 
 ![Dashboard showing application pipeline, response and interview rates, and upcoming deadlines](docs/screenshots/dashboard.png)
 
@@ -74,6 +74,7 @@ Regenerated with `npm run eval`, on real model calls:
 - **Skill matching** — the embedding layer lifts recall from 86.1% to **94.4%** (+8.3 points; F1 90.5% → **95.5%**) over lexical-only matching, in a controlled ablation.
 - **JD analysis** — **94.0% F1** on skill extraction (precision 94.8%, recall 93.4%), 93.3% seniority accuracy, **100% schema validity** across 15 labeled job descriptions.
 - **Bullet tailoring** — LLM-as-judge scores of **5/5** on relevance, grounding and formatting, with **zero hallucinations** across the 3 of 6 items the free-tier daily quota allowed (excluded items are reported, never silently scored).
+- **Pipeline coach & form autofill** — eval suites are written (LLM-judge plus a model-free focus-grounding check for the coach; exact-match company/role/deadline scoring for autofill), but their scorecards aren't captured yet. The judged suites default to `gemini-2.5-pro` as the LLM judge, which the Gemini free tier no longer serves — set `EVAL_JUDGE_MODEL` to an available model (e.g. `gemini-3.5-flash`) to run them.
 
 Full methodology and per-suite results: [evals/](evals/).
 
@@ -82,11 +83,13 @@ Full methodology and per-suite results: [evals/](evals/).
 | Module               | What it does                                                                                                                      |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | **Kanban pipeline**  | Drag-and-drop board (Saved → Applied → Interview → Offer → Rejected), optimistic updates, URL-synced list with search/filter/sort |
-| **Dashboard**        | Response, interview and offer rates, pipeline funnel, weekly-activity chart, resume-fit ranking, upcoming deadlines               |
-| **JD analysis**      | Gemini extracts required skills, nice-to-haves and seniority, then flags which skills your resumes are missing                    |
+| **Dashboard**        | Response, interview and offer rates, pipeline funnel, weekly-activity chart, resume-fit ranking, skill-gap insights, upcoming deadlines |
+| **JD analysis**      | Gemini extracts required skills, nice-to-haves and seniority, then flags which skills your resumes are missing — cached by content hash |
 | **Resume fit**       | Ranks every resume version against the JD by pgvector cosine similarity, labeled with Strong/Moderate/Weak bands                  |
 | **Bullet tailoring** | Rewrites your experience into JD-tuned resume bullets, streamed token-by-token, saved per application                             |
 | **Interview prep**   | Streamed prep sheet — likely technical and behavioral questions, each with what a strong answer covers                            |
+| **Pipeline coach**   | Reads your whole pipeline — rates and the skills missing most across roles — for cached, on-demand strategic advice               |
+| **Form autofill**    | Paste a job description on the new-application form and Gemini fills the company, role and deadline                               |
 | **Resume versions**  | PDF upload (content-type and magic-byte checked), text extraction, private Vercel Blob storage                                    |
 | **AI observability** | Admin page tracking tokens and cost per AI feature; a shared hourly AI budget per user                                            |
 
@@ -95,11 +98,15 @@ Two of the AI features stream. Here is bullet tailoring as it actually runs — 
 ![Resume bullets streaming in token by token as the model rewrites experience against the job description](docs/screenshots/tailor-streaming.gif)
 
 <details>
-<summary>📸 More screenshots — the board, all four AI features, and the landing page</summary>
+<summary>📸 More screenshots — the board, the AI features, and the landing page</summary>
 
 The dashboard's Activity section — weekly application bars and a resume-fit ranking, both hand-rolled SVG:
 
 ![Weekly activity chart by status and a resume-fit ranking of applications](docs/screenshots/activity.png)
+
+The Coaching section — a skill-gap tally across the pipeline beside on-demand AI advice:
+
+![Skill-gap card and AI pipeline coach with strategic advice](docs/screenshots/coaching.png)
 
 Drag a card and the move persists optimistically:
 
@@ -113,9 +120,13 @@ Drag a card and the move persists optimistically:
 | --- | --- |
 | ![Resume bullets tailored to the job description](docs/screenshots/tailor.png) | ![Generated prep sheet with likely technical and behavioral questions](docs/screenshots/interview-prep.png) |
 
+Paste a job description on the new-application form and AI auto-fill sets the company, role and deadline:
+
+![New-application form with a job description pasted and the AI auto-fill button](docs/screenshots/autofill.png)
+
 The design system in [docs/design.md](docs/design.md), as actually rendered:
 
-![Job Tracker landing page — hero, the four AI features, and the closing call to action](docs/screenshots/landing.png)
+![Job Tracker landing page — hero, the AI features, and the closing call to action](docs/screenshots/landing.png)
 
 </details>
 
@@ -163,11 +174,12 @@ Full environment-variable reference, scripts and deploy guide: [docs/setup.md](d
 
 ## Testing & quality
 
-250 tests across two Vitest projects:
+314 tests across two Vitest projects, plus a read-only Playwright smoke suite:
 
-- **Node (server)** — ownership scoping of every Server Action, the resume upload's blob lifecycle including compensating deletes, the page cap that stops a PDF bomb from pinning the function, rate limiting for both AI and auth, embedding batch splitting, and the fence that keeps a job description from being read as prompt instructions.
+- **Node (server)** — ownership scoping of every Server Action, the JD-analysis cache short-circuit, the pipeline-snapshot aggregation, the resume upload's blob lifecycle including compensating deletes, the page cap that stops a PDF bomb from pinning the function, rate limiting for both AI and auth, embedding batch splitting, and the fence that keeps a job description from being read as prompt instructions.
 - **jsdom (components)** — the streaming UI's save/discard rules and the accessibility invariants of the drag-and-drop board.
-- **Integration (10 of the 250)** — run against a real Postgres and skip when no database is reachable. They cover the raw SQL the mocked unit tests can't reach: the rate limiter's atomic upsert, and the predicate deciding whether a resume holds readable text.
+- **Integration (10 of the 314)** — run against a real Postgres and skip when no database is reachable. They cover the raw SQL the mocked unit tests can't reach: the rate limiter's atomic upsert, and the predicate deciding whether a resume holds readable text.
+- **e2e (`npm run test:e2e`)** — a Playwright smoke test walks sign-in, the dashboard, navigation and the auth redirect against a running app; it stays read-only to leave the shared demo untouched.
 
 Security-critical modules — the prompt fence, the admin gate, the AI ownership guard and the PDF page cap among them — are pinned to **100% coverage thresholds** in CI.
 
@@ -203,12 +215,12 @@ npm run screenshots     # regenerate README screenshots via Playwright
 
 Deliberate scope choices — plus one quota constraint — for a portfolio-scale deployment:
 
-- **The tailoring eval is a 3-of-6 sample** — the Gemini free tier caps generation at 20 requests/day, and running jd-analysis (15 calls, captured in full) first left only part of a day's budget; the remaining items need a paid key or another day's quota.
+- **Some eval scorecards aren't captured yet** — the tailoring suite is a 3-of-6 sample (the Gemini free tier caps generation at 20 requests/day), and the pipeline-coach and form-autofill suites are written but unrun. The judged suites also default to a `gemini-2.5-pro` judge the free tier no longer serves, so running them needs `EVAL_JUDGE_MODEL` pointed at an available model. Interview prep is the one AI feature without an eval suite at all.
 - **The e2e suite is a read-only smoke test** — `npm run test:e2e` drives a real browser through sign-in, the dashboard, navigation, an application detail page and the auth redirect (`e2e/smoke.spec.ts`). It deliberately skips the AI actions (they spend the shared hourly budget) and the create/edit/delete and upload flows (they mutate the shared demo other visitors see); those paths are covered by the unit and integration tests.
 - **Email/password auth only** — no OAuth providers.
 - **PDF text extraction only** — scanned or image-based PDFs yield no text, and the app asks for a readable file instead of OCR-ing it.
 
-Next on the roadmap: extending the e2e smoke suite to the mutating flows against a throwaway account, a fully captured scorecard on a paid Gemini key, and OAuth sign-in.
+Next on the roadmap: capturing the coach, autofill and full tailoring scorecards (and an interview-prep suite), extending the e2e smoke suite to the mutating flows against a throwaway account, and OAuth sign-in.
 
 ## About
 

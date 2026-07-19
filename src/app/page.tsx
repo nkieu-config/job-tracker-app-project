@@ -1,6 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Sparkles, Target, MessagesSquare, PenLine } from "lucide-react";
+import {
+  Sparkles,
+  Target,
+  MessagesSquare,
+  PenLine,
+  Compass,
+  Wand2,
+} from "lucide-react";
 import { DemoButton } from "@/components/auth/demo-button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { SkipLink } from "@/components/ui/skip-link";
@@ -40,12 +47,22 @@ const FEATURES = [
     title: "Interview prep",
     body: "Generates likely technical and behavioral questions from the JD, with pointers on what a strong answer covers.",
   },
+  {
+    icon: Compass,
+    title: "Pipeline coach",
+    body: "Reads your whole pipeline — response and interview rates, the skills missing most across roles — for on-demand strategic advice.",
+  },
+  {
+    icon: Wand2,
+    title: "Form autofill",
+    body: "Paste a job description on the new-application form and AI fills in the company, role, and deadline for you.",
+  },
 ];
 
 const STATS = [
-  { value: "4", label: "AI features, every one measured" },
-  { value: "250+", label: "automated tests" },
-  { value: "3", label: "AI eval suites" },
+  { value: "6", label: "AI features" },
+  { value: "300+", label: "automated tests" },
+  { value: "5", label: "AI eval suites" },
 ];
 
 export default function Home() {
@@ -133,8 +150,8 @@ export default function Home() {
                 The tedious parts, handled
               </h2>
               <p className="mt-3 font-sans text-body-lg leading-relaxed text-ink-mute">
-                Four AI features on Gemini and pgvector do the reading and
-                ranking, so you spend your time on the interview.
+                AI features on Gemini and pgvector do the reading, ranking and
+                writing, so you spend your time on the interview.
               </p>
             </Reveal>
             <div className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2">
