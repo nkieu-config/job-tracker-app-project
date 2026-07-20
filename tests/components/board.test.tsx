@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 vi.mock("@/actions/applications", () => ({ updateApplicationStatus: vi.fn() }));
 vi.mock("@/components/ui/toast", () => ({ useToast: () => vi.fn() }));
@@ -37,5 +37,19 @@ describe("ApplicationsBoard accessibility", () => {
     expect(
       screen.getByRole("button", { name: "Reorder Backend Engineer at Acme" }),
     ).toBeInTheDocument();
+  });
+
+  it("collapses a column at every breakpoint, so aria-expanded is never a lie", () => {
+    render(<ApplicationsBoard applications={APPS} />);
+    const header = screen.getByRole("button", { name: /Saved/ });
+    expect(header).toHaveAttribute("aria-expanded", "true");
+
+    fireEvent.click(header);
+
+    expect(header).toHaveAttribute("aria-expanded", "false");
+    const body = screen.getByRole("link", { name: /Backend Engineer/ })
+      .parentElement!.parentElement!;
+    expect(body.className).toContain("hidden");
+    expect(body.className).not.toMatch(/lg:(flex|block|grid)\b/);
   });
 });

@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   APPLICATION_STATUSES,
   STATUS_LABELS,
-  type ApplicationStatus,
 } from "@/lib/schemas/application";
 import { STATUS_COLORS } from "@/components/ui/status-colors";
 import { niceScale, stackSegments } from "@/lib/chart";
@@ -17,14 +16,6 @@ const H = 150;
 const PLOT_TOP = 8;
 const PLOT_BOTTOM = 126;
 const PLOT_H = PLOT_BOTTOM - PLOT_TOP;
-
-const swatch: Record<ApplicationStatus, string> = {
-  SAVED: "bg-zinc-400",
-  APPLIED: "bg-blue-500",
-  INTERVIEW: "bg-amber-500",
-  OFFER: "bg-green-500",
-  REJECTED: "bg-red-400",
-};
 
 export function ActivityChart({ weeks }: { weeks: WeeklyActivity[] }) {
   const [active, setActive] = useState<number | null>(null);
@@ -130,7 +121,7 @@ export function ActivityChart({ weeks }: { weeks: WeeklyActivity[] }) {
             (s) => (
               <TooltipRow
                 key={s}
-                swatch={swatch[s]}
+                swatch={STATUS_COLORS[s].fill}
                 label={STATUS_LABELS[s]}
                 value={String(weeks[active].counts[s])}
               />
@@ -183,7 +174,7 @@ export function ActivityChart({ weeks }: { weeks: WeeklyActivity[] }) {
             key={s}
             className="flex items-center gap-1.5 font-sans text-fine text-ink-mute"
           >
-            <span className={cn("h-2 w-2 rounded-full", swatch[s])} />
+            <span className={cn("h-2 w-2 rounded-full", STATUS_COLORS[s].fill)} />
             {STATUS_LABELS[s]}
           </li>
         ))}

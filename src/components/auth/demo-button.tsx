@@ -26,17 +26,23 @@ export function DemoButton({
   async function loginDemo() {
     setDemoLoading(true);
     if (onError) onError(null);
-    const { error } = await signIn.email({
-      email: DEMO_EMAIL,
-      password: DEMO_PASSWORD,
-    });
-    setDemoLoading(false);
-    if (error) {
+    try {
+      const { error } = await signIn.email({
+        email: DEMO_EMAIL,
+        password: DEMO_PASSWORD,
+      });
+      if (error) {
+        if (onError) onError("The demo account is unavailable right now.");
+        else toast("The demo account is unavailable right now.", "error");
+        return;
+      }
+      router.push("/dashboard");
+    } catch {
       if (onError) onError("The demo account is unavailable right now.");
       else toast("The demo account is unavailable right now.", "error");
-      return;
+    } finally {
+      setDemoLoading(false);
     }
-    router.push("/dashboard");
   }
 
   return (

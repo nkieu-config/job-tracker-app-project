@@ -6,7 +6,7 @@
 
 **The job hunt is a data problem. This is the tool I built to solve mine.** An AI-powered job-application tracker that analyzes job descriptions, scores your resume versions against them with vector embeddings, and tailors your bullets — built solo as my capstone project, used daily in my real job search.
 
-**6 AI features, 5 with eval suites · 337 tests + a 5-suite AI eval harness · ~14k lines of strict TypeScript (app, tests, evals)**
+**6 AI features, 5 with eval suites · 346 tests + a 5-suite AI eval harness · ~14k lines of strict TypeScript (app, tests, evals)**
 
 ![Dashboard showing application pipeline, response and interview rates, and upcoming deadlines](docs/screenshots/dashboard.png)
 
@@ -175,11 +175,11 @@ Full environment-variable reference, scripts and deploy guide: [docs/setup.md](d
 
 ## Testing & quality
 
-337 tests across two Vitest projects, plus a read-only Playwright smoke suite (its 8 browser tests run separately):
+346 tests across two Vitest projects, plus a read-only Playwright smoke suite (its 8 browser tests run separately):
 
 - **Node (server)** — ownership scoping of every Server Action, the JD-analysis cache short-circuit, the pipeline-snapshot aggregation, the resume upload's blob lifecycle including compensating deletes, the page cap that stops a PDF bomb from pinning the function, rate limiting for both AI and auth, embedding batch splitting, and the fence that keeps a job description from being read as prompt instructions.
 - **jsdom (components)** — the streaming UI's save/discard rules and the accessibility invariants of the drag-and-drop board.
-- **Integration (10 of the 337)** — run against a real Postgres, and skip locally when no database is reachable. CI always runs them against a `pgvector/pgvector` service container, so the raw SQL the mocked unit tests can't reach stays covered: the rate limiter's atomic upsert, and the predicate deciding whether a resume holds readable text.
+- **Integration (10 of the 346)** — run against a real Postgres, and skip locally when no database is reachable. CI always runs them against a `pgvector/pgvector` service container, so the raw SQL the mocked unit tests can't reach stays covered: the rate limiter's atomic upsert, and the predicate deciding whether a resume holds readable text.
 - **e2e (`npm run test:e2e`)** — a Playwright smoke test walks sign-in, the dashboard, navigation and the auth redirect against a running app; it stays read-only to leave the shared demo untouched.
 
 Security-critical modules — the prompt fence, the admin gate, the AI ownership guard and the PDF page cap among them — are pinned to **100% coverage thresholds** in CI.

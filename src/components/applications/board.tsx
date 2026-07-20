@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useOptimistic } from "react";
+import { useState, useTransition, useOptimistic, useMemo } from "react";
 import Link from "next/link";
 import { GripVertical, ChevronDown } from "lucide-react";
 import {
@@ -12,6 +12,7 @@ import {
   useSensors,
   useDraggable,
   useDroppable,
+  type Announcements,
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
@@ -110,7 +111,7 @@ function SectionHeader({
       type="button"
       onClick={onToggle}
       aria-expanded={!collapsed}
-      className="flex w-full items-center gap-2 px-0.5 text-left lg:pointer-events-none"
+      className="flex w-full items-center gap-2 px-0.5 text-left"
     >
       <span
         className={`size-1.5 shrink-0 rounded-full ${STATUS_COLORS[status].dot}`}
@@ -128,7 +129,7 @@ function SectionHeader({
           size={15}
           aria-hidden="true"
           className={cn(
-            "text-ink-mute transition-transform lg:hidden",
+            "text-ink-mute transition-transform",
             collapsed && "-rotate-90",
           )}
         />
@@ -166,7 +167,7 @@ function BoardColumn({
         className={cn(
           "flex min-h-16 flex-1 flex-col gap-2 rounded-xl p-1.5 transition-colors lg:min-h-30",
           isOver && "bg-canvas-lavender-hover",
-          !show && "hidden lg:flex",
+          !show && "hidden",
         )}
       >
         {apps.map((app) => (
@@ -313,9 +314,38 @@ export function ApplicationsBoard({
     : null;
   const dragging = activeId !== null;
 
+  const announcements = useMemo<Announcements>(() => {
+    const card = (id: string | number) => {
+      const app = optimisticApps.find((a) => a.id === String(id));
+      return app ? `${app.role} at ${app.company}` : "this application";
+    };
+    const column = (id: string | number | undefined) =>
+      isOneOf(APPLICATION_STATUSES, id) ? STATUS_LABELS[id] : null;
+
+    return {
+      onDragStart: ({ active }) =>
+        `Picked up ${card(active.id)}. Use the arrow keys to pick a column, then press space to drop.`,
+      onDragOver: ({ active, over }) => {
+        const target = column(over?.id);
+        return target
+          ? `${card(active.id)} is over ${target}.`
+          : `${card(active.id)} is not over a column.`;
+      },
+      onDragEnd: ({ active, over }) => {
+        const target = column(over?.id);
+        return target
+          ? `Moved ${card(active.id)} to ${target}.`
+          : `Dropped ${card(active.id)}. It stayed where it was.`;
+      },
+      onDragCancel: ({ active }) =>
+        `Cancelled moving ${card(active.id)}. It stayed where it was.`,
+    };
+  }, [optimisticApps]);
+
   return (
     <DndContext
       sensors={sensors}
+      accessibility={{ announcements }}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
