@@ -80,12 +80,18 @@ describe("postgresRateLimitStorage.consume", () => {
   });
 });
 
-// These exist only to satisfy Better Auth's storage interface — the point is
-// that they stay inert, so `consume` remains the single atomic path.
+// Better Auth reaches for get/set only when `consume` is missing, and that
+// path cannot enforce anything here: a null read means "no limit recorded", so
+// staying inert would silently unlock every auth endpoint. Failing loudly is
+// what makes such an upgrade impossible to miss.
 describe("postgresRateLimitStorage fallback interface", () => {
-  it("records nothing through get/set", async () => {
-    await expect(postgresRateLimitStorage.get()).resolves.toBeNull();
-    await expect(postgresRateLimitStorage.set()).resolves.toBeUndefined();
+  it("offers consume, the only path that enforces the limit", () => {
+    expect(typeof postgresRateLimitStorage.consume).toBe("function");
+  });
+
+  it("refuses to serve the fail-open get/set fallback", async () => {
+    await expect(postgresRateLimitStorage.get()).rejects.toThrow(/consume/);
+    await expect(postgresRateLimitStorage.set()).rejects.toThrow(/consume/);
     expect(rateLimit).not.toHaveBeenCalled();
   });
 });

@@ -72,7 +72,6 @@ npm run dev           # Next.js dev server
 npm run build         # production build (web)
 npm run lint          # eslint
 npm run typecheck     # tsc --noEmit
-npm run check         # typecheck (alias)
 npm test              # vitest
 npm run test:coverage # vitest with per-file coverage thresholds
 npm run eval          # AI eval suites (needs GEMINI_API_KEY)
@@ -90,7 +89,7 @@ The three image scripts drive a running app, so start one first — `npm run bui
 
 ## Verifying a build
 
-- Automated: `npm run lint && npm run check && npm test && npm run build`
+- Automated: `npm run lint && npm run typecheck && npm test && npm run build`
 - By hand: follow the [manual QA checklist](manual-qa.md)
 
 ## Related docs

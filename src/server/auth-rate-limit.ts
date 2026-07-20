@@ -10,12 +10,22 @@ export type AuthRateLimitRule = { window: number; max: number };
 // instances, and supplying `consume` opts out of Better Auth's non-atomic
 // check-then-increment fallback.
 //
-// `get`/`set` are the fallback's interface. They stay inert on purpose: if a
-// future Better Auth reached for them, a no-op store fails closed to "no
-// limit recorded" rather than silently reintroducing per-instance counters.
+// `get`/`set` are the fallback interface Better Auth uses only when `consume`
+// is absent, and a no-op pair would fail *open*: `get` returning null reads as
+// "no limit recorded", so every request would be allowed and `set` would drop
+// the count. They throw instead, so a future release that stops preferring
+// `consume` breaks loudly rather than silently unlocking the auth endpoints.
 export const postgresRateLimitStorage = {
-  get: async () => null,
-  set: async () => {},
+  get: async (): Promise<never> => {
+    throw new Error(
+      "Better Auth fell back to rate-limit storage.get; `consume` is the only path that enforces the limit.",
+    );
+  },
+  set: async (): Promise<never> => {
+    throw new Error(
+      "Better Auth fell back to rate-limit storage.set; `consume` is the only path that enforces the limit.",
+    );
+  },
   consume: async (key: string, rule: AuthRateLimitRule) => {
     // Namespaced so an auth key can never collide with an `ai:`/`upload:` one.
     const { ok, resetAt } = await rateLimit(

@@ -280,10 +280,19 @@ HNSW caveat above, is in the [deploy guide](deploy.md).
 | --- | --- |
 | **Prisma 7 dropped the bundled query engine** | Prisma schema + migrations live in `prisma/`; the client generates into `src/generated/` and is configured via `prisma.config.ts`. |
 | **Connection exhaustion in serverless** | On classic Vercel functions each request got its own isolated instance, so every instance opened its own `pg` pool and Postgres ran out of connections (plus TLS/SNI routing issues from a misplaced `-pooler` suffix). The fix at the time was `@neondatabase/serverless` + `@prisma/adapter-neon`, pooling natively over WebSocket. **Since moving to Vercel Fluid compute** — which keeps instances warm and reuses TCP across requests — the app is back on `pg` + `@prisma/adapter-pg`, which is what Neon now recommends for Fluid. Exhaustion is held off by three things the original setup lacked: `attachDatabasePool` from `@vercel/functions` (drains idle connections before an instance suspends), a `max: 5` cap per instance, and the PgBouncer `-pooler` endpoint fronting it all. |
-| **Better Auth pulled a broken Kysely** | Kysely `0.29.2` stopped re-exporting a symbol the adapter imports; pinned to `0.28.17` via an npm `override`. |
+| **Better Auth pulled a broken Kysely** | Kysely `0.29.2` stopped re-exporting a symbol the adapter imports; pinned to `0.28.17` via an npm `override`. **Revisit when Better Auth's peer range drops `^0.28`** — the pin is invisible until it blocks an upgrade, so check it whenever `better-auth` itself is bumped. |
 | **Next 16 renamed `middleware` → `proxy`** | Read the bundled Next docs and adopted the new `proxy.ts` convention — which also reinforced the decision to keep auth checks in the data layer. |
 | **AI output can't be trusted** | The Zod round-trip (schema-out, validate-in) makes off-schema Gemini responses an explicit, recoverable failure instead of a page crash. |
 | **Resume privacy** | Private Blob store + authenticated streaming route; no public URLs. |
+
+## Accepted trade-offs
+
+Known, deliberate limits — recorded so they read as decisions rather than oversights.
+
+- **Resource caps are checked, then written, without a transaction.** `MAX_APPLICATIONS` and `MAX_RESUME_VERSIONS` count before inserting, so two concurrent requests can overshoot the cap slightly. Only a user's own quota is affected, the overshoot is bounded by request concurrency, and closing it would put a transaction on the hot path of every create. Revisit if caps ever gate something billable per row.
+- **Deleting a resume removes the blob before the row.** If the row delete then fails, the row survives pointing at a blob that is gone and the file route 404s — recoverable by deleting again. The inverse order would instead orphan a blob that nothing references and nothing bills against a user, which is the harder leak to notice. The row is what the user sees, so the row wins.
+- **Deadline tone is computed on the UTC day, not the viewer's.** `deadlineTone` derives "today" from the UTC date, and every deadline is rendered with `timeZone: "UTC"`, so the display is internally consistent. A viewer west of UTC can still see "overdue" up to a day before their own wall clock agrees. Fixing it means passing the client timezone into an otherwise static server render; the inconsistency is cosmetic, so it stays.
+- **Account deletion is not exposed over HTTP.** Better Auth's `deleteUser` endpoint stays disabled; accounts are removed with `npm run delete-user`, which deletes the user's resume blobs before the row so nothing is stranded. Deleting a user row directly in the database still leaks its blobs — the script is the supported path.
 
 ## Open questions
 

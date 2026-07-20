@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { deleteExpiredRateLimits } from "@/server/rate-limit";
+import { deleteExpiredAiUsage } from "@/server/data/ai-usage";
 
 export const maxDuration = 30;
 
@@ -26,6 +27,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const deleted = await deleteExpiredRateLimits();
-  return NextResponse.json({ deleted });
+  const [rateLimits, aiUsage] = await Promise.all([
+    deleteExpiredRateLimits(),
+    deleteExpiredAiUsage(),
+  ]);
+  return NextResponse.json({ deleted: { rateLimits, aiUsage } });
 }

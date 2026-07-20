@@ -30,20 +30,39 @@ export type AiUsageStats = {
   }[];
 };
 
+// Bounds every aggregate below. Without it the admin page's cost, error rate
+// and percentiles are lifetime figures that drift further from "how is this
+// behaving now" with every call recorded.
+export const USAGE_WINDOW_DAYS = 30;
+
+// Kept longer than the reporting window so the page never loses rows it would
+// have shown, while still bounding a table nothing else prunes.
+export const USAGE_RETENTION_DAYS = 90;
+
+function windowStart(days: number): Date {
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+}
+
 export async function getAiUsageStats(): Promise<AiUsageStats> {
+  const since = windowStart(USAGE_WINDOW_DAYS);
+  const inWindow = { createdAt: { gte: since } };
+
   const [overall, errorCount, grouped, recent, latency] = await Promise.all([
     prisma.aiUsage.aggregate({
+      where: inWindow,
       _count: true,
       _sum: { totalTokens: true },
     }),
-    prisma.aiUsage.count({ where: { ok: false } }),
+    prisma.aiUsage.count({ where: { ...inWindow, ok: false } }),
     prisma.aiUsage.groupBy({
       by: ["feature", "model"],
+      where: inWindow,
       _count: true,
       _sum: { promptTokens: true, outputTokens: true, totalTokens: true },
       _avg: { latencyMs: true },
     }),
     prisma.aiUsage.findMany({
+      where: inWindow,
       orderBy: { createdAt: "desc" },
       take: 12,
       select: {
@@ -61,6 +80,7 @@ export async function getAiUsageStats(): Promise<AiUsageStats> {
         percentile_cont(0.5) WITHIN GROUP (ORDER BY "latencyMs") AS p50,
         percentile_cont(0.95) WITHIN GROUP (ORDER BY "latencyMs") AS p95
       FROM ai_usage
+      WHERE "createdAt" >= ${since}
     `,
   ]);
 
@@ -107,4 +127,11 @@ export async function getAiUsageStats(): Promise<AiUsageStats> {
     byFeature,
     recent,
   };
+}
+
+export async function deleteExpiredAiUsage(): Promise<number> {
+  const { count } = await prisma.aiUsage.deleteMany({
+    where: { createdAt: { lt: windowStart(USAGE_RETENTION_DAYS) } },
+  });
+  return count;
 }
