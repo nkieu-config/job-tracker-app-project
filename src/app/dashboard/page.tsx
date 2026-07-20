@@ -4,13 +4,13 @@ import { Sparkles, Plus } from "lucide-react";
 import { requireSession } from "@/server/get-session";
 import { formatDisplayDate, deadlineTone } from "@/lib/format";
 import { DEADLINE_TONE_CLASS } from "@/components/ui/deadline";
-import { getStatusCounts, getUpcomingDeadlines } from "@/server/data/applications";
+import { getUpcomingDeadlines } from "@/server/data/applications";
 import {
   getWeeklyActivity,
   getBestFitPerApplication,
   getPipelineSnapshot,
 } from "@/server/data/insights";
-import { prisma } from "@/server/prisma";
+import { getCoachState } from "@/server/data/users";
 import { coachSnapshotHash, MIN_ANALYZED_FOR_COACH } from "@/server/coach";
 import { coachAdviceSchema } from "@/lib/schemas/coach";
 import { Pipeline } from "@/components/dashboard/pipeline";
@@ -63,17 +63,13 @@ export default async function DashboardPage() {
   const session = await requireSession();
   const userId = session.user.id;
 
-  const [counts, upcoming, weeklyActivity, bestFit, snapshot, coachUser] =
+  const [upcoming, weeklyActivity, bestFit, snapshot, coachUser] =
     await Promise.all([
-      getStatusCounts(userId),
       getUpcomingDeadlines(userId),
       getWeeklyActivity(userId),
       getBestFitPerApplication(userId),
       getPipelineSnapshot(userId),
-      prisma.user.findUnique({
-        where: { id: userId },
-        select: { coachAdvice: true, coachHash: true, coachAt: true },
-      }),
+      getCoachState(userId),
     ]);
 
   const coachParsed = coachAdviceSchema.safeParse(coachUser?.coachAdvice);
@@ -82,13 +78,11 @@ export default async function DashboardPage() {
     advice !== null && coachUser?.coachHash !== coachSnapshotHash(snapshot);
   const canCoach = snapshot.analyzedCount >= MIN_ANALYZED_FOR_COACH;
 
-  const total = Object.values(counts).reduce((a, b) => a + b, 0);
-  const applied =
-    counts.APPLIED + counts.INTERVIEW + counts.OFFER + counts.REJECTED;
-  const responded = counts.INTERVIEW + counts.OFFER + counts.REJECTED;
-  const interviews = counts.INTERVIEW + counts.OFFER;
-  const rate = (n: number) => (applied ? Math.round((n / applied) * 100) : 0);
-  const fmt = (n: number) => (applied ? `${rate(n)}%` : "—");
+  const counts = snapshot.statusCounts;
+  const total = snapshot.total;
+  const { rates } = snapshot;
+  const pct = (rate: number | null) => (rate === null ? 0 : Math.round(rate * 100));
+  const fmt = (rate: number | null) => (rate === null ? "—" : `${pct(rate)}%`);
 
   return (
     <div className="flex flex-col gap-10">
@@ -145,22 +139,26 @@ export default async function DashboardPage() {
           <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Metric
               label="Response rate"
-              value={fmt(responded)}
-              pct={rate(responded)}
+              value={fmt(rates.responseRate)}
+              pct={pct(rates.responseRate)}
               bar="bg-link-blue"
-              hint={applied ? `of ${applied} applied` : "no applications yet"}
+              hint={
+                rates.applied
+                  ? `of ${rates.applied} applied`
+                  : "no applications yet"
+              }
             />
             <Metric
               label="Interview rate"
-              value={fmt(interviews)}
-              pct={rate(interviews)}
+              value={fmt(rates.interviewRate)}
+              pct={pct(rates.interviewRate)}
               bar="bg-semantic-warning"
               hint="reached interview"
             />
             <Metric
               label="Offer rate"
-              value={fmt(counts.OFFER)}
-              pct={rate(counts.OFFER)}
+              value={fmt(rates.offerRate)}
+              pct={pct(rates.offerRate)}
               bar="bg-semantic-success"
               hint={`${counts.OFFER} offer${counts.OFFER === 1 ? "" : "s"}`}
             />

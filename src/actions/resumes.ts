@@ -3,13 +3,14 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { del } from "@vercel/blob";
-import { prisma } from "@/server/prisma";
-import { getSession } from "@/server/get-session";
-import { getResumeFileUrl } from "@/server/data/resumes";
+import { requireSession } from "@/server/get-session";
+import {
+  getResumeFileUrl,
+  deleteResumeForUser,
+} from "@/server/data/resumes";
 
 export async function deleteResume(id: string): Promise<void> {
-  const session = await getSession();
-  if (!session) redirect("/sign-in");
+  const session = await requireSession();
 
   // Scope by userId so a user can only delete their own resume.
   const resume = await getResumeFileUrl(id, session.user.id);
@@ -26,9 +27,7 @@ export async function deleteResume(id: string): Promise<void> {
     }
   }
 
-  await prisma.resumeVersion.deleteMany({
-    where: { id, userId: session.user.id },
-  });
+  await deleteResumeForUser(id, session.user.id);
 
   revalidatePath("/dashboard/resumes");
   redirect("/dashboard/resumes");

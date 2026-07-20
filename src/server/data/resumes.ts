@@ -87,3 +87,17 @@ export function getResumeFileUrl(id: string, userId: string) {
     select: { fileUrl: true },
   });
 }
+
+export function createResumeVersion(
+  userId: string,
+  data: { label: string; fileUrl: string; content: string },
+) {
+  return prisma.resumeVersion.create({ data: { ...data, userId } });
+}
+
+export async function deleteResumeForUser(
+  id: string,
+  userId: string,
+): Promise<void> {
+  await prisma.resumeVersion.deleteMany({ where: { id, userId } });
+}

@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { put, del } from "@vercel/blob";
 import { getSession } from "@/server/get-session";
-import { prisma } from "@/server/prisma";
 import { extractPdfText, PdfTooLongError } from "@/server/pdf";
 import { checkUploadRateLimit } from "@/server/rate-limit";
 import {
   countResumeVersions,
+  createResumeVersion,
   MAX_RESUME_VERSIONS,
 } from "@/server/data/resumes";
 import { resumeBlobPath } from "@/lib/blob-paths";
@@ -125,8 +125,10 @@ export async function POST(request: Request) {
   // the blob would be billed forever, so it is removed before bailing out.
   let resume;
   try {
-    resume = await prisma.resumeVersion.create({
-      data: { userId: session.user.id, label, fileUrl, content },
+    resume = await createResumeVersion(session.user.id, {
+      label,
+      fileUrl,
+      content,
     });
   } catch (err) {
     await del(fileUrl).catch(() => {});

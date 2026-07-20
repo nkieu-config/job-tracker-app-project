@@ -3,11 +3,12 @@ import "server-only";
 import { cache } from "react";
 import { prisma } from "@/server/prisma";
 import {
-  APPLICATION_STATUSES,
+  type ApplicationInput,
   type ApplicationStatus,
   type ApplicationSort,
 } from "@/lib/schemas/application";
-import { zeroRecord } from "@/lib/records";
+import type { StoredJdAnalysis } from "@/lib/schemas/jd-analysis";
+import type { Prisma } from "@/generated/prisma/client";
 
 // Every query is scoped by userId — a user can only ever read their own
 // applications. This is the real authorization boundary (alongside the
@@ -70,23 +71,6 @@ export const getApplication = cache((id: string, userId: string) => {
   return prisma.application.findFirst({ where: { id, userId } });
 });
 
-export async function getStatusCounts(
-  userId: string,
-): Promise<Record<ApplicationStatus, number>> {
-  const grouped = await prisma.application.groupBy({
-    by: ["status"],
-    where: { userId },
-    _count: { _all: true },
-  });
-
-  const counts = zeroRecord(APPLICATION_STATUSES);
-
-  for (const row of grouped) {
-    counts[row.status] = row._count._all;
-  }
-  return counts;
-}
-
 export function getUpcomingDeadlines(userId: string, limit = 5) {
   const startOfTodayUtc = new Date(new Date().toISOString().slice(0, 10));
   return prisma.application.findMany({
@@ -99,4 +83,43 @@ export function getUpcomingDeadlines(userId: string, limit = 5) {
     orderBy: { deadline: "asc" },
     take: limit,
   });
+}
+
+export function createApplicationForUser(
+  userId: string,
+  data: ApplicationInput,
+) {
+  return prisma.application.create({ data: { ...data, userId } });
+}
+
+export async function updateApplicationForUser(
+  id: string,
+  userId: string,
+  data: Prisma.ApplicationUpdateManyMutationInput,
+): Promise<boolean> {
+  const { count } = await prisma.application.updateMany({
+    where: { id, userId },
+    data,
+  });
+  return count > 0;
+}
+
+export async function saveApplicationAnalysis(
+  id: string,
+  userId: string,
+  analysis: StoredJdAnalysis,
+  analysisHash: string,
+): Promise<boolean> {
+  return updateApplicationForUser(id, userId, {
+    analysis: analysis as unknown as Prisma.InputJsonValue,
+    analysisHash,
+    analyzedAt: new Date(),
+  });
+}
+
+export async function deleteApplicationForUser(
+  id: string,
+  userId: string,
+): Promise<void> {
+  await prisma.application.deleteMany({ where: { id, userId } });
 }

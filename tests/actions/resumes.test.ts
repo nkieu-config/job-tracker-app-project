@@ -1,16 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const deleteMany = vi.fn();
-vi.mock("@/server/prisma", () => ({
-  prisma: { resumeVersion: { deleteMany } },
+const getSession = vi.fn();
+vi.mock("@/server/get-session", () => ({
+  getSession: () => getSession(),
+  requireSession: async () => {
+    const session = await getSession();
+    if (!session) throw new RedirectError("/sign-in");
+    return session;
+  },
 }));
 
-const getSession = vi.fn();
-vi.mock("@/server/get-session", () => ({ getSession: () => getSession() }));
-
 const getResumeFileUrl = vi.fn();
+const deleteResumeForUser = vi.fn();
 vi.mock("@/server/data/resumes", () => ({
   getResumeFileUrl: (...a: unknown[]) => getResumeFileUrl(...a),
+  deleteResumeForUser: (...a: unknown[]) => deleteResumeForUser(...a),
 }));
 
 const del = vi.fn();
@@ -36,7 +40,7 @@ async function redirectOf(promise: Promise<unknown>): Promise<string> {
 }
 
 beforeEach(() => {
-  deleteMany.mockReset().mockResolvedValue({ count: 1 });
+  deleteResumeForUser.mockReset().mockResolvedValue(undefined);
   getSession.mockReset().mockResolvedValue({ user: { id: OWNER } });
   getResumeFileUrl.mockReset().mockResolvedValue({ fileUrl: BLOB_URL });
   del.mockReset().mockResolvedValue(undefined);
@@ -49,7 +53,7 @@ describe("deleteResume", () => {
     expect(await redirectOf(deleteResume("r-1"))).toBe("/sign-in");
     expect(getResumeFileUrl).not.toHaveBeenCalled();
     expect(del).not.toHaveBeenCalled();
-    expect(deleteMany).not.toHaveBeenCalled();
+    expect(deleteResumeForUser).not.toHaveBeenCalled();
   });
 
   // The lookup is the ownership boundary: someone else's id must look exactly
@@ -62,16 +66,14 @@ describe("deleteResume", () => {
     );
     expect(getResumeFileUrl).toHaveBeenCalledWith("someone-elses", OWNER);
     expect(del).not.toHaveBeenCalled();
-    expect(deleteMany).not.toHaveBeenCalled();
+    expect(deleteResumeForUser).not.toHaveBeenCalled();
   });
 
   it("removes the blob and the row, both scoped to the caller", async () => {
     expect(await redirectOf(deleteResume("r-1"))).toBe("/dashboard/resumes");
 
     expect(del).toHaveBeenCalledWith(BLOB_URL);
-    expect(deleteMany).toHaveBeenCalledWith({
-      where: { id: "r-1", userId: OWNER },
-    });
+    expect(deleteResumeForUser).toHaveBeenCalledWith("r-1", OWNER);
   });
 
   // A blob that outlives its row is billed forever, but a blob store outage
@@ -80,9 +82,7 @@ describe("deleteResume", () => {
     del.mockRejectedValue(new Error("blob store unreachable"));
 
     expect(await redirectOf(deleteResume("r-1"))).toBe("/dashboard/resumes");
-    expect(deleteMany).toHaveBeenCalledWith({
-      where: { id: "r-1", userId: OWNER },
-    });
+    expect(deleteResumeForUser).toHaveBeenCalledWith("r-1", OWNER);
   });
 
   it("deletes a row whose upload never produced a blob", async () => {
@@ -90,8 +90,6 @@ describe("deleteResume", () => {
 
     expect(await redirectOf(deleteResume("r-1"))).toBe("/dashboard/resumes");
     expect(del).not.toHaveBeenCalled();
-    expect(deleteMany).toHaveBeenCalledWith({
-      where: { id: "r-1", userId: OWNER },
-    });
+    expect(deleteResumeForUser).toHaveBeenCalledWith("r-1", OWNER);
   });
 });

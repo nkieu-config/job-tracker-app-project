@@ -9,7 +9,14 @@ vi.mock("@/server/prisma", () => ({
 }));
 
 const getSession = vi.fn();
-vi.mock("@/server/get-session", () => ({ getSession: () => getSession() }));
+vi.mock("@/server/get-session", () => ({
+  getSession: () => getSession(),
+  requireSession: async () => {
+    const session = await getSession();
+    if (!session) throw new RedirectError("/sign-in");
+    return session;
+  },
+}));
 
 const getPipelineSnapshot = vi.fn();
 vi.mock("@/server/data/insights", () => ({
