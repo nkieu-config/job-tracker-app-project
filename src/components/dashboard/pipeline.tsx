@@ -25,7 +25,10 @@ function FunnelBar({
   total: number;
 }) {
   return (
-    <div className="flex h-3 w-full gap-0.5 overflow-hidden rounded-full bg-hairline">
+    <div
+      aria-hidden="true"
+      className="flex h-3 w-full gap-0.5 overflow-hidden rounded-full bg-hairline"
+    >
       {APPLICATION_STATUSES.map((status) =>
         counts[status] > 0 ? (
           <div

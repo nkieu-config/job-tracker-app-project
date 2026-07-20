@@ -1,5 +1,6 @@
 "use client";
 
+import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { inputClass } from "@/components/ui/form-styles";
 import {
@@ -19,13 +20,18 @@ export function ListControls({
   status?: ApplicationStatus;
 }) {
   const router = useRouter();
+  const [, startTransition] = useTransition();
+  const [optimisticSort, setOptimisticSort] = useOptimistic(sort);
 
   function apply(nextQuery: string, nextSort: ApplicationSort) {
     const params = new URLSearchParams({ view: "list" });
     if (status) params.set("status", status);
     if (nextQuery.trim()) params.set("q", nextQuery.trim());
     if (nextSort !== "newest") params.set("sort", nextSort);
-    router.push(`/dashboard/applications?${params.toString()}`);
+    startTransition(() => {
+      setOptimisticSort(nextSort);
+      router.push(`/dashboard/applications?${params.toString()}`);
+    });
   }
 
   return (
@@ -38,6 +44,7 @@ export function ListControls({
       className="flex flex-col gap-2 sm:flex-row sm:items-center"
     >
       <input
+        key={query}
         type="search"
         name="q"
         defaultValue={query}
@@ -49,7 +56,7 @@ export function ListControls({
       <label className="flex items-center gap-2 font-sans text-body text-ink-mute">
         Sort by
         <select
-          value={sort}
+          value={optimisticSort}
           onChange={(e) => apply(query, e.target.value as ApplicationSort)}
           aria-label="Sort applications"
           className={`${inputClass} text-body`}

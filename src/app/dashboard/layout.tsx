@@ -6,6 +6,7 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { SkipLink } from "@/components/ui/skip-link";
+import { LogoMark } from "@/components/ui/logo";
 
 export default async function DashboardLayout({
   children,
@@ -26,11 +27,7 @@ export default async function DashboardLayout({
       <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col justify-between border-r border-hairline bg-canvas px-4 py-6 lg:flex">
         <div className="flex flex-col gap-8">
           <Link href="/dashboard" className="flex items-center gap-2 px-2">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary">
-              <span className="text-xl font-bold leading-none text-on-primary">
-                J
-              </span>
-            </div>
+            <LogoMark size="md" />
             <span className="font-display-sm tracking-tight text-primary">
               Job Tracker
             </span>
@@ -53,11 +50,7 @@ export default async function DashboardLayout({
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between gap-3 border-b border-hairline bg-canvas px-4 py-3 lg:hidden">
           <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-              <span className="text-xl font-bold leading-none text-on-primary">
-                J
-              </span>
-            </div>
+            <LogoMark size="md" />
           </Link>
           <nav aria-label="Main" className="min-w-0">
             <DashboardNav orientation="horizontal" isAdmin={isAdmin} />

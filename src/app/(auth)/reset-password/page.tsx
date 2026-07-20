@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
+import { LogoMark } from "@/components/ui/logo";
 
 export const metadata: Metadata = {
   title: "Reset password",
@@ -19,11 +20,7 @@ export default async function ResetPasswordPage({
       <div className="w-full max-w-sm">
         <div className="flex justify-center mb-8">
           <Link href="/">
-            <div className="w-12 h-12 bg-primary rounded-md flex items-center justify-center">
-              <span className="text-on-primary font-bold text-2xl leading-none">
-                J
-              </span>
-            </div>
+            <LogoMark size="lg" />
           </Link>
         </div>
         <h1 className="font-display-md text-ink text-center tracking-tight mb-2">

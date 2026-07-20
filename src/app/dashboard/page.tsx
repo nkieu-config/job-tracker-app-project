@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import { Sparkles, Plus } from "lucide-react";
 import { requireSession } from "@/server/get-session";
@@ -59,18 +60,40 @@ function Metric({
   );
 }
 
+async function ResumeFit({ userId }: { userId: string }) {
+  const bestFit = await getBestFitPerApplication(userId);
+
+  if (bestFit.length === 0) {
+    return (
+      <EmptyState className="flex-1 justify-center border-0 bg-transparent p-0">
+        Analyze a job description and compute resume fit to see how your resumes
+        stack up.
+      </EmptyState>
+    );
+  }
+  return <FitRanking points={bestFit} />;
+}
+
+function ResumeFitFallback() {
+  return (
+    <div className="flex flex-1 flex-col gap-3" aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="h-6 animate-pulse rounded-md bg-hairline" />
+      ))}
+    </div>
+  );
+}
+
 export default async function DashboardPage() {
   const session = await requireSession();
   const userId = session.user.id;
 
-  const [upcoming, weeklyActivity, bestFit, snapshot, coachUser] =
-    await Promise.all([
-      getUpcomingDeadlines(userId),
-      getWeeklyActivity(userId),
-      getBestFitPerApplication(userId),
-      getPipelineSnapshot(userId),
-      getCoachState(userId),
-    ]);
+  const [upcoming, weeklyActivity, snapshot, coachUser] = await Promise.all([
+    getUpcomingDeadlines(userId),
+    getWeeklyActivity(userId),
+    getPipelineSnapshot(userId),
+    getCoachState(userId),
+  ]);
 
   const coachParsed = coachAdviceSchema.safeParse(coachUser?.coachAdvice);
   const advice = coachParsed.success ? coachParsed.data : null;
@@ -193,14 +216,9 @@ export default async function DashboardPage() {
                 <p className="mb-4 mt-1 font-sans text-caption text-ink-mute">
                   Best resume match per application
                 </p>
-                {bestFit.length === 0 ? (
-                  <EmptyState className="flex-1 justify-center border-0 bg-transparent p-0">
-                    Analyze a job description and compute resume fit to see how
-                    your resumes stack up.
-                  </EmptyState>
-                ) : (
-                  <FitRanking points={bestFit} />
-                )}
+                <Suspense fallback={<ResumeFitFallback />}>
+                  <ResumeFit userId={userId} />
+                </Suspense>
               </Card>
             </div>
           </section>

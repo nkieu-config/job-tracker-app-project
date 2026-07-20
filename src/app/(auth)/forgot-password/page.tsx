@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { emailIsDeliverable } from "@/server/email";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
+import { LogoMark } from "@/components/ui/logo";
 
 export const metadata: Metadata = {
   title: "Forgot password",
@@ -18,11 +19,7 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-sm">
         <div className="flex justify-center mb-8">
           <Link href="/">
-            <div className="w-12 h-12 bg-primary rounded-md flex items-center justify-center">
-              <span className="text-on-primary font-bold text-2xl leading-none">
-                J
-              </span>
-            </div>
+            <LogoMark size="lg" />
           </Link>
         </div>
         <h1 className="font-display-md text-ink text-center tracking-tight mb-2">

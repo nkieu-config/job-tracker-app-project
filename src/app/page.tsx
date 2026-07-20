@@ -14,6 +14,7 @@ import { SkipLink } from "@/components/ui/skip-link";
 import { Reveal } from "@/components/ui/reveal";
 import { buttonClass } from "@/components/ui/button";
 import { Badge, Dot, type BadgeTone } from "@/components/ui/badge";
+import { LogoMark } from "@/components/ui/logo";
 
 const FIT_ROWS: {
   label: string;
@@ -71,9 +72,7 @@ export default function Home() {
       <SkipLink />
       <header className="relative z-10 flex items-center justify-between border-b border-hairline px-4 py-3 md:px-10">
         <div className="flex shrink-0 items-center gap-2">
-          <div className="flex size-7 items-center justify-center rounded-md bg-primary">
-            <span className="font-bold leading-none text-on-primary">J</span>
-          </div>
+          <LogoMark size="sm" />
           <span className="font-sans text-body-lg font-semibold tracking-tight text-ink">
             Job Tracker
           </span>
