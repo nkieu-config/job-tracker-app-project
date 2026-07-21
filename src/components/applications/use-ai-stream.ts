@@ -84,7 +84,7 @@ export function useAiStream({
       }
     } catch (err) {
       // An unmount/abort isn't a failure the (gone) user needs to see.
-      if ((err as Error)?.name !== "AbortError") {
+      if (!(err instanceof Error && err.name === "AbortError")) {
         setOutput(previous);
         setError("Streaming failed. Please try again.");
       }

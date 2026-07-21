@@ -3,6 +3,7 @@
 import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { inputClass } from "@/components/ui/form-styles";
+import { isOneOf } from "@/lib/guards";
 import {
   APPLICATION_SORTS,
   SORT_LABELS,
@@ -57,7 +58,10 @@ export function ListControls({
         Sort by
         <select
           value={optimisticSort}
-          onChange={(e) => apply(query, e.target.value as ApplicationSort)}
+          onChange={(e) => {
+            const next = e.target.value;
+            if (isOneOf(APPLICATION_SORTS, next)) apply(query, next);
+          }}
           aria-label="Sort applications"
           className={`${inputClass} text-body`}
         >
