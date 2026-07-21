@@ -8,7 +8,7 @@ import {
 import { STATUS_COLORS } from "@/components/ui/status-colors";
 import { niceScale, stackSegments } from "@/lib/chart";
 import { cn } from "@/lib/cn";
-import type { WeeklyActivity } from "@/server/data/insights";
+import type { WeeklyActivity } from "@/lib/insights";
 import { ChartTooltip, TooltipRow } from "./chart-tooltip";
 
 const W = 480;

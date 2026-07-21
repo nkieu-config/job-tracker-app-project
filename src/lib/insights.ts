@@ -11,6 +11,21 @@ export type Seniority = (typeof SENIORITY_LEVELS)[number];
 
 export type SkillGap = { skill: string; count: number };
 
+export type WeeklyActivity = {
+  weekStart: string;
+  label: string;
+  counts: Record<ApplicationStatus, number>;
+  total: number;
+};
+
+export type ApplicationFit = {
+  id: string;
+  company: string;
+  role: string;
+  status: ApplicationStatus;
+  score: number;
+};
+
 export type PipelineRates = {
   applied: number;
   responseRate: number | null;

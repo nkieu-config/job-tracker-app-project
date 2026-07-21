@@ -3,7 +3,7 @@ import { fitBand } from "@/components/ui/fit-score";
 import { STATUS_COLORS } from "@/components/ui/status-colors";
 import { STATUS_LABELS } from "@/lib/schemas/application";
 import { cn } from "@/lib/cn";
-import type { ApplicationFit } from "@/server/data/insights";
+import type { ApplicationFit } from "@/lib/insights";
 
 const BAND_FILL: Record<string, string> = {
   success: "bg-semantic-success",

@@ -2,10 +2,7 @@ import "server-only";
 
 import { prisma } from "@/server/prisma";
 import { EMBEDDING_MODEL } from "@/server/ai/models";
-import {
-  APPLICATION_STATUSES,
-  type ApplicationStatus,
-} from "@/lib/schemas/application";
+import { APPLICATION_STATUSES } from "@/lib/schemas/application";
 import { storedJdAnalysisSchema } from "@/lib/schemas/jd-analysis";
 import { zeroRecord } from "@/lib/records";
 import {
@@ -17,20 +14,15 @@ import {
 import {
   buildPipelineSnapshot,
   type AnalyzedApplication,
+  type ApplicationFit,
   type PipelineSnapshot,
+  type WeeklyActivity,
 } from "@/lib/insights";
 
 // Every query here is scoped by userId — the same authorization boundary the
 // rest of the data layer enforces.
 
 export const ACTIVITY_WEEKS = 12;
-
-export type WeeklyActivity = {
-  weekStart: string;
-  label: string;
-  counts: Record<ApplicationStatus, number>;
-  total: number;
-};
 
 export async function getWeeklyActivity(
   userId: string,
@@ -79,14 +71,6 @@ export async function getPipelineSnapshot(
 
   return buildPipelineSnapshot(applications);
 }
-
-export type ApplicationFit = {
-  id: string;
-  company: string;
-  role: string;
-  status: ApplicationStatus;
-  score: number;
-};
 
 export const MAX_FIT_POINTS = 100;
 

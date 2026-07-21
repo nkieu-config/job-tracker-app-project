@@ -6,7 +6,7 @@ import {
   type ApplicationStatus,
 } from "@/lib/schemas/application";
 import { zeroRecord } from "@/lib/records";
-import type { WeeklyActivity } from "@/server/data/insights";
+import type { WeeklyActivity } from "@/lib/insights";
 
 function week(
   label: string,

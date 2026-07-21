@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import { FitRanking } from "@/components/dashboard/fit-ranking";
-import type { ApplicationFit } from "@/server/data/insights";
+import type { ApplicationFit } from "@/lib/insights";
 
 const point = (over: Partial<ApplicationFit>): ApplicationFit => ({
   id: "a1",
