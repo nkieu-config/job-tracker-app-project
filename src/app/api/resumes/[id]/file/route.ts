@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
 import { getBlob } from "@/server/blob";
 import { getSession } from "@/server/get-session";
 import { getResumeFileUrl } from "@/server/data/resumes";
+import { jsonError } from "@/lib/http";
 import { ACCEPTED_RESUME_TYPE } from "@/lib/schemas/resume";
 
 // Streams a private resume PDF. The blob store is private, so its URL isn't
@@ -13,18 +13,18 @@ export async function GET(
 ) {
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return jsonError("Unauthorized", 401);
   }
 
   const { id } = await params;
   const resume = await getResumeFileUrl(id, session.user.id);
   if (!resume || !resume.fileUrl) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return jsonError("Not found", 404);
   }
 
   const result = await getBlob(resume.fileUrl);
   if (!result || result.statusCode !== 200) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return jsonError("Not found", 404);
   }
 
   return new Response(result.stream, {

@@ -2,6 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { deleteExpiredRateLimits } from "@/server/rate-limit";
 import { deleteExpiredAiUsage } from "@/server/data/ai-usage";
+import { jsonError } from "@/lib/http";
 
 export const maxDuration = 30;
 
@@ -21,10 +22,10 @@ function authorizationMatches(header: string | null, secret: string): boolean {
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret) {
-    return NextResponse.json({ error: "Not configured" }, { status: 503 });
+    return jsonError("Not configured", 503);
   }
   if (!authorizationMatches(request.headers.get("authorization"), secret)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return jsonError("Unauthorized", 401);
   }
 
   const [rateLimits, aiUsage] = await Promise.all([
