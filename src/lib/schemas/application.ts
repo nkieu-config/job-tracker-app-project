@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import type { StoredJdAnalysis } from "@/lib/schemas/jd-analysis";
+
 export const APPLICATION_STATUSES = [
   "SAVED",
   "APPLIED",
@@ -51,6 +53,15 @@ export const applicationInputSchema = z.object({
 });
 
 export type ApplicationInput = z.infer<typeof applicationInputSchema>;
+
+// Every shape a Server Action is allowed to write. The data layer used to take
+// Prisma's UpdateManyMutationInput, which let any caller set any column.
+export type ApplicationMutation =
+  | ApplicationInput
+  | { status: ApplicationStatus }
+  | { tailoredExperience: string; tailoredBullets: string; tailoredAt: Date }
+  | { interviewPrep: string; interviewPrepAt: Date }
+  | { analysis: StoredJdAnalysis; analysisHash: string; analyzedAt: Date };
 
 export function applicationInputFromFormData(formData: FormData) {
   return {

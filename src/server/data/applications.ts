@@ -4,11 +4,11 @@ import { cache } from "react";
 import { prisma } from "@/server/prisma";
 import {
   type ApplicationInput,
+  type ApplicationMutation,
   type ApplicationStatus,
   type ApplicationSort,
 } from "@/lib/schemas/application";
 import type { StoredJdAnalysis } from "@/lib/schemas/jd-analysis";
-import type { Prisma } from "@/generated/prisma/client";
 
 // Every query is scoped by userId — a user can only ever read their own
 // applications. This is the real authorization boundary (alongside the
@@ -95,7 +95,7 @@ export function createApplicationForUser(
 export async function updateApplicationForUser(
   id: string,
   userId: string,
-  data: Prisma.ApplicationUpdateManyMutationInput,
+  data: ApplicationMutation,
 ): Promise<boolean> {
   const { count } = await prisma.application.updateMany({
     where: { id, userId },
@@ -111,7 +111,7 @@ export async function saveApplicationAnalysis(
   analysisHash: string,
 ): Promise<boolean> {
   return updateApplicationForUser(id, userId, {
-    analysis: analysis as unknown as Prisma.InputJsonValue,
+    analysis,
     analysisHash,
     analyzedAt: new Date(),
   });
