@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ACCEPTED_RESUME_TYPE,
+  firstUploadError,
+  MAX_LABEL_LENGTH,
   MAX_RESUME_BYTES,
   humanFileSize,
 } from "@/lib/schemas/resume";
@@ -26,20 +27,9 @@ export function ResumeUploadForm() {
     const label = (formData.get("label") ?? "").toString().trim();
 
     // Fast client-side checks; the server re-validates authoritatively.
-    if (!label) {
-      setError("Give this version a label.");
-      return;
-    }
-    if (!(file instanceof File) || file.size === 0) {
-      setError("Choose a PDF file.");
-      return;
-    }
-    if (file.type !== ACCEPTED_RESUME_TYPE) {
-      setError("Only PDF files are allowed.");
-      return;
-    }
-    if (file.size > MAX_RESUME_BYTES) {
-      setError(`File too large (max ${humanFileSize(MAX_RESUME_BYTES)}).`);
+    const problem = firstUploadError({ label, file });
+    if (problem) {
+      setError(problem);
       return;
     }
 
@@ -74,7 +64,7 @@ export function ResumeUploadForm() {
         <input
           name="label"
           required
-          maxLength={100}
+          maxLength={MAX_LABEL_LENGTH}
           placeholder="e.g. Backend-focused v2"
           className={inputClass}
         />
