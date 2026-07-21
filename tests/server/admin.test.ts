@@ -1,5 +1,10 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { isAdminEmail } from "@/server/admin";
+import { describe, it, expect, afterEach, vi } from "vitest";
+import { isAdminEmail, requireAdmin } from "@/server/admin";
+
+const notFound = vi.fn(() => {
+  throw new Error("NEXT_NOT_FOUND");
+});
+vi.mock("next/navigation", () => ({ notFound: () => notFound() }));
 
 const original = process.env.ADMIN_EMAILS;
 afterEach(() => {
@@ -35,5 +40,23 @@ describe("isAdminEmail", () => {
     expect(isAdminEmail("admin@example.com.evil.com")).toBe(false);
     expect(isAdminEmail("notadmin@example.com")).toBe(false);
     expect(isAdminEmail("admin@example.co")).toBe(false);
+  });
+});
+
+describe("requireAdmin", () => {
+  it("returns a scope for an allowlisted email", () => {
+    process.env.ADMIN_EMAILS = "boss@example.com";
+    expect(() => requireAdmin("boss@example.com")).not.toThrow();
+  });
+
+  it("refuses a non-admin by calling notFound", () => {
+    process.env.ADMIN_EMAILS = "boss@example.com";
+    expect(() => requireAdmin("someone@example.com")).toThrow();
+    expect(notFound).toHaveBeenCalled();
+  });
+
+  it("refuses a missing email", () => {
+    process.env.ADMIN_EMAILS = "boss@example.com";
+    expect(() => requireAdmin(null)).toThrow();
   });
 });

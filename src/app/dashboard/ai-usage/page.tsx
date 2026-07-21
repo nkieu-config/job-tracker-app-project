@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { Activity, Sparkles } from "lucide-react";
 import { requireSession } from "@/server/get-session";
-import { isAdminEmail } from "@/server/admin";
+import { requireAdmin } from "@/server/admin";
 import { getAiUsageStats, type FeatureStat } from "@/server/data/ai-usage";
 import { AI_FEATURES, type AiFeature } from "@/server/observability";
 import { isOneOf } from "@/lib/guards";
@@ -97,10 +96,8 @@ function FeatureRow({ stat, maxCalls }: { stat: FeatureStat; maxCalls: number })
 
 export default async function AiUsagePage() {
   const session = await requireSession();
-  if (!isAdminEmail(session.user.email)) {
-    notFound();
-  }
-  const stats = await getAiUsageStats();
+  const scope = requireAdmin(session.user.email);
+  const stats = await getAiUsageStats(scope);
   const maxCalls = Math.max(1, ...stats.byFeature.map((f) => f.calls));
 
   return (

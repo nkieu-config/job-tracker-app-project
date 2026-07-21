@@ -2,6 +2,7 @@ import "server-only";
 
 import { prisma } from "@/server/prisma";
 import { estimateCostUsd } from "@/server/observability";
+import type { AdminScope } from "@/server/admin";
 
 export type FeatureStat = {
   feature: string;
@@ -43,7 +44,7 @@ function windowStart(days: number): Date {
   return new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 }
 
-export async function getAiUsageStats(): Promise<AiUsageStats> {
+export async function getAiUsageStats(_scope: AdminScope): Promise<AiUsageStats> {
   const since = windowStart(USAGE_WINDOW_DAYS);
   const inWindow = { createdAt: { gte: since } };
 
