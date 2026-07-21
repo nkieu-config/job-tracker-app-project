@@ -41,4 +41,17 @@ describe("resolveSkillGap", () => {
     expect(gap?.matched).toContain("Go");
     expect(gap?.missing).toContain("Kubernetes");
   });
+
+  // An analyzer that matched nothing stores [], which is not the same as an
+  // older analysis that stored nothing at all. The empty array is an answer,
+  // so it must not fall through to re-reading the resume.
+  it("treats an empty stored match list as an answer, not a missing one", async () => {
+    const gap = await resolveSkillGap(
+      { requiredSkills: ["Go", "Kubernetes"], skillMatches: [] } as never,
+      "user-1",
+    );
+
+    expect(gap).toEqual({ matched: [], missing: ["Go", "Kubernetes"] });
+    expect(getResumeText).not.toHaveBeenCalled();
+  });
 });
