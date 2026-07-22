@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Job Tracker — AI-powered job application tracking";
+export const alt = "Margin — the AI reads the posting with you";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -16,10 +16,8 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "80px",
-          backgroundColor: "#4a154b",
-          backgroundImage:
-            "radial-gradient(at 100% 0%, rgba(233, 216, 255, 0.25) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(255, 240, 230, 0.15) 0px, transparent 50%)",
-          color: "#ffffff",
+          backgroundColor: "#f9f7f1",
+          color: "#26231d",
           fontFamily: "sans-serif",
         }}
       >
@@ -29,8 +27,8 @@ export default function OpengraphImage() {
               width: "88px",
               height: "88px",
               borderRadius: "20px",
-              backgroundColor: "#ffffff",
-              color: "#4a154b",
+              backgroundColor: "#2b2721",
+              color: "#fbf9f3",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -38,9 +36,9 @@ export default function OpengraphImage() {
               fontWeight: 700,
             }}
           >
-            J
+            M
           </div>
-          <div style={{ fontSize: "52px", fontWeight: 700 }}>Job Tracker</div>
+          <div style={{ fontSize: "52px", fontWeight: 700 }}>Margin</div>
         </div>
         <div
           style={{
@@ -52,18 +50,59 @@ export default function OpengraphImage() {
             maxWidth: "980px",
           }}
         >
-          Track your applications. Land your dream job.
+          Every job posting, marked up against your resume.
+        </div>
+        <div style={{ display: "flex", gap: "16px", marginTop: "44px" }}>
+          <div
+            style={{
+              display: "flex",
+              backgroundColor: "#ffdb4d",
+              color: "#26231d",
+              fontSize: "30px",
+              fontWeight: 600,
+              padding: "10px 22px",
+              borderRadius: "6px",
+            }}
+          >
+            React
+          </div>
+          <div
+            style={{
+              display: "flex",
+              backgroundColor: "#ffdb4d",
+              color: "#26231d",
+              fontSize: "30px",
+              fontWeight: 600,
+              padding: "10px 22px",
+              borderRadius: "6px",
+            }}
+          >
+            TypeScript
+          </div>
+          <div
+            style={{
+              display: "flex",
+              color: "#b0392c",
+              fontSize: "30px",
+              fontWeight: 600,
+              padding: "10px 22px",
+              borderRadius: "6px",
+              borderBottom: "5px solid #b0392c",
+            }}
+          >
+            WebGL
+          </div>
         </div>
         <div
           style={{
-            marginTop: "32px",
-            fontSize: "32px",
-            color: "#d9bdde",
+            marginTop: "40px",
+            fontSize: "30px",
+            color: "#7a7264",
             maxWidth: "900px",
           }}
         >
-          AI-powered JD analysis · Resume fit scoring · Streaming bullet
-          tailoring
+          Matched skills highlighted · gaps underlined · every model output
+          measured by a six-suite eval harness
         </div>
       </div>
     ),

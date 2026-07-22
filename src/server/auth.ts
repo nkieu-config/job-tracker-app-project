@@ -23,7 +23,7 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, url }) => {
       await sendEmail({
         to: user.email,
-        subject: "Reset your Job Tracker password",
+        subject: "Reset your Margin password",
         text: `Someone asked to reset the password for this account.\n\nReset it here (the link expires in 1 hour):\n${url}\n\nIf this wasn't you, ignore this email — your password stays unchanged.`,
       });
     },
@@ -36,8 +36,8 @@ export const auth = betterAuth({
       if (user.email === DEMO_EMAIL) return;
       await sendEmail({
         to: user.email,
-        subject: "Verify your email for Job Tracker",
-        text: `Welcome to Job Tracker.\n\nConfirm this address here (the link expires in 24 hours):\n${url}\n\nIf you didn't create this account, ignore this email.`,
+        subject: "Verify your email for Margin",
+        text: `Welcome to Margin.\n\nConfirm this address here (the link expires in 24 hours):\n${url}\n\nIf you didn't create this account, ignore this email.`,
       });
     },
   },

@@ -1,10 +1,10 @@
-# Job Tracker 💼
+# Margin 🖍️
 
 [![CI](https://github.com/nkieu-config/job-tracker/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nkieu-config/job-tracker/actions/workflows/ci.yml)
 [![Live demo](https://img.shields.io/badge/demo-live-brightgreen?logo=vercel&logoColor=white)](https://job-tracker-app-project.vercel.app)
 [![License: view-only](https://img.shields.io/badge/license-view--only-informational.svg)](LICENSE)
 
-**The job hunt is a data problem. This is the tool I built to solve mine.** An AI-powered job-application tracker that analyzes job descriptions, scores your resume versions against them with vector embeddings, and tailors your bullets — built solo as my capstone project, used daily in my real job search.
+**The job hunt is a reading problem. This is the tool I built to solve mine.** Margin marks up a job posting against your resume — highlighting what you already have, underlining what you're missing, ranking your resume versions with vector embeddings, and drilling you on the interview questions the posting implies. Built solo as my capstone project, used daily in my real job search.
 
 **6 AI features, each with an eval suite · 381 tests + a 6-suite AI eval harness · ~14k lines of strict TypeScript (app, tests, evals)**
 
@@ -128,7 +128,7 @@ Paste a job description on the new-application form and AI auto-fill sets the co
 
 The design system in [docs/design.md](docs/design.md), as actually rendered:
 
-![Job Tracker landing page — hero, the AI features, and the closing call to action](docs/screenshots/landing.png)
+![Margin landing page — hero, the AI features, and the closing call to action](docs/screenshots/landing.png)
 
 </details>
 

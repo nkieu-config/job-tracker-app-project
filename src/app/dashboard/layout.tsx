@@ -29,7 +29,7 @@ export default async function DashboardLayout({
           <Link href="/dashboard" className="flex items-center gap-2 px-2">
             <LogoMark size="md" />
             <span className="font-display-sm tracking-tight text-primary">
-              Job Tracker
+              Margin
             </span>
           </Link>
           <nav aria-label="Main">

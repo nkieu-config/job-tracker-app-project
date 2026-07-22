@@ -1,30 +1,39 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { Literata } from "next/font/google";
 import { ToastProvider } from "@/components/ui/toast";
 import "./globals.css";
+
+// The document tier: job descriptions, coaching briefs, interview questions —
+// anything the app presents as a piece of writing rather than as interface.
+const literata = Literata({
+  subsets: ["latin"],
+  variable: "--font-literata",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://job-tracker-app-project.vercel.app"),
   title: {
-    default: "Job Tracker — AI-powered job application tracking",
-    template: "%s · Job Tracker",
+    default: "Margin — the AI reads the posting with you",
+    template: "%s · Margin",
   },
   description:
-    "Smart job application tracker with AI-powered JD analysis, resume fit scoring, and resume tailoring.",
+    "Margin marks up a job posting against your resume: what you already have, what you're missing, and how to answer for it.",
   openGraph: {
-    title: "Job Tracker — AI-powered job application tracking",
+    title: "Margin — the AI reads the posting with you",
     description:
-      "Track your pipeline, analyze job descriptions with AI, and tailor your resume to every application.",
+      "Paste a job posting and watch it get marked up against your resume — matched skills highlighted, gaps underlined, interview questions drilled.",
     url: "/",
-    siteName: "Job Tracker",
+    siteName: "Margin",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Job Tracker — AI-powered job application tracking",
+    title: "Margin — the AI reads the posting with you",
     description:
-      "Track your pipeline, analyze job descriptions with AI, and tailor your resume to every application.",
+      "Paste a job posting and watch it get marked up against your resume — matched skills highlighted, gaps underlined, interview questions drilled.",
   },
 };
 
@@ -36,7 +45,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${GeistSans.variable} ${GeistMono.variable} h-full scroll-smooth antialiased`}
+      className={`${GeistSans.variable} ${GeistMono.variable} ${literata.variable} h-full scroll-smooth antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

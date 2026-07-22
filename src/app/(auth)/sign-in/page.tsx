@@ -28,7 +28,7 @@ export default async function SignInPage({
           Welcome back
         </h1>
         <p className="text-center font-sans text-ink-mute mb-8">
-          Sign in to your job tracker.
+          Sign in to pick up where you left off.
         </p>
 
         <SignInForm

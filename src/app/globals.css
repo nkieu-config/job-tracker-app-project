@@ -14,104 +14,117 @@
 :root {
   color-scheme: light;
 
-  --background: #ffffff;
-  --foreground: #221a26;
+  --background: #f9f7f1;
+  --foreground: #26231d;
 
-  --primary: #4a154b;
-  --primary-press: #611f69;
-  --on-primary: #ffffff;
+  --primary: #2b2721;
+  --primary-press: #46403a;
+  --on-primary: #fbf9f3;
 
-  --ink: #221a26;
-  --ink-mute: #5f5566;
+  --ink: #26231d;
+  --ink-mute: #7a7264;
 
-  --link-blue: #1264a3;
-  --link-hover: #3860be;
+  --link-blue: #2c5c93;
+  --link-hover: #1f4676;
 
-  --canvas: #ffffff;
-  --canvas-lavender: #f4f0f5;
-  --canvas-lavender-hover: #ece6ef;
+  --canvas: #fffef9;
+  --canvas-lavender: #f2efe5;
+  --canvas-lavender-hover: #eae5d7;
 
-  --surface-hover: #f5eded;
+  --surface-hover: #f2efe5;
 
-  --hairline: #e5dde9;
+  --hairline: #e3ded0;
 
-  --semantic-error: #bd3a12;
-  --semantic-error-tint: #fdebea;
-  --semantic-error-hover: #fad8d6;
-  --semantic-error-solid: #bd3a12;
-  --semantic-success: #007a5a;
-  --semantic-success-tint: #e2f1ea;
-  --semantic-warning: #8a6500;
-  --semantic-warning-tint: #fcf2db;
+  --marker: #ffdb4d;
+  --marker-ink: #26231d;
+  --pen: #b0392c;
+
+  --semantic-error: #b0392c;
+  --semantic-error-tint: #faeae6;
+  --semantic-error-hover: #f4d8d1;
+  --semantic-error-solid: #b0392c;
+  --semantic-success: #2f7a4d;
+  --semantic-success-tint: #e6f0e6;
+  --semantic-warning: #a8720f;
+  --semantic-warning-tint: #faf0d9;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
 
-    --background: #141017;
-    --foreground: #e8e5ee;
+    --background: #1a1815;
+    --foreground: #eae5da;
 
-    --primary: #8a4d93;
-    --primary-press: #9a5aa3;
-    --on-primary: #ffffff;
+    --primary: #e4dcc6;
+    --primary-press: #f0e9d6;
+    --on-primary: #221f1a;
 
-    --ink: #e8e5ee;
-    --ink-mute: #a49eae;
+    --ink: #eae5da;
+    --ink-mute: #9c947f;
 
-    --link-blue: #7cb8ef;
-    --link-hover: #9dccf4;
+    --link-blue: #8fb6e8;
+    --link-hover: #b0cdf2;
 
-    --canvas: #1d1722;
-    --canvas-lavender: #141017;
-    --canvas-lavender-hover: #252030;
+    --canvas: #232019;
+    --canvas-lavender: #1a1815;
+    --canvas-lavender-hover: #2b2720;
 
-    --surface-hover: #252030;
+    --surface-hover: #2b2720;
 
-    --hairline: #39323f;
+    --hairline: #37332a;
 
-    --semantic-error: #f08a6c;
-    --semantic-error-tint: #3a1e1a;
-    --semantic-error-hover: #4c2820;
-    --semantic-error-solid: #c0442a;
-    --semantic-success: #4cbf95;
-    --semantic-success-tint: #17302a;
-    --semantic-warning: #e6b23c;
-    --semantic-warning-tint: #342a17;
+    --marker: rgb(240 205 84 / 0.32);
+    --marker-ink: #eae5da;
+    --pen: #e28074;
+
+    --semantic-error: #e28074;
+    --semantic-error-tint: #3a201b;
+    --semantic-error-hover: #4c2a22;
+    --semantic-error-solid: #b0392c;
+    --semantic-success: #63b584;
+    --semantic-success-tint: #17301f;
+    --semantic-warning: #dca53e;
+    --semantic-warning-tint: #342b17;
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --background: #141017;
-  --foreground: #e8e5ee;
+  --background: #1a1815;
+  --foreground: #eae5da;
 
-  --primary: #8a4d93;
-  --primary-press: #9a5aa3;
-  --on-primary: #ffffff;
+  --primary: #e4dcc6;
+  --primary-press: #f0e9d6;
+  --on-primary: #221f1a;
 
-  --ink: #e8e5ee;
-  --ink-mute: #a49eae;
+  --ink: #eae5da;
+  --ink-mute: #9c947f;
 
-  --link-blue: #7cb8ef;
-  --link-hover: #9dccf4;
+  --link-blue: #8fb6e8;
+  --link-hover: #b0cdf2;
 
-  --canvas: #1d1722;
-  --canvas-lavender: #141017;
-  --canvas-lavender-hover: #252030;
+  --canvas: #232019;
+  --canvas-lavender: #1a1815;
+  --canvas-lavender-hover: #2b2720;
 
-  --surface-hover: #252030;
+  --surface-hover: #2b2720;
 
-  --hairline: #39323f;
+  --hairline: #37332a;
 
-  --semantic-error: #f08a6c;
-  --semantic-error-tint: #3a1e1a;
-  --semantic-error-hover: #4c2820;
-  --semantic-success: #4cbf95;
-  --semantic-success-tint: #17302a;
-  --semantic-warning: #e6b23c;
-  --semantic-warning-tint: #342a17;
+  --marker: rgb(240 205 84 / 0.32);
+  --marker-ink: #eae5da;
+  --pen: #e28074;
+
+  --semantic-error: #e28074;
+  --semantic-error-tint: #3a201b;
+  --semantic-error-hover: #4c2a22;
+  --semantic-error-solid: #b0392c;
+  --semantic-success: #63b584;
+  --semantic-success-tint: #17301f;
+  --semantic-warning: #dca53e;
+  --semantic-warning-tint: #342b17;
 }
 
 @theme inline {
@@ -120,8 +133,9 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
     monospace;
+  --font-serif: var(--font-literata), ui-serif, Georgia, serif;
 
-  /* Slacc Colors */
+  /* Paper-and-ink palette */
   --color-primary: var(--primary);
   --color-primary-press: var(--primary-press);
   --color-on-primary: var(--on-primary);
@@ -137,6 +151,10 @@
 
   --color-hairline: var(--hairline);
 
+  --color-marker: var(--marker);
+  --color-marker-ink: var(--marker-ink);
+  --color-pen: var(--pen);
+
   --color-semantic-error: var(--semantic-error);
   --color-semantic-error-tint: var(--semantic-error-tint);
   --color-semantic-error-hover: var(--semantic-error-hover);
@@ -151,7 +169,7 @@
   --color-canvas-lavender-hover: var(--canvas-lavender-hover);
   --color-surface-hover: var(--surface-hover);
 
-  /* Radius scale — tightened, aubergine-console feel; no 90px pills */
+  /* Radius scale — tightened, printed-document feel; no 90px pills */
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 7px;
@@ -186,9 +204,9 @@ body {
   font-family: var(--font-sans);
 }
 
-/* currentColor renders a white ring on the white page for `text-on-primary`
-   buttons. A dark ring separated from the element by a white halo stays
-   visible on light surfaces and on the aubergine ones alike. */
+/* currentColor renders a paper-coloured ring on the page for `text-on-primary`
+   buttons. An ink ring separated from the element by a paper halo stays
+   visible on the page, on cards, and on filled ink buttons alike. */
 :focus-visible:not(input):not(textarea):not(select) {
   outline: 2px solid var(--color-ink);
   outline-offset: 3px;

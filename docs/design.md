@@ -1,8 +1,9 @@
 # Design system
 
-A deep aubergine primary, a Geist Sans / Geist Mono pair where the mono tier is
-load-bearing, a tight radius scale with no pills, and depth carried by hairline
-borders rather than shadows.
+Paper and ink: a warm paper ground, an ink primary, and a strict rule that
+every remaining colour encodes a state rather than a brand. A Geist Sans /
+Geist Mono / Literata trio where the mono tier is load-bearing, a tight radius
+scale with no pills, and depth carried by hairline borders rather than shadows.
 
 Two files are the source of truth:
 
@@ -19,28 +20,38 @@ describing a system that no longer existed.
 
 ## Overview
 
-The accent is a deep aubergine (`--color-primary`). Everything around it is a
-neutral biased toward that aubergine — the greys carry a red/purple undertone
-rather than being pure, so the accent reads as part of the palette instead of
-dropped onto it.
+The ground is warm paper and the primary is ink (`--color-primary`) — a filled
+button reads as printed type, not as a brand colour. The neutrals carry the same
+warm bias, so nothing looks dropped onto the page.
 
-Typography is a **pair**, not a family: Geist Sans for what a person reads, Geist
-Mono for what a machine produced. Buttons are 7px, cards 12px; nothing is a pill.
-Regions are separated by 1px hairlines and, in dark mode, a real surface step.
+The rule that drives everything: **the app has no decorative colour left.** Five
+pipeline statuses, three semantic states, and the two marks the AI is allowed to
+make have to stay distinguishable from each other, and that is the entire colour
+budget. Anything spent on decoration is taken from the states that need it.
+
+Typography is a **trio**, each tier answering "who produced this": Geist Sans for
+interface, Geist Mono for what a machine computed, Literata for what reads as a
+document — job descriptions, coaching briefs, interview questions. Buttons are
+7px, cards 12px; nothing is a pill. Regions are separated by 1px hairlines and,
+in dark mode, a real surface step.
 
 ### Key characteristics
 
-- **One aubergine accent** — filled buttons, wordmark, active nav. Blue
+- **Ink is the accent** — filled buttons, wordmark, active nav. Blue
   (`--color-link-blue`) is the only other chromatic note in body type, reserved
   for inline links.
+- **Marker and pen are the AI's voice** — `--color-marker` highlights what the
+  posting and your resume agree on; `--color-pen` underlines what is missing.
+  They appear nowhere else, so seeing either one always means "the model marked
+  this".
 - **Mono as an information channel**, not decoration: it marks a value as
   computed and comparable.
 - **A tight radius scale** (4–12px) assigned by role.
 - **Borders, not shadows.** Shadow is reserved for things that genuinely float.
 - **Indicators are dots**, so a dense list isn't a wall of tinted chips.
 - **Dark mode is a palette swap**, not an inversion.
-- **A categorical status palette** for the pipeline — the one deliberate break
-  from the single-accent rule.
+- **A categorical status palette** for the pipeline — five stages that must be
+  distinguishable, never ranked by how "branded" they are.
 
 ## Color
 
@@ -50,9 +61,10 @@ properties the dark palette redefines. See
 
 | Group | Tokens | Role |
 | --- | --- | --- |
-| Brand | `primary`, `primary-press`, `on-primary` | Filled buttons, wordmark, active nav, accent text |
-| Link | `link-blue`, `link-hover` | Inline links — the only non-aubergine body colour |
-| Surface | `canvas`, `canvas-lavender`, `canvas-lavender-hover`, `surface-hover` | `canvas` is the card; `canvas-lavender` is the page beneath it |
+| Brand | `primary`, `primary-press`, `on-primary` | Filled buttons, wordmark, active nav, accent text — ink, not a hue |
+| AI | `marker`, `marker-ink`, `pen` | The only marks the model may make on a document: highlight for a match, underline for a gap |
+| Link | `link-blue`, `link-hover` | Inline links — the only chromatic note in body text |
+| Surface | `canvas`, `canvas-lavender`, `canvas-lavender-hover`, `surface-hover` | `canvas` is the card; `canvas-lavender` is the page beneath it (named for the retired palette — renamed when the components move) |
 | Line | `hairline` | 1px borders and dividers — the workhorse |
 | Text | `ink`, `ink-mute` | Body and secondary; `ink` is also the focus ring |
 | Semantic | `semantic-{error,success,warning}` + `-tint` | Status feedback, never decoration |
@@ -76,7 +88,7 @@ Two values worth knowing the reasoning for:
 ### Pipeline status — a categorical scale
 
 The five stages need colours that read as *different*, not as *more or less
-branded*, so they come from Tailwind's palette rather than the aubergine system.
+branded*, so they come from Tailwind's palette rather than the ink system.
 [`status-colors.ts`](../src/components/ui/status-colors.ts) is the single source:
 one entry per status supplying every surface it appears on (`badge`, `dot`,
 `fill`, `num`, `seg`), each with a dark variant.
@@ -106,8 +118,10 @@ variants out.
 
 ## Typography
 
-Geist Sans (`--font-sans`) and Geist Mono (`--font-mono`), loaded by `next/font`
-in [`layout.tsx`](../src/app/layout.tsx) via the `geist` package.
+Geist Sans (`--font-sans`) and Geist Mono (`--font-mono`) via the `geist`
+package, plus Literata (`--font-serif`) via `next/font/google` — all loaded in
+[`layout.tsx`](../src/app/layout.tsx). Literata is the document tier: it sets
+the text the app did not write, so a job posting never looks like interface.
 
 **Display tier** — `font-display-lg` (50px) / `-md` (32px, the workhorse) /
 `-sm` (24px). Implemented as `@utility` classes rather than `@theme` variables so
@@ -153,7 +167,7 @@ Border first, surface step second, shadow only when something genuinely floats.
 | --- | --- | --- |
 | 0 | Flat on `canvas-lavender` | The page |
 | 1 | `border-hairline` + `bg-canvas` | Cards, rows, panels — the default |
-| 2 | Soft aubergine shadow | The landing's product panel and fit console |
+| 2 | Soft ink shadow | The landing's product panel and fit console |
 | 3 | Stronger shadow | Drag overlay, dialogs — actually lifted |
 
 In dark mode the border does less work and the surface step does more: the page
@@ -236,9 +250,9 @@ and grey on another. A date that is merely *present* is never coloured.
 ### Focus ring
 
 A system-wide rule in `globals.css`: a 2px `ink` outline, offset, with a `canvas`
-halo. A `currentColor` ring would be white-on-white on aubergine-filled buttons;
-an ink ring separated by a halo stays visible on light surfaces, aubergine ones
-and dark mode alike.
+halo. A `currentColor` ring would vanish into ink-filled buttons; an ink ring
+separated by a paper halo stays visible on the page, on cards, on filled
+buttons and in dark mode alike.
 
 ## Responsive behavior
 
@@ -261,13 +275,15 @@ parameter.
 
 ## Do's and Don'ts
 
-**Do** — reserve aubergine for filled buttons, the wordmark and active nav (one
-filled aubergine button per viewport) · set computed values in `font-mono` with
+**Do** — reserve ink fills for buttons, the wordmark and active nav (one filled
+button per viewport) · reserve `marker`/`pen` for marks the model made · set
+document text in `font-serif` · set computed values in `font-mono` with
 `tabular-nums` · set headlines with a `font-display-*` utility · import the
 primitives rather than restyling · take pipeline colours from `STATUS_COLORS` ·
 tint with `bg-primary/15` when a surface must read as raised in both themes.
 
-**Don't** — add a fourth colour family · use aubergine for body text · reach for
+**Don't** — add a decorative colour family · use `marker` or `pen` for anything
+a human wrote · use ink fills for body text · reach for
 `rounded-full` on anything with a text label · set prose in mono or a computed
 value in sans · colour a deadline by hand · fill a status pill where a dot will
 do · assume `canvas-lavender` lifts (it inverts) · write a `dark:` class where a
@@ -283,11 +299,11 @@ choices, not drift:
 | **The 90px pill was removed entirely** | A marketing page has a handful of CTAs; this app has buttons, chips, segments and toggles on every screen. At that density uniform pills stop reading as emphasis and start reading as a default — nothing has a stance. 7px lets shape carry role again. |
 | **A mono tier was added** | A tracker is mostly numbers. One family gives the reader no way to tell a computed value from a written one; mono is the cheapest possible signal. |
 | **The pastel-mesh gradient was dropped** | It carried depth for a page with almost nothing on it. Behind a real board it fought the cards, and it has no honest dark-mode analogue. |
-| **Neutrals were biased toward the accent** | Pure greys made the aubergine look pasted on. |
+| **Neutrals were biased toward the accent** | Pure greys made the ink look pasted on. |
 | **Status pills became dots** | Fine on a marketing card, unreadable on a 12-row table. |
-| **A categorical status palette** breaks the "never add a third accent" rule | Five stages must be *distinguishable*, not *branded*. Ranking them by how aubergine they are would encode a meaning the data doesn't have. Confined to `STATUS_COLORS`, so it can't leak into brand surfaces. |
+| **A categorical status palette** breaks the "never add a third accent" rule | Five stages must be *distinguishable*, not *branded*. Ranking them by how close to ink they are would encode a meaning the data doesn't have. Confined to `STATUS_COLORS`, so it can't leak into brand surfaces. |
 | **Dark mode as a palette swap** rather than `dark:` classes | Scattering overrides through components makes the palette unknowable. |
-| **A focus-ring rule was added** | The source never contended with aubergine-filled buttons, where a `currentColor` ring disappears. |
+| **A focus-ring rule was added** | The source never contended with ink-filled buttons, where a `currentColor` ring disappears. |
 
 ## Provenance
 
@@ -296,11 +312,16 @@ marketing site: the aubergine palette, the lavender canvases, the 90px pill, the
 pastel-mesh gradient and the display-typography rules came from there, with
 **Inter** substituted for the study's two proprietary faces.
 
-It has since been rebuilt. The marketing language was doing what it was designed
-to do — sell on a page with three CTAs and a lot of air — and that is the wrong
-job for a board, a table, and a detail page with six sections. What survived is
-the aubergine and the display tier's tight tracking. What replaced the rest is
-documented above.
+It has since been rebuilt twice. The marketing language was doing what it was
+designed to do — sell on a page with three CTAs and a lot of air — and that is
+the wrong job for a board, a table, and a detail page with six sections.
+
+The second rebuild retired the aubergine itself. Counting what the palette
+actually had to encode — five pipeline statuses, three semantic states, and the
+marks the AI makes on a posting — showed the brand hue was spending colour the
+states needed, and that a purple-accented AI product looks like every other one.
+Paper and ink freed the whole chromatic range for meaning. What survived from
+the original study is only the display tier's tight tracking.
 
 ## Related docs
 

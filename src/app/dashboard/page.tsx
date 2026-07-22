@@ -132,7 +132,7 @@ export default async function DashboardPage() {
       {total === 0 ? (
         <div className={cardClass("flex flex-col gap-6 p-8 shadow-sm")}>
           <div>
-            <h2 className="font-display-sm text-ink">Welcome to your Job Tracker!</h2>
+            <h2 className="font-display-sm text-ink">Welcome to Margin!</h2>
             <p className="mt-2 font-sans text-body-lg text-ink-mute">Follow these 3 simple steps to let AI power your job search.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
