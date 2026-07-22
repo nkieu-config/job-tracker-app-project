@@ -8,7 +8,7 @@ vi.mock("@/server/ai/gemini", () => ({
   getGeminiClient: () => getGeminiClient(),
   GENERATION_MODEL: "test-generation-model",
   TAILORING_MODEL: "test-tailoring-model",
-  THINKING_DISABLED: { thinkingBudget: 0 },
+  thinkingOffFor: () => ({ thinkingBudget: 0 }),
   billedOutputTokens: (usage?: {
     candidatesTokenCount?: number;
     thoughtsTokenCount?: number;

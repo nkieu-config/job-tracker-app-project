@@ -4,7 +4,7 @@ import {
   getGeminiClient,
   GENERATION_MODEL,
   TAILORING_MODEL,
-  THINKING_DISABLED,
+  thinkingOffFor,
   billedOutputTokens,
 } from "./gemini";
 import { fenceUntrusted, UNTRUSTED_DATA_RULE } from "./prompt";
@@ -84,7 +84,7 @@ async function generate(
       contents: prompt,
       config: {
         temperature,
-        thinkingConfig: THINKING_DISABLED,
+        thinkingConfig: thinkingOffFor(model),
         abortSignal: signal,
       },
     });

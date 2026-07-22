@@ -51,7 +51,7 @@ other model response, and token usage is recorded for cost observability.
 
 The judge should be a **different, stronger model** than the one under test — a
 model judging its own output scores it leniently (self-preference bias). It
-defaults to `gemini-3.5-flash` (a newer generation than the `gemini-3.1-flash-lite`
+defaults to `gemini-3.5-flash` (a different model from the `gemini-3.5-flash-lite`
 under test; the earlier `gemini-2.5-pro` default is no longer served on the free
 tier). Override with `EVAL_JUDGE_MODEL` — for the tailoring suite, whose generator
 is itself `gemini-3.5-flash`, point it at a different model so it isn't
@@ -82,26 +82,29 @@ structural check is the one a lenient judge can't inflate.
 
 ## Results
 
-Generation on `gemini-3.1-flash-lite` + `gemini-embedding-001` (tailoring on
+Generation on `gemini-3.5-flash-lite` + `gemini-embedding-001` (tailoring on
 `gemini-3.5-flash` — see below), judged by the default `gemini-3.5-flash`;
-`npm run eval` regenerates. The free tier retired `gemini-2.5-flash` for new
-projects, which forced this migration and re-capture.
+`npm run eval` regenerates. Generation moved from `gemini-3.1-flash-lite` on the
+harness's own evidence: every metric held or improved, and the 25× quota is what
+makes a full same-day capture affordable.
 
 | Suite | Measures | Status | Result |
 | --- | --- | --- | --- |
 | **skill-match** | embedding layer's lift over lexical-only matching (macro, n=12) | Captured | recall **86.1% → 94.4% (+8.3)**, F1 **90.5% → 95.5%**, precision 97.9% |
-| **jd-analysis** | skill extraction P/R/F1 · seniority accuracy · schema-valid rate (n=15) | Captured | F1 **87.4%** (P 88.1% / R 93.4%), seniority accuracy **93.3%**, schema-valid **100%** |
-| **coach** | LLM-judge relevance / grounding / actionability (1–5) · focus-skill grounding · hallucination rate (n=5) | Captured | **5 / 4.8 / 4.4**, focus grounded **100%**, hallucination rate **0%** |
+| **jd-analysis** | skill extraction P/R/F1 · seniority accuracy · schema-valid rate (n=15) | Captured | F1 **90.4%** (P 89.8% / R 97.8%), seniority accuracy **93.3%**, schema-valid **100%** |
+| **coach** | LLM-judge relevance / grounding / actionability (1–5) · focus-skill grounding · hallucination rate (n=5) | Captured | **5 / 5 / 4.6**, focus grounded **100%**, hallucination rate **0%** |
 | **autofill** | company / role / deadline extraction accuracy · schema-valid rate (n=6) | Captured | company / role / deadline **100% / 100% / 100%**, schema-valid **100%** |
 | **tailoring** | LLM-as-judge relevance / grounding / formatting (1–5) · hallucination rate (n=6) | Re-capturing | flash-lite grounded only 3.83/5 → moved to `gemini-3.5-flash` + a grounding-tightened prompt; fresh numbers pending |
-| **interview** | LLM-judge relevance / grounding / actionability (1–5) · structural validity · answer-key coverage · hallucination rate (n=5) | Captured | **5 / 4.8 / 5**, structure valid **100%**, answer-key coverage **100%**, hallucination rate **20%** (one item over-levelled a mid-level role to senior — see note) |
+| **interview** | LLM-judge relevance / grounding / actionability (1–5) · structural validity · answer-key coverage · hallucination rate (n=5) | Captured | **5 / 5 / 5**, structure valid **100%**, answer-key coverage **100%**, hallucination rate **0%** |
 
 > [!NOTE]
-> The eval doing its job: it caught that `gemini-3.1-flash-lite`, fine for the
-> extraction suites, grounded bullet tailoring below the gate (fabricating
-> qualifiers like "high-throughput"). Tailoring alone was routed to the stronger
-> `gemini-3.5-flash` and its prompt tightened — a model choice made by
-> measurement, not assumption.
+> The eval doing its job: it caught that the then-current `gemini-3.1-flash-lite`,
+> fine for the extraction suites, grounded bullet tailoring below the gate
+> (fabricating qualifiers like "high-throughput"). Tailoring alone was routed to
+> the stronger `gemini-3.5-flash` and its prompt tightened — a model choice made
+> by measurement, not assumption. Whether the split is still needed now that
+> generation runs on `gemini-3.5-flash-lite` is unmeasured, and re-running the
+> tailoring suite is what would answer it.
 
 > [!NOTE]
 > The interview suite forced a metric fix, not a model fix. The first run scored
@@ -116,10 +119,10 @@ projects, which forced this migration and re-capture.
 > something changes.
 
 > [!IMPORTANT]
-> The Gemini **free tier caps generation at 20 requests/day**. The judged suites
+> The Gemini free tier meters per model. `gemini-3.5-flash-lite` allows **500 requests/day**, which is what makes running the whole harness in one sitting realistic; the judge models are far tighter (`gemini-3.6-flash` is 20/day). The judged suites
 > also need `EVAL_JUDGE_MODEL` pointed at a served model (e.g. `gemini-3.5-flash`)
-> since `gemini-2.5-pro` is no longer free. Running all six in one day is close
-> to the cap; `skill-match` runs on the separate embeddings quota. Excluded items
+> since `gemini-2.5-pro` is no longer free; `skill-match` runs on the separate
+> embeddings quota. Excluded items
 > (e.g. a call the API never answered) are reported as such, never silently
 > scored. Use `-- --n=<k>` to subset, or a paid key, to run more freely.
 

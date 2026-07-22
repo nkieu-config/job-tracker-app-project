@@ -9,7 +9,7 @@ export {
   GENERATION_MODEL,
   TAILORING_MODEL,
   EMBEDDING_MODEL,
-  THINKING_DISABLED,
+  thinkingOffFor,
   billedOutputTokens,
 } from "./models";
 

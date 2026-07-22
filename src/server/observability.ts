@@ -2,12 +2,6 @@ import "server-only";
 
 import { after } from "next/server";
 
-import {
-  EMBEDDING_MODEL,
-  GENERATION_MODEL,
-  TAILORING_MODEL,
-} from "@/server/ai/models";
-
 export const AI_FEATURES = [
   "analyze",
   "embed",
@@ -24,9 +18,10 @@ export type AiFeature = (typeof AI_FEATURES)[number];
 // model constants so a swap in models.ts can't leave a live model unpriced;
 // retired models stay listed so historical ai_usage rows keep their cost.
 export const PRICING = {
-  [GENERATION_MODEL]: { input: 0.1, output: 0.4 },
-  [TAILORING_MODEL]: { input: 0.3, output: 2.5 },
-  [EMBEDDING_MODEL]: { input: 0.15, output: 0 },
+  "gemini-3.5-flash-lite": { input: 0.3, output: 2.5 },
+  "gemini-3.5-flash": { input: 0.3, output: 2.5 },
+  "gemini-embedding-001": { input: 0.15, output: 0 },
+  "gemini-3.1-flash-lite": { input: 0.1, output: 0.4 },
   "gemini-2.5-flash": { input: 0.3, output: 2.5 },
 } satisfies Record<string, { input: number; output: number }>;
 

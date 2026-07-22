@@ -6,7 +6,7 @@ import { recordAiUsage, type AiFeature } from "@/server/observability";
 import {
   getGeminiClient,
   GENERATION_MODEL,
-  THINKING_DISABLED,
+  thinkingOffFor,
   billedOutputTokens,
 } from "./gemini";
 
@@ -49,7 +49,7 @@ export async function generateStructured<T>(options: {
         responseMimeType: "application/json",
         responseJsonSchema: responseJsonSchemaFor(schema),
         temperature,
-        thinkingConfig: THINKING_DISABLED,
+        thinkingConfig: thinkingOffFor(GENERATION_MODEL),
         abortSignal: AbortSignal.timeout(TIMEOUT_MS),
       },
     });

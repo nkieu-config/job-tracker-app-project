@@ -5,7 +5,7 @@ const generateContent = vi.fn();
 vi.mock("@/server/ai/gemini", () => ({
   getGeminiClient: () => ({ models: { generateContent } }),
   GENERATION_MODEL: "test-generation-model",
-  THINKING_DISABLED: { thinkingBudget: 0 },
+  thinkingOffFor: () => ({ thinkingBudget: 0 }),
   billedOutputTokens: () => 0,
 }));
 
