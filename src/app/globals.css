@@ -22,7 +22,7 @@
   --on-primary: #fbf9f3;
 
   --ink: #26231d;
-  --ink-mute: #7a7264;
+  --ink-mute: #6b6355;
 
   --link-blue: #2c5c93;
   --link-hover: #1f4676;
@@ -45,7 +45,7 @@
   --semantic-error-solid: #b0392c;
   --semantic-success: #2f7a4d;
   --semantic-success-tint: #e6f0e6;
-  --semantic-warning: #a8720f;
+  --semantic-warning: #875d0b;
   --semantic-warning-tint: #faf0d9;
 }
 

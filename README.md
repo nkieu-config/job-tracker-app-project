@@ -8,7 +8,9 @@
 
 **6 AI features, each with an eval suite · 425 tests + a 6-suite AI eval harness · ~14k lines of strict TypeScript (app, tests, evals)**
 
-![Dashboard showing application pipeline, response and interview rates, and upcoming deadlines](docs/screenshots/dashboard.png)
+![The desk: a job posting with required skills highlighted where the resume covers them and underlined in red where it does not, beside the skills analysis and resume-fit panels](docs/screenshots/the-read.png)
+
+*The posting on the left, you on the right. Highlighted where your resume backs the requirement up; underlined in red where it does not.*
 
 ## Try it in 60 seconds
 
@@ -19,7 +21,7 @@
 | **Email**    | `demo@jobtracker.app` |
 | **Password** | `demotracker2026`     |
 
-Then open **Applications → Senior Backend Engineer (Acme Corp)**: the skill-gap chips show **5 of the 6 required skills matched**, with Kubernetes flagged as the gap; **Resume fit** ranks the three resume versions by cosine similarity, putting the backend-focused one on top as a Strong fit; and **Tailor resume bullets** regenerates live, token by token.
+Then open **Applications → Senior Backend Engineer (Acme Corp)**. It sits at the interview stage, so the desk opens on **Prep** — press *Practise* and the sheet turns into a drill, one question at a time with the answer key hidden. Switch to **Match** and the posting itself is marked up: **5 of its 6 required skills highlighted** where your resume backs them up, **Kubernetes underlined in red** where it does not. **Resume fit** ranks the three resume versions by cosine similarity, and **Tailor** regenerates bullets live, token by token. `⌘K` jumps to any application by name.
 
 > [!NOTE]
 > The demo account is shared and public — anything you change is visible to other visitors until the nightly reseed, and all AI actions on it draw from one 30-calls-per-hour budget.
@@ -62,6 +64,8 @@ Full deep-dive — system design, data model, decision rationale, challenges-and
 - **The AI is measured, not assumed.** Every feature has to clear an [evaluation harness](evals/) — real metrics, a controlled ablation, and an LLM judge — before it ships. Scorecard below.
 - **Defense-in-depth auth.** Middleware does an optimistic cookie check, but every page, Server Action and route handler independently re-verifies the session and scopes queries by `userId` — a design that survives CVE-2025-29927, the Next.js middleware bypass.
 - **Vector search in the database, not the app.** Embeddings live in Postgres `vector(768)` columns behind an HNSW index; resume ranking is one raw-SQL cosine-distance query, not an application-side similarity loop.
+- **The AI marks up the document instead of reporting on it.** The analysis returns skill names; the app locates each one as a span in the posting and highlights it in place. A spike over the 15 labelled job descriptions in `evals/datasets`, run against real model output rather than gold labels, located **97.4%** of returned skills — and the two it could not are both cases where the model summarised a phrase ("deploying models as services" → "Model Deployment") rather than quoting one. Those are reported separately as read-but-not-quoted, so a highlight always means *the posting says this*. The locator's strictness doubles as a filter on over-extraction: it declines to highlight a job title that merely resembles a skill.
+- **Accessibility is a gate, not an aspiration.** [`e2e/a11y.spec.ts`](e2e/a11y.spec.ts) runs axe over every screen a visitor lands on and fails on any serious or critical violation. It has already earned its place twice: it caught the paper palette's muted ink at **4.13:1** against the page (below AA), and a scrollable posting pane that a mouse could scroll and a keyboard could not.
 - **Charts are hand-rolled SVG, not a charting library.** The dashboard's weekly-activity bars and fit ranking are built from primitives (pure bucketing/scale helpers, unit-tested) so they inherit the design tokens — theme-aware in light and dark, keyboard-navigable with an `sr-only` data table — and add zero KB to the bundle.
 - **AI behind one boundary.** All Gemini access lives in a single `server/ai/` module called only from server code, so the API key never reaches the client and there is exactly one place to meter, validate and mock.
 - **Streaming end to end.** Gemini's chunk iterator is piped straight into a Route Handler `ReadableStream` → browser, with an end-of-stream status frame so a dropped connection can never silently persist a truncated result.
@@ -85,7 +89,7 @@ The judged suites (tailoring, coach, interview) are scored by a separate LLM jud
 | Module               | What it does                                                                                                                      |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | **Kanban pipeline**  | Drag-and-drop board (Saved → Applied → Interview → Offer → Rejected), optimistic updates, URL-synced list with search/filter/sort |
-| **Dashboard**        | Response, interview and offer rates, pipeline funnel, weekly-activity chart, resume-fit ranking, skill-gap insights, upcoming deadlines |
+| **Today**            | An agenda derived from the pipeline (closing deadlines, interviews with no prep sheet, unread postings, applications gone quiet), then the coach brief, then response/interview/offer rates, funnel, weekly activity, fit ranking and skill gaps |
 | **JD analysis**      | Gemini extracts required skills, nice-to-haves and seniority, then flags which skills your resumes are missing — cached by content hash |
 | **Resume fit**       | Ranks every resume version against the JD by pgvector cosine similarity, labeled with Strong/Moderate/Weak bands                  |
 | **Bullet tailoring** | Rewrites your experience into JD-tuned resume bullets, streamed token-by-token, saved per application                             |
@@ -100,31 +104,27 @@ Two of the AI features stream. Here is bullet tailoring as it actually runs — 
 ![Resume bullets streaming in token by token as the model rewrites experience against the job description](docs/screenshots/tailor-streaming.gif)
 
 <details>
-<summary>📸 More screenshots — the board, the AI features, and the landing page</summary>
+<summary>📸 More screenshots — Today, the drill, the board and the landing page</summary>
 
-The dashboard's Activity section — weekly application bars and a resume-fit ranking, both hand-rolled SVG:
+Today opens on an agenda derived from the pipeline — a deadline inside the week, an interview with no prep sheet, a posting saved but never read, an application gone quiet — then the coach brief, then the rates:
 
-![Weekly activity chart by status and a resume-fit ranking of applications](docs/screenshots/activity.png)
+![Today, listing what needs doing with the AI coach brief below it](docs/screenshots/today.png)
 
-The Coaching section — a skill-gap tally across the pipeline beside on-demand AI advice:
+The prep sheet is something to practise against, not to read: answer keys stay collapsed, and a drill takes one question at a time and asks you to score yourself:
 
-![Skill-gap card and AI pipeline coach with strategic advice](docs/screenshots/coaching.png)
+![The interview drill showing one question with a progress bar and the answer key hidden](docs/screenshots/prep-drill.png)
+
+| Skills analysis | Resume fit |
+| --- | --- |
+| ![Required skills highlighted where matched and underlined where missing](docs/screenshots/skills-analysis.png) | ![Resume versions ranked by cosine similarity, bars scaled to the spread of the set](docs/screenshots/resume-fit.png) |
 
 Drag a card and the move persists optimistically:
 
 ![Kanban board with applications grouped by status](docs/screenshots/board.png)
 
-| JD analysis & skill gap | Resume fit ranking |
-| --- | --- |
-| ![Required skills tagged as matched or missing against the resume](docs/screenshots/jd-analysis.png) | ![Resume versions ranked by cosine similarity to the job description](docs/screenshots/resume-fit.png) |
+Capture starts with the posting, not with a grid of empty fields. What the model read stays marked in highlighter until you touch it, and it says so when the posting never stated a field:
 
-| Bullet tailoring (streamed) | Interview prep (streamed) |
-| --- | --- |
-| ![Resume bullets tailored to the job description](docs/screenshots/tailor.png) | ![Generated prep sheet with likely technical and behavioral questions](docs/screenshots/interview-prep.png) |
-
-Paste a job description on the new-application form and AI auto-fill sets the company, role and deadline:
-
-![New-application form with a job description pasted and the AI auto-fill button](docs/screenshots/autofill.png)
+![New-application form led by a large job-posting field with a Read the posting button beneath it](docs/screenshots/capture.png)
 
 The design system in [docs/design.md](docs/design.md), as actually rendered:
 
@@ -176,12 +176,12 @@ Full environment-variable reference, scripts and deploy guide: [docs/setup.md](d
 
 ## Testing & quality
 
-425 tests across two Vitest projects, plus two Playwright suites (9 browser tests, run separately):
+425 tests across two Vitest projects, plus three Playwright suites (17 browser tests including the sign-in setup, run separately):
 
 - **Node (server)** — ownership scoping of every Server Action, the JD-analysis cache short-circuit, the pipeline-snapshot aggregation, the resume upload's blob lifecycle including compensating deletes, the page cap that stops a PDF bomb from pinning the function, rate limiting for both AI and auth, embedding batch splitting, and the fence that keeps a job description from being read as prompt instructions.
 - **jsdom (components)** — the streaming UI's save/discard rules and the accessibility invariants of the drag-and-drop board.
 - **Integration (10 of the 425)** — run against a real Postgres, and skip locally when no database is reachable. CI always runs them against a `pgvector/pgvector` service container, so the raw SQL the mocked unit tests can't reach stays covered: the rate limiter's atomic upsert, and the predicate deciding whether a resume holds readable text.
-- **e2e (`npm run test:e2e`)** — two Playwright suites against a running app. A read-only smoke test walks sign-in, the dashboard, navigation and the auth redirect on the shared demo without mutating it; a separate suite signs up a throwaway account, drives the full create → edit → delete lifecycle, and deletes the account afterwards — so the mutating paths get real-browser coverage without ever touching the demo.
+- **e2e (`npm run test:e2e`)** — three Playwright suites against a running app. A read-only smoke test walks sign-in, Today, navigation and the auth redirect on the shared demo without mutating it; a separate suite signs up a throwaway account, drives the full create → edit → delete lifecycle, and deletes the account afterwards; and an axe suite fails the build on any serious or critical accessibility violation on every screen a visitor lands on, plus the keyboard paths through the desk tabs and the command palette.
 
 Security-critical modules — the prompt fence, the admin gate, the AI ownership guard and the PDF page cap among them — are pinned to **100% coverage thresholds** in CI.
 

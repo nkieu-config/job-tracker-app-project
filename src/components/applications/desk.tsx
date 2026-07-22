@@ -44,7 +44,15 @@ export function Desk({
 
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-8">
-      <div className="lg:sticky lg:top-6 lg:max-h-[calc(100dvh-5rem)] lg:overflow-y-auto lg:pr-1">
+      {/* The pane scrolls on its own at wide widths, which makes it unreachable
+          by keyboard unless it can take focus — a mouse can scroll it, a
+          keyboard could not. */}
+      <div
+        role="region"
+        aria-label="Job posting"
+        tabIndex={0}
+        className="lg:sticky lg:top-6 lg:max-h-[calc(100dvh-5rem)] lg:overflow-y-auto lg:pr-1"
+      >
         {posting}
       </div>
 

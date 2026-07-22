@@ -67,6 +67,16 @@ test.describe("signed in as the demo account", () => {
     await expect(
       page.getByRole("heading", { level: 2, name: "Job posting" }),
     ).toBeVisible();
+
+    // This seeded application is at the interview stage, so the desk opens on
+    // Prep: a prep sheet is what matters once someone has offered you a slot,
+    // and the skills breakdown is not.
+    await expect(page.getByRole("tab", { selected: true })).toHaveText("Prep");
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Skills analysis" }),
+    ).toBeHidden();
+
+    await page.getByRole("tab", { name: "Match" }).click();
     await expect(
       page.getByRole("heading", { level: 2, name: "Skills analysis" }),
     ).toBeVisible();
@@ -74,26 +84,16 @@ test.describe("signed in as the demo account", () => {
       page.getByRole("heading", { level: 2, name: "Resume fit" }),
     ).toBeVisible();
 
-    // Switching tabs must not unmount the others — a stream in flight on a
-    // hidden panel has to survive.
-    await page.getByRole("tab", { name: "Prep" }).click();
-    await expect(page.getByRole("tab", { name: "Prep" })).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
-    await expect(
-      page.getByRole("heading", { level: 2, name: "Skills analysis" }),
-    ).toBeHidden();
-    await expect(
-      page.getByRole("button", { name: /prep sheet/i }),
-    ).toBeVisible();
+    // A required skill the resume covers is highlighted in the posting itself.
+    await expect(page.locator("mark").first()).toBeVisible();
   });
 
-  test("the new-application form offers AI auto-fill", async ({ page }) => {
+  test("the new-application form leads with the posting", async ({ page }) => {
     await page.goto("/dashboard/applications/new");
+    await expect(page.getByLabel(/job posting/i)).toBeVisible();
     await expect(page.getByLabel("Company")).toBeVisible();
     await expect(
-      page.getByRole("button", { name: /Auto-fill from description/ }),
+      page.getByRole("button", { name: /Read the posting/ }),
     ).toBeVisible();
   });
 

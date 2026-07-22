@@ -96,53 +96,47 @@ async function shootSection(heading: string, file: string, maxHeight?: number) {
 // it off the screen. Cutting at the viewport also lands the hero on the same 1.6
 // aspect as the board shot that follows, so the two full-width images agree.
 await settle(page);
-await shootFullPage(page, "dashboard.png", CONTEXT_OPTIONS.viewport.height);
-await shootSection("Activity", "activity.png");
-await shootSection("Coaching", "coaching.png");
+await shootFullPage(page, "today.png", CONTEXT_OPTIONS.viewport.height);
 
 await page.goto("/dashboard/applications");
 await settle(page);
 await shootFullPage(page, "board.png");
 
-// The new-application form with a job description pasted in, so the AI
-// auto-fill button is enabled the way a user would first see it.
+// The new-application form with a posting pasted in, so "Read the posting" is
+// live the way someone would first meet it.
 await page.goto("/dashboard/applications/new");
 await settle(page);
 await page
-  .getByLabel("Job description")
+  .getByLabel(/job posting/i)
   .fill(
     "Aperture Labs is hiring a Senior Frontend Engineer to build our design system in React, Next.js and TypeScript. Apply by 2026-09-15.",
   );
 await settle(page);
-await shootFullPage(page, "autofill.png", 1400);
+await shootFullPage(page, "capture.png", 1400);
 
+// The Read: the posting marked up against the resumes. This is the shot the
+// README opens with, so it is taken at the fold rather than full-page.
 await page.goto("/dashboard/applications/demo_app_1");
 await settle(page);
+await page.getByRole("tab", { name: "Match" }).click();
+await settle(page);
+await shootFullPage(page, "the-read.png", CONTEXT_OPTIONS.viewport.height);
+await shootSection("Skills analysis", "skills-analysis.png");
+await shootSection("Resume fit", "resume-fit.png");
 
-const fitSection = sectionByHeading(page, "Resume fit");
-if ((await fitSection.getByText("No fit scores yet").count()) > 0) {
-  console.log("No fit scores stored — computing (uses GEMINI_API_KEY)…");
-  await fitSection
-    .getByRole("button", { name: /compute resume fit/i })
-    .click();
-  const scores = fitSection.locator("li").first();
-  const alert = fitSection.getByRole("alert");
-  await scores.or(alert).first().waitFor({ timeout: 300_000 });
-  if (await alert.count()) {
-    console.error(`Compute fit failed: ${await alert.innerText()}`);
-    await browser.close();
-    process.exit(1);
-  }
+await page.getByRole("tab", { name: "Tailor" }).click();
+await settle(page);
+await shootFullPage(page, "tailor.png", 1200);
+
+// The drill, mid-question with the answer key still hidden.
+await page.getByRole("tab", { name: "Prep" }).click();
+await settle(page);
+const practise = page.getByRole("button", { name: /practise/i });
+if (await practise.count()) {
+  await practise.click();
   await settle(page);
 }
-
-await shootSection("Skills analysis", "jd-analysis.png");
-await shootSection("Resume fit", "resume-fit.png");
-await shootSection("Tailor resume bullets", "tailor.png");
-
-await page.goto("/dashboard/applications/demo_app_8");
-await settle(page);
-await shootSection("Interview prep", "interview-prep.png");
+await shootFullPage(page, "prep-drill.png", 1200);
 
 await context.close();
 
