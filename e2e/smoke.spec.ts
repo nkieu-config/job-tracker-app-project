@@ -50,18 +50,36 @@ test.describe("signed in as the demo account", () => {
     await expect(page.getByLabel("Search applications")).toBeVisible();
   });
 
-  test("an application detail page shows the AI analysis sections", async ({ page }) => {
+  test("the desk shows the posting beside the AI panels", async ({ page }) => {
     await page.goto("/dashboard/applications");
     await page
       .getByRole("link", { name: /Senior Backend Engineer/ })
       .first()
       .click();
     await page.waitForURL(/\/dashboard\/applications\/[^/]+$/);
+
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Job posting" }),
+    ).toBeVisible();
     await expect(
       page.getByRole("heading", { level: 2, name: "Skills analysis" }),
     ).toBeVisible();
     await expect(
       page.getByRole("heading", { level: 2, name: "Resume fit" }),
+    ).toBeVisible();
+
+    // Switching tabs must not unmount the others — a stream in flight on a
+    // hidden panel has to survive.
+    await page.getByRole("tab", { name: "Prep" }).click();
+    await expect(page.getByRole("tab", { name: "Prep" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Skills analysis" }),
+    ).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: /prep sheet/i }),
     ).toBeVisible();
   });
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
 import { saveInterviewPrep } from "@/actions/applications";
 import { Button } from "@/components/ui/button";
 import { useAiStream } from "@/components/applications/use-ai-stream";
@@ -24,9 +23,7 @@ export function InterviewPrep({
   return (
     <div className="flex flex-col gap-3">
       <div>
-        <Button onClick={() => generate()} disabled={loading}>
-          <Sparkles size={16} aria-hidden="true" />
-          {loading
+        <Button onClick={() => generate()} disabled={loading}>          {loading
             ? "Preparing…"
             : output
               ? "Regenerate prep sheet"
