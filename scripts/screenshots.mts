@@ -138,6 +138,32 @@ if (await practise.count()) {
 }
 await shootFullPage(page, "prep-drill.png", 1200);
 
+// The landing page's product shot — the most-seen image in the project, and
+// the one nothing regenerated. It was drawn by hand and was two renames out of
+// date before anyone noticed, still showing a sidebar reading "Job Tracker".
+// Shot here from the same demo as everything else, in both themes, so it
+// drifts with the app or not at all. 1280x800 at 2x matches the intrinsic size
+// the landing page declares for it.
+const signedIn = await context.storageState();
+const landingDir = path.join(rootDir, "public", "landing");
+
+for (const scheme of ["light", "dark"] as const) {
+  const themed = await browser.newContext({
+    ...CONTEXT_OPTIONS,
+    colorScheme: scheme,
+    viewport: { width: 1280, height: 800 },
+    storageState: signedIn,
+  });
+  const themedPage = await themed.newPage();
+  await themedPage.goto("/dashboard/applications");
+  await settle(themedPage);
+  await themedPage.screenshot({
+    path: path.join(landingDir, `board-${scheme}.png`),
+  });
+  console.log(`✓ landing/board-${scheme}.png`);
+  await themed.close();
+}
+
 await context.close();
 
 const { context: visitorContext, page: visitorPage } =
@@ -148,4 +174,6 @@ await shootFullPage(visitorPage, "landing.png", 4000);
 await visitorContext.close();
 
 await browser.close();
-console.log(`Saved to ${path.relative(rootDir, outDir)}/`);
+console.log(
+  `Saved to ${path.relative(rootDir, outDir)}/ and public/landing/`,
+);

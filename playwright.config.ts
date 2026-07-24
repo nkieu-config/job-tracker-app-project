@@ -15,6 +15,14 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
+  // One worker in CI. The app there is a single instance holding a pool of
+  // five connections — sized for Vercel Fluid, where many small instances each
+  // serve a little concurrency — and a suite running two-up against it is not
+  // that shape. Two workers loading the desk together can want more of the
+  // pool than is left, and the page that loses simply never renders. Running
+  // serially tests the same paths without manufacturing contention no real
+  // deployment produces.
+  workers: process.env.CI ? 1 : undefined,
   reporter: "list",
   use: {
     baseURL: BASE_URL,
