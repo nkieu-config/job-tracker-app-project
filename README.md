@@ -1,7 +1,7 @@
 # Applywise 🖍️
 
 [![CI](https://github.com/nkieu-config/applywise-job-tracker/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nkieu-config/applywise-job-tracker/actions/workflows/ci.yml)
-[![Live demo](https://img.shields.io/badge/demo-live-brightgreen?logo=vercel&logoColor=white)](https://job-tracker-app-project.vercel.app)
+[![Live demo](https://img.shields.io/badge/demo-live-brightgreen?logo=vercel&logoColor=white)](https://applywise-tracker.vercel.app)
 [![License: view-only](https://img.shields.io/badge/license-view--only-informational.svg)](LICENSE)
 
 **The job hunt is a reading problem. This is the tool I built to solve mine.** Applywise marks up a job posting against your resume — highlighting what you already have, underlining what you're missing, ranking your resume versions with vector embeddings, and drilling you on the interview questions the posting implies. Built solo as my capstone project, used daily in my real job search.
@@ -14,7 +14,7 @@
 
 ## Try it in 60 seconds
 
-**🔗 Live demo: [job-tracker-app-project.vercel.app](https://job-tracker-app-project.vercel.app)** — click **Try the live demo** on the homepage (no signup), or sign in directly:
+**🔗 Live demo: [applywise-tracker.vercel.app](https://applywise-tracker.vercel.app)** — click **Try the live demo** on the homepage (no signup), or sign in directly:
 
 | Field        | Value                 |
 | ------------ | --------------------- |
@@ -227,7 +227,7 @@ Built solo by [Natthachak (@nkieu-config)](https://github.com/nkieu-config) — 
 
 📫 [natthachak.config@gmail.com](mailto:natthachak.config@gmail.com)
 
-If you're hiring — [try the demo](https://job-tracker-app-project.vercel.app), then let's talk.
+If you're hiring — [try the demo](https://applywise-tracker.vercel.app), then let's talk.
 
 > [!IMPORTANT]
 > © 2026 Natthachak Jeungraksareechai — all rights reserved. This code is public so you can read it as a work sample; it is **not** licensed for reuse. Please don't copy it or submit it as your own. See [LICENSE](LICENSE).

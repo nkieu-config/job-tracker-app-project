@@ -82,9 +82,9 @@ point `BASE_URL` at the live URL (the seed signs the account up through the
 running app so passwords hash the same way) and the connection strings at Neon:
 
 ```bash
-BASE_URL=https://job-tracker-app-project.vercel.app \
+BASE_URL=https://applywise-tracker.vercel.app \
 DIRECT_URL=<neon-direct-url> \
-BETTER_AUTH_URL=https://job-tracker-app-project.vercel.app \
+BETTER_AUTH_URL=https://applywise-tracker.vercel.app \
 npm run seed
 ```
 
@@ -101,7 +101,7 @@ Point the browser suite at the deployment — it is read-only, and the mutating
 suite skips itself anywhere but a local app:
 
 ```bash
-BASE_URL=https://job-tracker-app-project.vercel.app npm run test:e2e
+BASE_URL=https://applywise-tracker.vercel.app npm run test:e2e
 ```
 
 Then click the AI steps by hand, which no suite covers:

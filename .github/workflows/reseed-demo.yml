@@ -34,7 +34,7 @@ jobs:
       # succeeds and just skips them.
       - name: Reseed the demo account against production
         env:
-          BASE_URL: https://job-tracker-app-project.vercel.app
+          BASE_URL: https://applywise-tracker.vercel.app
           DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
