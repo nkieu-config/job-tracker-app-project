@@ -175,7 +175,10 @@ jobs:
       - name: Seed the demo account
         run: npm run seed
 
-      - run: npx playwright test
+      # Retries stay on so a genuine one-off does not fail the branch, but a
+      # test that only passes on its second attempt is a finding, not a pass —
+      # this is what stops the suite going quietly green on flake.
+      - run: npx playwright test --fail-on-flaky-tests
 
       - name: Upload the Playwright report
         if: failure()
