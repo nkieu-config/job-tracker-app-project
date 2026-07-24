@@ -60,6 +60,9 @@ const FEATURES = [
   },
 ];
 
+const BOARD_SIZES =
+  "(min-width: 1232px) 1152px, (min-width: 768px) calc(100vw - 80px), calc(100vw - 32px)";
+
 // Countable claims, so CI checks them: the drift guard in .github/workflows/ci.yml
 // reads these values and fails the build when they stop matching the suites.
 const STATS = [
@@ -134,7 +137,16 @@ export default function Home() {
                   View source
                 </a>
               </div>
-              <p className="mt-6 font-sans text-caption text-ink-mute">
+              <p className="mt-5 font-sans text-body text-ink-mute">
+                Already have an account?{" "}
+                <Link
+                  href="/sign-in"
+                  className="font-bold text-link-blue transition-colors hover:text-link-hover hover:underline"
+                >
+                  Sign in
+                </Link>
+              </p>
+              <p className="mt-4 font-sans text-caption text-ink-mute">
                 No signup for the demo · every AI feature is measured, not
                 assumed · open source
               </p>
@@ -192,7 +204,7 @@ export default function Home() {
               </p>
             </Reveal>
             <Reveal delay={80} className="mt-10">
-              <div className="overflow-hidden rounded-2xl border border-hairline bg-canvas shadow-[0_20px_60px_rgba(74,21,75,0.10)]">
+              <div className="overflow-hidden rounded-2xl border border-hairline bg-canvas shadow-panel">
                 <div className="flex h-9 items-center gap-1.5 border-b border-hairline px-4">
                   <span className="size-2.5 rounded-full bg-hairline" />
                   <span className="size-2.5 rounded-full bg-hairline" />
@@ -203,6 +215,7 @@ export default function Home() {
                   alt="The Applywise board, with roles grouped into Saved, Applied, Interview and Offer columns"
                   width={2560}
                   height={1600}
+                  sizes={BOARD_SIZES}
                   className="block h-auto w-full dark:hidden"
                 />
                 <Image
@@ -211,6 +224,7 @@ export default function Home() {
                   aria-hidden="true"
                   width={2560}
                   height={1600}
+                  sizes={BOARD_SIZES}
                   className="hidden h-auto w-full dark:block"
                 />
               </div>
@@ -239,12 +253,15 @@ export default function Home() {
                   in mono. */}
               <dl className="flex flex-wrap gap-x-10 gap-y-6">
                 {STATS.map((stat) => (
-                  <div key={stat.label} className="max-w-32">
-                    <dt className="font-display-md font-mono tabular-nums leading-none text-primary-ink sm:font-display-lg">
-                      {stat.value}
-                    </dt>
-                    <dd className="mt-2 font-sans text-caption leading-snug text-ink-mute">
+                  <div
+                    key={stat.label}
+                    className="flex max-w-32 flex-col-reverse"
+                  >
+                    <dt className="mt-2 font-sans text-caption leading-snug text-ink-mute">
                       {stat.label}
+                    </dt>
+                    <dd className="font-display-md font-mono tabular-nums leading-none text-primary-ink sm:font-display-lg">
+                      {stat.value}
                     </dd>
                   </div>
                 ))}
@@ -302,7 +319,11 @@ export default function Home() {
 
 function FitPanel() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-hairline bg-canvas shadow-[0_24px_70px_rgba(74,21,75,0.14)]">
+    <div
+      role="group"
+      aria-label="Example: résumé fit scores for one job posting"
+      className="overflow-hidden rounded-2xl border border-hairline bg-canvas shadow-panel-lg"
+    >
       <div className="flex items-center justify-between border-b border-hairline px-4 py-2.5">
         <span className="font-mono text-fine text-ink-mute">resume-fit</span>
         <span className="flex items-center gap-1.5 font-sans text-fine text-ink-mute">
@@ -312,9 +333,9 @@ function FitPanel() {
       </div>
       <div className="flex flex-col gap-3 p-5">
         <div className="flex items-baseline justify-between gap-2">
-          <h3 className="font-sans text-fine font-medium uppercase tracking-wide text-ink-mute">
+          <p className="font-sans text-fine font-medium uppercase tracking-wide text-ink-mute">
             Résumé fit
-          </h3>
+          </p>
           <span className="font-mono text-fine text-ink-mute">
             Senior Backend Engineer
           </span>
