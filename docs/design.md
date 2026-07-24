@@ -173,16 +173,30 @@ given room to be one. The application detail page separates sections with
 
 Border first, surface step second, shadow only when something genuinely floats.
 
-| Level | Treatment | Use |
-| --- | --- | --- |
-| 0 | Flat on `canvas-lavender` | The page |
-| 1 | `border-hairline` + `bg-canvas` | Cards, rows, panels — the default |
-| 2 | Soft aubergine shadow | The landing's product panel and fit console |
-| 3 | Stronger shadow | Drag overlay, dialogs — actually lifted |
+| Level | Treatment | Token | Use |
+| --- | --- | --- | --- |
+| 0 | Flat on `canvas-lavender` | — | The page |
+| 1 | `border-hairline` + `bg-canvas` | — | Cards, rows, panels — the default |
+| 2 | Soft cast shadow | `shadow-panel` | The landing's board frame |
+| 3 | Stronger cast shadow | `shadow-panel-lg` | The landing's fit console |
+| 4 | Lifted | *(literal, not yet tokenized)* | Drag overlay, dialogs |
 
 In dark mode the border does less work and the surface step does more: the page
 is darker than the card, so cards read as raised even where a hairline is nearly
 invisible.
+
+**The shadow changes hue between themes, and the tokens are why.** In light mode
+it is aubergine at low alpha, so the cast reads as tinted by the brand rather
+than as grey dirt. Carried into dark mode unchanged, that same aubergine sits on
+a near-black page as a faint purple halo — light where a shadow should be dark.
+So `--elevation-panel` swaps to black at a much higher alpha in dark: on a
+`#141017` page only black is actually darker than the surface it falls on.
+
+Levels 2 and 3 are tokenized. Level 4 is still three hand-written
+`shadow-[0_…_rgba(74,21,75,…)]` literals in `confirm-dialog.tsx`, `board.tsx`
+and `resumes/page.tsx` — each a different guess, none theme-aware. They move to
+tokens when those screens are audited; until then this table is describing an
+intent the code only half keeps.
 
 ## Shape
 

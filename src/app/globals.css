@@ -65,6 +65,9 @@
   --semantic-success-tint: #e2f1ea;
   --semantic-warning: #8a6500;
   --semantic-warning-tint: #fcf2db;
+
+  --elevation-panel: 0 20px 60px rgb(74 21 75 / 0.10);
+  --elevation-panel-lg: 0 24px 70px rgb(74 21 75 / 0.14);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -105,6 +108,9 @@
     --semantic-success-tint: #17302a;
     --semantic-warning: #e6b23c;
     --semantic-warning-tint: #342a17;
+
+    --elevation-panel: 0 20px 60px rgb(0 0 0 / 0.5);
+    --elevation-panel-lg: 0 24px 70px rgb(0 0 0 / 0.6);
   }
 }
 
@@ -145,6 +151,9 @@
   --semantic-success-tint: #17302a;
   --semantic-warning: #e6b23c;
   --semantic-warning-tint: #342a17;
+
+  --elevation-panel: 0 20px 60px rgb(0 0 0 / 0.5);
+  --elevation-panel-lg: 0 24px 70px rgb(0 0 0 / 0.6);
 }
 
 @theme inline {
@@ -193,6 +202,9 @@
 
   --color-canvas-lavender-hover: var(--canvas-lavender-hover);
   --color-surface-hover: var(--surface-hover);
+
+  --shadow-panel: var(--elevation-panel);
+  --shadow-panel-lg: var(--elevation-panel-lg);
 
   /* Radius scale — tightened, aubergine-console feel; no 90px pills */
   --radius-sm: 4px;

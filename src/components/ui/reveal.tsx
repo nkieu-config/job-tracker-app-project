@@ -18,6 +18,7 @@ export function Reveal({
     const el = ref.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (el.getBoundingClientRect().top < window.innerHeight) return;
 
     el.setAttribute("data-reveal", "hidden");
     const observer = new IntersectionObserver(
