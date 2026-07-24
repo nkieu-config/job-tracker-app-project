@@ -32,7 +32,7 @@ export default async function DashboardLayout({
             <LogoMark size="md" />
             <span
               translate="no"
-              className="font-display-sm tracking-tight text-primary"
+              className="font-display-sm tracking-tight text-primary-ink"
             >
               Applywise
             </span>

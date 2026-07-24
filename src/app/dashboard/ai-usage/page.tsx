@@ -51,7 +51,7 @@ function Tile({
   return (
     <Card className="p-6 shadow-sm">
       <p className="text-caption font-sans font-medium text-ink-mute">{label}</p>
-      <p className="mt-2 font-display-md font-mono tabular-nums text-primary">
+      <p className="mt-2 font-display-md font-mono tabular-nums text-primary-ink">
         {value}
       </p>
       <p className="mt-1 text-caption font-sans text-ink-mute">{hint}</p>
@@ -104,7 +104,7 @@ export default async function AiUsagePage() {
     <div className="flex flex-col gap-8">
       <div>
         <h1 className="flex items-center gap-2 font-display-md tracking-tight text-ink">
-          <Activity size={26} className="text-primary" aria-hidden="true" />
+          <Activity size={26} className="text-primary-ink" aria-hidden="true" />
           AI usage
         </h1>
         <p className="mt-2 font-sans text-body-lg text-ink-mute">
@@ -115,7 +115,7 @@ export default async function AiUsagePage() {
 
       {stats.totalCalls === 0 ? (
         <EmptyState
-          icon={<Sparkles size={24} className="text-primary" aria-hidden="true" />}
+          icon={<Sparkles size={24} className="text-primary-ink" aria-hidden="true" />}
           title="No AI calls recorded yet"
           className="p-12 shadow-sm"
         >

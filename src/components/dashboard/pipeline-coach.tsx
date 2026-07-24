@@ -107,7 +107,7 @@ export function PipelineCoach({
                 <li key={i} className="flex gap-3">
                   <span
                     aria-hidden="true"
-                    className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-canvas-lavender font-mono text-fine font-bold text-primary"
+                    className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-canvas-lavender font-mono text-fine font-bold text-primary-ink"
                   >
                     {i + 1}
                   </span>

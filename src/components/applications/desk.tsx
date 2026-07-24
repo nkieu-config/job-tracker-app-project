@@ -81,7 +81,7 @@ export function Desk({
                 className={cn(
                   "-mb-px border-b-2 px-3 py-2 font-sans text-body font-semibold transition-colors",
                   selected
-                    ? "border-primary text-ink"
+                    ? "border-primary-ink text-ink"
                     : "border-transparent text-ink-mute hover:text-ink",
                 )}
               >

@@ -101,7 +101,7 @@ export function ActivityChart({ weeks }: { weeks: WeeklyActivity[] }) {
           <button
             key={week.weekStart}
             type="button"
-            className="flex-1 cursor-default rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+            className="flex-1 cursor-default rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-primary-ink/60"
             aria-label={`Week of ${week.label}: ${week.total} application${week.total === 1 ? "" : "s"}`}
             onMouseEnter={() => setActive(i)}
             onMouseLeave={() => setActive(null)}

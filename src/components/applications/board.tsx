@@ -76,7 +76,7 @@ function BoardCard({ app, dragging }: { app: BoardApplication; dragging: boolean
         href={`/dashboard/applications/${app.id}`}
         draggable={false}
         tabIndex={dragging ? -1 : 0}
-        className="block rounded-xl border border-hairline bg-canvas py-2.5 pl-3 pr-9 transition-colors hover:border-primary"
+        className="block rounded-xl border border-hairline bg-canvas py-2.5 pl-3 pr-9 transition-colors hover:border-primary-ink"
       >
         <CardContent app={app} />
       </Link>
@@ -229,7 +229,7 @@ function RejectedStrip({
             <Link
               key={app.id}
               href={`/dashboard/applications/${app.id}`}
-              className="w-full shrink-0 rounded-lg border border-hairline bg-canvas px-3 py-1.5 transition-colors hover:border-primary lg:w-40"
+              className="w-full shrink-0 rounded-lg border border-hairline bg-canvas px-3 py-1.5 transition-colors hover:border-primary-ink lg:w-40"
             >
               <p className="truncate font-sans text-fine font-medium text-ink">
                 {app.role}
@@ -372,7 +372,7 @@ export function ApplicationsBoard({
       </div>
       <DragOverlay>
         {activeApp && (
-          <div className="w-60 rounded-xl border border-primary bg-canvas py-2.5 pl-3 pr-9 shadow-[0_10px_30px_rgba(74,21,75,0.2)]">
+          <div className="w-60 rounded-xl border border-primary-ink bg-canvas py-2.5 pl-3 pr-9 shadow-[0_10px_30px_rgba(74,21,75,0.2)]">
             <CardContent app={activeApp} />
           </div>
         )}

@@ -113,7 +113,7 @@ export default function Home() {
             <div className="flex flex-col items-start">
               <h1 className="font-display-lg text-balance text-ink">
                 Track every application. Send the résumé that{" "}
-                <span className="text-primary">fits</span>.
+                <span className="text-primary-ink">fits</span>.
               </h1>
               <p className="mt-6 max-w-xl font-sans text-title leading-relaxed text-ink-mute">
                 A job-application tracker with AI built in. Paste a job
@@ -162,7 +162,7 @@ export default function Home() {
               {FEATURES.map((feature, i) => (
                 <Reveal key={feature.title} delay={i * 70}>
                   <div className="flex gap-4">
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary-ink">
                       <feature.icon size={18} aria-hidden="true" />
                     </span>
                     <div>
@@ -240,7 +240,7 @@ export default function Home() {
               <dl className="flex flex-wrap gap-x-10 gap-y-6">
                 {STATS.map((stat) => (
                   <div key={stat.label} className="max-w-32">
-                    <dt className="font-display-md font-mono tabular-nums leading-none text-primary sm:font-display-lg">
+                    <dt className="font-display-md font-mono tabular-nums leading-none text-primary-ink sm:font-display-lg">
                       {stat.value}
                     </dt>
                     <dd className="mt-2 font-sans text-caption leading-snug text-ink-mute">
@@ -306,7 +306,7 @@ function FitPanel() {
       <div className="flex items-center justify-between border-b border-hairline px-4 py-2.5">
         <span className="font-mono text-fine text-ink-mute">resume-fit</span>
         <span className="flex items-center gap-1.5 font-sans text-fine text-ink-mute">
-          <Sparkles size={12} className="text-primary" aria-hidden="true" />
+          <Sparkles size={12} className="text-primary-ink" aria-hidden="true" />
           pgvector · cosine
         </span>
       </div>

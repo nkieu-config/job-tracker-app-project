@@ -31,7 +31,7 @@ export function PrepSheetView({ sheet }: { sheet: PrepSheet }) {
                 {q.answerKey ? (
                   <details className="group rounded-lg border border-hairline bg-canvas px-3 py-2">
                     <summary className="cursor-pointer list-none font-serif text-body leading-relaxed text-ink marker:content-none">
-                      <span className="mr-1.5 font-mono text-fine text-ink-mute group-open:text-primary">
+                      <span className="mr-1.5 font-mono text-fine text-ink-mute group-open:text-primary-ink">
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       {q.question}

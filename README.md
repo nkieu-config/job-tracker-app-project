@@ -174,7 +174,7 @@ Full environment-variable reference, scripts and deploy guide: [docs/setup.md](d
 
 ## Testing & quality
 
-425 tests across two Vitest projects, plus three Playwright suites (19 browser tests including the sign-in setup) — every one of them gating each push and pull request:
+425 tests across two Vitest projects, plus three Playwright suites (27 browser tests including the sign-in setup) — every one of them gating each push and pull request:
 
 - **Node (server)** — ownership scoping of every Server Action, the JD-analysis cache short-circuit, the pipeline-snapshot aggregation, the resume upload's blob lifecycle including compensating deletes, the page cap that stops a PDF bomb from pinning the function, rate limiting for both AI and auth, embedding batch splitting, and the fence that keeps a job description from being read as prompt instructions.
 - **jsdom (components)** — the streaming UI's save/discard rules and the accessibility invariants of the drag-and-drop board.

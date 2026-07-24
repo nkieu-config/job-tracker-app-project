@@ -21,6 +21,14 @@
   --primary-press: #611f69;
   --on-primary: #ffffff;
 
+  /* The accent as *ink* — drawn on a canvas rather than filled behind white
+     text. The two roles cannot share a value in dark mode: a fill needs to stay
+     dark enough to carry white type, and ink needs to be light enough to be
+     read against the page. In light mode they happen to agree, so this is the
+     same aubergine; in dark it lifts. Anything set in the accent colour — text,
+     icons, a selected-tab underline, a focus ring — uses this. */
+  --primary-ink: #4a154b;
+
   /* The brand aubergine as a *surface*, deliberately not theme-swapped. As an
      accent `--primary` lightens in dark mode so it can carry text and borders
      on a dark page; as a full-bleed band that same lightening would put a
@@ -68,6 +76,7 @@
 
     --primary: #8a4d93;
     --primary-press: #9a5aa3;
+    --primary-ink: #bd8ac4;
     --on-primary: #ffffff;
 
     --ink: #e8e5ee;
@@ -107,6 +116,7 @@
 
   --primary: #8a4d93;
   --primary-press: #9a5aa3;
+  --primary-ink: #bd8ac4;
   --on-primary: #ffffff;
 
   --ink: #e8e5ee;
@@ -148,6 +158,7 @@
   /* Slacc Colors */
   --color-primary: var(--primary);
   --color-primary-press: var(--primary-press);
+  --color-primary-ink: var(--primary-ink);
   --color-on-primary: var(--on-primary);
 
   --color-surface-brand: var(--surface-brand);
