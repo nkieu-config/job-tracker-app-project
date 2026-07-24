@@ -32,7 +32,9 @@ dark mode, a real surface step.
 
 ### Key characteristics
 
-- **One aubergine accent** — filled buttons, wordmark, active nav. Blue
+- **One aubergine accent, in two roles** — as a fill behind white text (buttons,
+  active nav) and as ink on the page (wordmark, accent text, icons). The roles
+  are separate tokens because in dark mode they cannot share a value. Blue
   (`--color-link-blue`) is the only other chromatic note in body type, reserved
   for inline links.
 - **Marker and pen are the AI's voice** — `--color-marker` highlights what the
@@ -56,7 +58,9 @@ properties the dark palette redefines. See
 
 | Group | Tokens | Role |
 | --- | --- | --- |
-| Brand | `primary`, `primary-press`, `on-primary` | Filled buttons, wordmark, active nav, accent text |
+| Brand — fill | `primary`, `primary-press`, `on-primary` | Filled buttons, active nav, bar fills — anywhere the accent is a surface under white text |
+| Brand — ink | `primary-ink` | The accent *drawn on* the page: wordmark, accent text, icons, the selected-tab underline, the outline button's border, the input focus ring |
+| Brand — band | `surface-brand`, `on-surface-brand`, `on-surface-brand-mute` | The landing's closing band. Fixed aubergine, never theme-swapped |
 | AI | `marker`, `marker-ink`, `pen` | The only marks the model may make on a document: highlight for a match, underline for a gap |
 | Link | `link-blue`, `link-hover` | Inline links — the only non-aubergine body colour |
 | Surface | `canvas`, `canvas-lavender`, `canvas-lavender-hover`, `surface-hover` | `canvas` is the card; `canvas-lavender` is the page beneath it |
@@ -66,9 +70,19 @@ properties the dark palette redefines. See
 
 Two values worth knowing the reasoning for:
 
-- **The dark primary is lightened.** It has to clear 4.5:1 under white button
-  text *and* stay legible as accent text on a near-black page — one token, two
-  jobs.
+- **The accent is two tokens, because it cannot be one.** In dark mode a fill
+  has to stay dark enough to carry white button text (white on `--primary`
+  measures 5.9:1) while ink has to be light enough to read against the page.
+  Those pull opposite ways: every value light enough to pass as text drops
+  white-on-it below 3.8:1. `--primary` keeps the fills; `--primary-ink` lifts to
+  a lighter mauve in dark and clears 4.5:1 on **every** dark surface in the
+  palette, including the lightest. In light mode the two are the same aubergine.
+  This was found the hard way — every screen in the app failed contrast in dark
+  mode while `--primary` was doing both jobs.
+- **`surface-brand` is not `primary`.** The closing band needs an aubergine that
+  is dark enough for white type in *both* themes, so it is fixed rather than
+  swapped — `primary`'s dark-mode lightening would put a glowing slab in the
+  middle of a dark page.
 - **The light warning is a dark amber, not a bright one.** It appears as 12–13px
   text, and badge text is never "large text" under WCAG.
 
@@ -150,9 +164,10 @@ value is data. Pair `tabular-nums` with mono wherever values stack in a column.
 ## Layout & spacing
 
 Tailwind's default 4px scale; the app defines no spacing tokens. Cards are `p-8`
-(compact ones `p-6`). The landing bands run `py-16 md:py-24`. The application
-detail page separates sections with `divide-y divide-hairline` rather than
-wrapping each in a card.
+(compact ones `p-6`). The landing bands run `py-16 md:py-24`, except the closing
+aubergine band at `py-20 md:py-28` — it is the page's last statement and is
+given room to be one. The application detail page separates sections with
+`divide-y divide-hairline` rather than wrapping each in a card.
 
 ## Elevation & depth
 
@@ -204,7 +219,7 @@ only place its thing is styled. Classes are not reproduced here — read the fil
 
 | Primitive | What it is |
 | --- | --- |
-| [`button.tsx`](../src/components/ui/button.tsx) | `rounded-lg`, six variants (primary / secondary / outline / ghost / danger / danger-solid), three sizes. `md` and `lg` land at ~42px and ~52px tall |
+| [`button.tsx`](../src/components/ui/button.tsx) | `rounded-lg`, eight variants (primary / secondary / outline / on-brand / outline-on-brand / ghost / danger / danger-solid), three sizes. `md` and `lg` land at ~42px and ~52px tall. The two `*-on-brand` variants exist only for the closing band, where `primary` would vanish into the surface and `ghost` would float on it |
 | [`card.tsx`](../src/components/ui/card.tsx) | `rounded-2xl` + hairline; padding passed by the caller |
 | [`empty-state.tsx`](../src/components/ui/empty-state.tsx) | The same shape, dashed, with icon / title / body / CTA slots |
 | [`form-styles.ts`](../src/components/ui/form-styles.ts) | `inputClass` + `labelClass`. Every form imports both — a field styled by hand is a bug |
@@ -270,8 +285,9 @@ parameter.
 
 ## Do's and Don'ts
 
-**Do** — reserve aubergine for filled buttons, the wordmark and active nav (one
-filled aubergine button per viewport) · reserve `marker`/`pen` for marks the
+**Do** — reserve aubergine for filled buttons and active nav (one filled
+aubergine button per viewport) · reach for `primary-ink` whenever the accent is
+drawn on the page rather than filled behind white text · reserve `marker`/`pen` for marks the
 model made · set document text in `font-serif` · set computed values in `font-mono` with
 `tabular-nums` · set headlines with a `font-display-*` utility · import the
 primitives rather than restyling · take pipeline colours from `STATUS_COLORS` ·
@@ -293,7 +309,7 @@ choices, not drift:
 | --- | --- |
 | **The 90px pill was removed entirely** | A marketing page has a handful of CTAs; this app has buttons, chips, segments and toggles on every screen. At that density uniform pills stop reading as emphasis and start reading as a default — nothing has a stance. 7px lets shape carry role again. |
 | **A mono tier was added** | A tracker is mostly numbers. One family gives the reader no way to tell a computed value from a written one; mono is the cheapest possible signal. |
-| **The pastel-mesh gradient was dropped** | It carried depth for a page with almost nothing on it. Behind a real board it fought the cards, and it has no honest dark-mode analogue. |
+| **The pastel-mesh gradient was dropped** | Behind a real board it fought the cards. The original note here also claimed it had no honest dark-mode analogue — that turned out to be wrong, and a low-opacity translation of the same stops reads well on a dark page. The reason it stays out is the one found when that was tested: **a gradient behind text defeats axe's contrast check**. Measured on the landing hero, adding it took the page from 2 reported violations to 0 — and 17 elements, including the `<h1>`, the body copy and both buttons, to *"background could not be determined"*. The gate would have gone **greener** while checking less, which is the failure nobody notices. If this is ever revisited, the depth has to come from something axe can resolve — a solid tint, or the shadow the product panel already uses. |
 | **Neutrals were biased toward the accent** | Pure greys made the aubergine look pasted on. |
 | **Status pills became dots** | Fine on a marketing card, unreadable on a 12-row table. |
 | **A categorical status palette** breaks the "never add a third accent" rule | Five stages must be *distinguishable*, not *branded*. Ranking them by how aubergine they are would encode a meaning the data doesn't have. Confined to `STATUS_COLORS`, so it can't leak into brand surfaces. |
@@ -309,9 +325,23 @@ pastel-mesh gradient and the display-typography rules came from there, with
 
 It has since been rebuilt. The marketing language was doing what it was designed
 to do — sell on a page with three CTAs and a lot of air — and that is the wrong
-job for a board, a table, and a detail page with six sections. What survived is
-the aubergine and the display tier's tight tracking. What replaced the rest is
-documented above.
+job for a board, a table, and a detail page with six sections. What replaced it
+is documented above.
+
+What survived, and where:
+
+| From the study | Where it lives now |
+| --- | --- |
+| The aubergine, its pressed state, the link blue, the success green | `--primary`, `--primary-press`, `--link-blue`, `--semantic-success` |
+| Tight negative tracking on display type | `font-display-*` utilities |
+| The closing aubergine band, and its muted mauve for secondary type on it | `--surface-brand`, `--on-surface-brand-mute`, the landing footer |
+| Statistics carried by scale alone | The landing's stat row, set at the display tier |
+
+Everything else — the 90px pill, the radius scale, the seven-tier display scale,
+the two proprietary typefaces, the cream canvas, the pastel-mesh gradient, the
+status pills — was replaced or dropped for the reasons in the table above. The
+study itself is not vendored here; it was a starting point, not a dependency,
+and this document is the system of record.
 
 ## Related docs
 
