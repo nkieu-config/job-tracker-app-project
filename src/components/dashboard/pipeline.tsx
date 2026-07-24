@@ -61,7 +61,7 @@ function StageCard({
     <Link
       href={stageHref(status)}
       style={{ animationDelay: `${index * 70}ms` }}
-      className="animate-rise flex flex-1 flex-col gap-2.5 rounded-xl border border-hairline bg-canvas p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md md:min-w-0"
+      className="animate-rise flex flex-1 flex-col gap-2.5 rounded-xl border border-hairline bg-canvas p-4 shadow-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md md:min-w-0"
     >
       <div className="flex items-center gap-2">
         <span className={`h-2 w-2 rounded-full ${color.dot}`} />

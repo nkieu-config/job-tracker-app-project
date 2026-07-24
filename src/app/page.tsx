@@ -60,10 +60,12 @@ const FEATURES = [
   },
 ];
 
+// Countable claims, so CI checks them: the drift guard in .github/workflows/ci.yml
+// reads these values and fails the build when they stop matching the suites.
 const STATS = [
   { value: "6", label: "AI features" },
-  { value: "300+", label: "automated tests" },
-  { value: "5", label: "AI eval suites" },
+  { value: "425", label: "automated tests" },
+  { value: "6", label: "AI eval suites" },
 ];
 
 export default function Home() {
@@ -73,7 +75,10 @@ export default function Home() {
       <header className="relative z-10 flex items-center justify-between border-b border-hairline px-4 py-3 md:px-10">
         <div className="flex shrink-0 items-center gap-2">
           <LogoMark size="sm" />
-          <span className="font-sans text-body-lg font-semibold tracking-tight text-ink">
+          <span
+            translate="no"
+            className="font-sans text-body-lg font-semibold tracking-tight text-ink"
+          >
             Applywise
           </span>
         </div>
@@ -263,7 +268,7 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-col justify-between gap-3 border-t border-hairline pt-6 font-sans text-caption text-ink-mute sm:flex-row">
-            <p>© 2026 Applywise</p>
+            <p translate="no">© 2026 Applywise</p>
             <a
               href="https://github.com/nkieu-config/applywise-job-tracker"
               target="_blank"

@@ -30,7 +30,10 @@ export default async function DashboardLayout({
         <div className="flex flex-col gap-8">
           <Link href="/dashboard" className="flex items-center gap-2 px-2">
             <LogoMark size="md" />
-            <span className="font-display-sm tracking-tight text-primary">
+            <span
+              translate="no"
+              className="font-display-sm tracking-tight text-primary"
+            >
               Applywise
             </span>
           </Link>
@@ -56,7 +59,10 @@ export default async function DashboardLayout({
         <header className="flex items-center justify-between gap-3 border-b border-hairline bg-canvas px-4 py-3 lg:hidden">
           <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
             <LogoMark size="md" />
-            <span className="font-sans text-body-lg font-semibold tracking-tight text-ink">
+            <span
+              translate="no"
+              className="font-sans text-body-lg font-semibold tracking-tight text-ink"
+            >
               Applywise
             </span>
           </Link>

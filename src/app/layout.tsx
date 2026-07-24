@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Literata } from "next/font/google";
@@ -21,6 +21,17 @@ const literata = Literata({
 
 const SOCIAL_DESCRIPTION =
   "Paste a job posting and watch it get marked up against your resume — matched skills highlighted, gaps underlined, interview questions drilled.";
+
+// Matches `--background` in globals.css, per theme, so a mobile browser's
+// chrome continues the page instead of drawing a seam above it. This is the
+// page colour, not the brand colour — the manifest keeps the aubergine for the
+// installed-app splash, which is a different surface.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#141017" },
+  ],
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

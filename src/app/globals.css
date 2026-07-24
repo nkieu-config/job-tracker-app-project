@@ -235,6 +235,28 @@ body {
   letter-spacing: -0.192px;
 }
 
+/* Mobile browsers hold every tap for ~300ms waiting to see whether it is the
+   first half of a double-tap-to-zoom. Nothing here zooms on double-tap, so the
+   wait buys nothing and costs the whole app a sluggish feel on touch. Zoom
+   itself is untouched — pinch still works, which is why this is not
+   `user-scalable=no`. */
+button,
+a,
+label,
+select,
+summary,
+[role="button"],
+[role="tab"] {
+  touch-action: manipulation;
+}
+
+/* Scrolling to the end of a dialog's own list should stop there, not hand the
+   remaining momentum to the page behind it. */
+[role="dialog"],
+[data-scroll-lock] {
+  overscroll-behavior: contain;
+}
+
 .reveal {
   transition:
     opacity 0.6s ease,

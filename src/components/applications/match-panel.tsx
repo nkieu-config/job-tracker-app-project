@@ -13,6 +13,10 @@ export type FitRow = { id: string; label: string; score: number };
 function SkillMark({ skill, matched }: { skill: string; matched: boolean }) {
   return (
     <li
+      // A skill name is a proper noun for a technology. Browser auto-translate
+      // will happily turn "Kubernetes" into something else and make the mark
+      // point at a requirement the posting never wrote.
+      translate="no"
       className={
         matched
           ? "rounded-sm bg-marker px-1.5 py-0.5 font-sans text-caption font-medium text-marker-ink"
