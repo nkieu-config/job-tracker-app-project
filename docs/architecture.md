@@ -315,8 +315,14 @@ Known, deliberate limits — recorded so they read as decisions rather than over
 
 ## Open questions
 
-- **The tailoring eval is still a 3-of-6 sample.** Completing it needs a paid
-  Gemini key or another day's free-tier quota.
+- **Whether bullet tailoring still needs its own model.** Tailoring runs on
+  `gemini-3.5-flash` while everything else runs on `gemini-3.5-flash-lite`,
+  because the *3.1* lite model grounded it at 3.83/5 and fabricated specifics in
+  half its outputs. The full n=6 re-capture confirms the exception works —
+  grounding 4.83/5, zero hallucinations — but not that it is still necessary now
+  that the lite model is a generation newer. Pointing `TAILORING_MODEL` at the
+  lite model and re-running the suite is what would answer it, and would retire
+  a per-feature exception if the answer is no.
 - **The action layer has two return conventions and one workflow gap.** Actions
   consumed by `useActionState` return a named `*State`; those called imperatively
   return `{ error?: string }`. Both are deliberate, but the workflow layer is

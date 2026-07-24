@@ -94,17 +94,23 @@ makes a full same-day capture affordable.
 | **jd-analysis** | skill extraction P/R/F1 · seniority accuracy · schema-valid rate (n=15) | Captured | F1 **90.4%** (P 89.8% / R 97.8%), seniority accuracy **93.3%**, schema-valid **100%** |
 | **coach** | LLM-judge relevance / grounding / actionability (1–5) · focus-skill grounding · hallucination rate (n=5) | Captured | **5 / 5 / 4.6**, focus grounded **100%**, hallucination rate **0%** |
 | **autofill** | company / role / deadline extraction accuracy · schema-valid rate (n=6) | Captured | company / role / deadline **100% / 100% / 100%**, schema-valid **100%** |
-| **tailoring** | LLM-as-judge relevance / grounding / formatting (1–5) · hallucination rate (n=6) | Re-capturing | flash-lite grounded only 3.83/5 → moved to `gemini-3.5-flash` + a grounding-tightened prompt; fresh numbers pending |
+| **tailoring** | LLM-as-judge relevance / grounding / formatting (1–5) · hallucination rate (n=6) | Captured | **4.83 / 4.83 / 5**, hallucination rate **0%** — up from grounding 3.83 and a 50% hallucination rate on `gemini-3.1-flash-lite` |
 | **interview** | LLM-judge relevance / grounding / actionability (1–5) · structural validity · answer-key coverage · hallucination rate (n=5) | Captured | **5 / 5 / 5**, structure valid **100%**, answer-key coverage **100%**, hallucination rate **0%** |
 
 > [!NOTE]
-> The eval doing its job: it caught that the then-current `gemini-3.1-flash-lite`,
-> fine for the extraction suites, grounded bullet tailoring below the gate
-> (fabricating qualifiers like "high-throughput"). Tailoring alone was routed to
-> the stronger `gemini-3.5-flash` and its prompt tightened — a model choice made
-> by measurement, not assumption. Whether the split is still needed now that
-> generation runs on `gemini-3.5-flash-lite` is unmeasured, and re-running the
-> tailoring suite is what would answer it.
+> The eval doing its job, then closing the loop: it caught that the then-current
+> `gemini-3.1-flash-lite`, fine for the extraction suites, grounded bullet
+> tailoring below the gate — 3.83/5, fabricating qualifiers like
+> "high-throughput" in half its outputs. Tailoring alone was routed to the
+> stronger `gemini-3.5-flash` and its prompt tightened to bar unsupported
+> qualifiers. The re-capture confirms the fix rather than assuming it:
+> **grounding 3.83 → 4.83, hallucination rate 50% → 0%**, across the full n=6.
+> A model choice made by measurement, and verified the same way.
+>
+> What is still unmeasured is whether the split is needed *now* that generation
+> runs on `gemini-3.5-flash-lite` rather than the 3.1 lite that failed. Pointing
+> `TAILORING_MODEL` at the lite model and re-running this suite is the one
+> experiment that would retire the exception — worth doing, and cheap.
 
 > [!NOTE]
 > The interview suite forced a metric fix, not a model fix. The first run scored
