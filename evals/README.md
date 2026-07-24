@@ -119,7 +119,7 @@ makes a full same-day capture affordable.
 > something changes.
 
 > [!IMPORTANT]
-> The Gemini free tier meters per model. `gemini-3.5-flash-lite` allows **500 requests/day**, which is what makes running the whole harness in one sitting realistic; the judge models are far tighter (`gemini-3.6-flash` is 20/day). The judged suites
+> The Gemini free tier meters per model. `gemini-3.5-flash-lite` allows **500 requests/day**, which is what makes running the whole harness in one sitting realistic; the judge models are far tighter (`gemini-3.5-flash` is 20/day). The judged suites
 > also need `EVAL_JUDGE_MODEL` pointed at a served model (e.g. `gemini-3.5-flash`)
 > since `gemini-2.5-pro` is no longer free; `skill-match` runs on the separate
 > embeddings quota. Excluded items

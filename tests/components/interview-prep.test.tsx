@@ -31,8 +31,19 @@ function respondWithPrep(text: string, end: StreamEnd) {
 
 function generate() {
   render(<InterviewPrep id="app-1" />);
-  fireEvent.click(screen.getByRole("button", { name: /generate prep sheet/i }));
+  fireEvent.click(screen.getByRole("button", { name: /draft my prep sheet/i }));
 }
+
+const SHEET = [
+  "Technical questions",
+  "- How would you scale this API?",
+  "  Strong answers cover: caching and pagination.",
+  "- How do you migrate a live schema?",
+  "  Strong answers cover: backwards-compatible steps.",
+  "",
+  "Questions to ask the interviewer",
+  "- What does on-call look like?",
+].join("\n");
 
 beforeEach(() => {
   saveInterviewPrep.mockReset().mockResolvedValue({ error: null });
@@ -99,5 +110,48 @@ describe("InterviewPrep", () => {
         /failed to generate interview prep/i,
       ),
     );
+  });
+
+  // A sheet that shows the answer beside the question is something to read; the
+  // point of the panel is that you try first.
+  it("keeps each answer key collapsed until the reader opens it", async () => {
+    respondWithPrep(SHEET, { ok: true });
+    generate();
+
+    await waitFor(() =>
+      expect(screen.getByText(/how would you scale this api/i)).toBeVisible(),
+    );
+    expect(screen.getByText(/caching and pagination/i)).not.toBeVisible();
+
+    fireEvent.click(screen.getByText(/how would you scale this api/i));
+    expect(screen.getByText(/caching and pagination/i)).toBeVisible();
+  });
+
+  it("offers a drill over the questions you answer, not the ones you ask", async () => {
+    respondWithPrep(SHEET, { ok: true });
+    generate();
+
+    const practise = await screen.findByRole("button", {
+      name: /practise 2 questions/i,
+    });
+    fireEvent.click(practise);
+
+    expect(screen.getByText(/how would you scale this api/i)).toBeVisible();
+    expect(screen.queryByText(/caching and pagination/i)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /show the answer/i }));
+    expect(screen.getByText(/caching and pagination/i)).toBeVisible();
+  });
+
+  it("shows output verbatim when the model ignored the section contract", async () => {
+    respondWithPrep("Some free-form thoughts about the role.", { ok: true });
+    generate();
+
+    await waitFor(() =>
+      expect(screen.getByText(/free-form thoughts/i)).toBeVisible(),
+    );
+    expect(
+      screen.queryByRole("button", { name: /practise/i }),
+    ).not.toBeInTheDocument();
   });
 });

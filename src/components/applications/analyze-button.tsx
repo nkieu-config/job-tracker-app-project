@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState, useEffect } from "react";
-import { Sparkles } from "lucide-react";
 import { analyzeApplication, type AnalyzeState } from "@/actions/applications";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
@@ -26,9 +25,7 @@ export function AnalyzeButton({
 
   return (
     <form action={formAction} className="flex flex-col gap-2">
-      <Button type="submit" disabled={pending}>
-        <Sparkles size={16} aria-hidden="true" />
-        {pending ? "Analyzing…" : label}
+      <Button type="submit" disabled={pending}>        {pending ? "Analyzing…" : label}
       </Button>
       {state.error && (
         <p

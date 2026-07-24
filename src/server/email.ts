@@ -4,7 +4,7 @@ import { Resend } from "resend";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const EMAIL_FROM =
-  process.env.EMAIL_FROM ?? "Job Tracker <onboarding@resend.dev>";
+  process.env.EMAIL_FROM ?? "Applywise <onboarding@resend.dev>";
 
 export type SendEmailInput = {
   to: string;

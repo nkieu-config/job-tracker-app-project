@@ -56,7 +56,11 @@ const inDays = (n: number) =>
 const directUrl = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
 if (!directUrl) throw new Error("DIRECT_URL or DATABASE_URL must be set");
 const url = new URL(directUrl);
-url.searchParams.set("sslmode", "require");
+// Neon needs TLS and does not always spell it out in the connection string, so
+// require it when the URL is silent — but never overrule an explicit choice.
+// That is what lets CI seed a plain, TLS-less Postgres container with
+// `?sslmode=disable` instead of failing to connect at all.
+if (!url.searchParams.has("sslmode")) url.searchParams.set("sslmode", "require");
 url.searchParams.set("uselibpqcompat", "true");
 const pool = new pg.Pool({ connectionString: url.toString() });
 const adapter = new PrismaPg(pool);

@@ -15,15 +15,21 @@ test.describe("signed in as the demo account", () => {
     await page.goto("/dashboard");
   });
 
-  test("the dashboard renders every section", async ({ page }) => {
-    await expect(
-      page.getByRole("heading", { level: 1, name: /Welcome/ }),
-    ).toBeVisible();
-    await expect(page.getByText("Response rate", { exact: true })).toBeVisible();
-    for (const heading of ["Pipeline", "Activity", "Coaching", "Upcoming deadlines"]) {
+  test("Today leads with what needs doing, then how the search is going", async ({
+    page,
+  }) => {
+    // The headline counts the agenda, so it reads either way round depending on
+    // the demo data — what matters is that the page is about today.
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(
+      /worth doing|Nothing is waiting/,
+    );
+
+    for (const heading of ["How the search is going", "Every deadline ahead"]) {
       await expect(sectionByHeading(page, heading)).toBeVisible();
     }
-    // The insights I added: a deterministic skill-gap card and the AI coach.
+    await expect(page.getByText("Response", { exact: true })).toBeVisible();
+
+    // A deterministic skill-gap card and the AI coach.
     await expect(
       page.getByRole("heading", { name: "Skills to focus on" }),
     ).toBeVisible();
@@ -31,7 +37,7 @@ test.describe("signed in as the demo account", () => {
   });
 
   test("a pipeline stage links through to the filtered list", async ({ page }) => {
-    const applied = sectionByHeading(page, "Pipeline")
+    const applied = sectionByHeading(page, "How the search is going")
       .getByRole("link")
       .filter({ hasText: /Applied/ })
       .first();
@@ -50,26 +56,44 @@ test.describe("signed in as the demo account", () => {
     await expect(page.getByLabel("Search applications")).toBeVisible();
   });
 
-  test("an application detail page shows the AI analysis sections", async ({ page }) => {
+  test("the desk shows the posting beside the AI panels", async ({ page }) => {
     await page.goto("/dashboard/applications");
     await page
       .getByRole("link", { name: /Senior Backend Engineer/ })
       .first()
       .click();
     await page.waitForURL(/\/dashboard\/applications\/[^/]+$/);
+
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Job posting" }),
+    ).toBeVisible();
+
+    // This seeded application is at the interview stage, so the desk opens on
+    // Prep: a prep sheet is what matters once someone has offered you a slot,
+    // and the skills breakdown is not.
+    await expect(page.getByRole("tab", { selected: true })).toHaveText("Prep");
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Skills analysis" }),
+    ).toBeHidden();
+
+    await page.getByRole("tab", { name: "Match" }).click();
     await expect(
       page.getByRole("heading", { level: 2, name: "Skills analysis" }),
     ).toBeVisible();
     await expect(
       page.getByRole("heading", { level: 2, name: "Resume fit" }),
     ).toBeVisible();
+
+    // A required skill the resume covers is highlighted in the posting itself.
+    await expect(page.locator("mark").first()).toBeVisible();
   });
 
-  test("the new-application form offers AI auto-fill", async ({ page }) => {
+  test("the new-application form leads with the posting", async ({ page }) => {
     await page.goto("/dashboard/applications/new");
+    await expect(page.getByLabel(/job posting/i)).toBeVisible();
     await expect(page.getByLabel("Company")).toBeVisible();
     await expect(
-      page.getByRole("button", { name: /Auto-fill from description/ }),
+      page.getByRole("button", { name: /Read the posting/ }),
     ).toBeVisible();
   });
 

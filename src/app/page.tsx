@@ -74,7 +74,7 @@ export default function Home() {
         <div className="flex shrink-0 items-center gap-2">
           <LogoMark size="sm" />
           <span className="font-sans text-body-lg font-semibold tracking-tight text-ink">
-            Job Tracker
+            Applywise
           </span>
         </div>
         <nav className="hidden items-center gap-7 font-sans text-body font-medium text-ink-mute md:flex">
@@ -82,7 +82,7 @@ export default function Home() {
             Features
           </Link>
           <a
-            href="https://github.com/nkieu-config/job-tracker"
+            href="https://github.com/nkieu-config/applywise-job-tracker"
             target="_blank"
             rel="noopener noreferrer"
             className="transition-colors hover:text-ink"
@@ -121,7 +121,7 @@ export default function Home() {
                   className={buttonClass({ size: "lg" })}
                 />
                 <a
-                  href="https://github.com/nkieu-config/job-tracker"
+                  href="https://github.com/nkieu-config/applywise-job-tracker"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={buttonClass({ variant: "ghost", size: "lg" })}
@@ -195,7 +195,7 @@ export default function Home() {
                 </div>
                 <Image
                   src="/landing/board-light.png"
-                  alt="The Job Tracker board, with roles grouped into Saved, Applied, Interview and Offer columns"
+                  alt="The Applywise board, with roles grouped into Saved, Applied, Interview and Offer columns"
                   width={2560}
                   height={1600}
                   className="block h-auto w-full dark:hidden"
@@ -263,9 +263,9 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-col justify-between gap-3 border-t border-hairline pt-6 font-sans text-caption text-ink-mute sm:flex-row">
-            <p>© 2026 Job Tracker</p>
+            <p>© 2026 Applywise</p>
             <a
-              href="https://github.com/nkieu-config/job-tracker"
+              href="https://github.com/nkieu-config/applywise-job-tracker"
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium underline-offset-4 transition-colors hover:text-ink hover:underline"

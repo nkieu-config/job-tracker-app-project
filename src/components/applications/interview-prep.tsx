@@ -1,9 +1,12 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
 import { saveInterviewPrep } from "@/actions/applications";
 import { Button } from "@/components/ui/button";
 import { useAiStream } from "@/components/applications/use-ai-stream";
+import { PrepSheetView } from "@/components/applications/prep-sheet-view";
+import { PrepDrill } from "@/components/applications/prep-drill";
+import { parsePrepSheet, drillableQuestions } from "@/lib/prep-sheet";
 
 export function InterviewPrep({
   id,
@@ -20,43 +23,59 @@ export function InterviewPrep({
     savedMessage: "Interview prep saved to this application.",
     saveFailedMessage: "Prep sheet generated but could not be saved.",
   });
+  const [drilling, setDrilling] = useState(false);
+
+  // Parsing every frame of the stream is what makes questions arrive as whole
+  // cards instead of as text crawling across the panel.
+  const sheet = useMemo(() => parsePrepSheet(output), [output]);
+  const drillable = useMemo(() => drillableQuestions(sheet), [sheet]);
 
   return (
-    <div className="flex flex-col gap-3">
-      <div>
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap gap-2">
         <Button onClick={() => generate()} disabled={loading}>
-          <Sparkles size={16} aria-hidden="true" />
           {loading
-            ? "Preparing…"
+            ? "Writing…"
             : output
-              ? "Regenerate prep sheet"
-              : "Generate prep sheet"}
+              ? "Write a new sheet"
+              : "Draft my prep sheet"}
         </Button>
+        {!loading && !drilling && drillable.length > 0 && (
+          <Button variant="outline" onClick={() => setDrilling(true)}>
+            Practise {drillable.length} questions
+          </Button>
+        )}
       </div>
 
       {error && (
-        <p role="alert" className="text-body font-sans text-semantic-error">
+        <p role="alert" className="font-sans text-body text-semantic-error">
           {error}
         </p>
       )}
 
-      {(output || loading) && (
-        <div className="flex flex-col gap-2">
-          <div
-            aria-live="polite"
-            className="whitespace-pre-wrap rounded-xl border border-hairline bg-canvas p-6 font-sans text-body-lg leading-relaxed text-ink"
-          >
-            {output}
-            {loading && <span className="animate-pulse">▍</span>}
-          </div>
-          {output && !loading && (
-            <div className="flex justify-end">
-              <Button variant="ghost" size="sm" onClick={copyOutput}>
-                Copy prep sheet
-              </Button>
+      {drilling ? (
+        <PrepDrill questions={drillable} onExit={() => setDrilling(false)} />
+      ) : (
+        (output || loading) && (
+          <div className="flex flex-col gap-3">
+            <div aria-live="polite" aria-busy={loading}>
+              {sheet.sections.length > 0 || sheet.raw !== null ? (
+                <PrepSheetView sheet={sheet} />
+              ) : (
+                <p className="rounded-xl border border-hairline bg-canvas p-6 font-sans text-body text-ink-mute">
+                  Reading the posting…
+                </p>
+              )}
             </div>
-          )}
-        </div>
+            {output && !loading && (
+              <div className="flex justify-end">
+                <Button variant="ghost" size="sm" onClick={copyOutput}>
+                  Copy sheet
+                </Button>
+              </div>
+            )}
+          </div>
+        )
       )}
     </div>
   );

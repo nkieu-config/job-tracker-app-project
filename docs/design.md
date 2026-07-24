@@ -1,8 +1,8 @@
 # Design system
 
-A deep aubergine primary, a Geist Sans / Geist Mono pair where the mono tier is
-load-bearing, a tight radius scale with no pills, and depth carried by hairline
-borders rather than shadows.
+A deep aubergine primary, a Geist Sans / Geist Mono / Literata trio where the
+mono tier is load-bearing, two marks reserved for the AI, a tight radius scale
+with no pills, and depth carried by hairline borders rather than shadows.
 
 Two files are the source of truth:
 
@@ -24,15 +24,21 @@ neutral biased toward that aubergine — the greys carry a red/purple undertone
 rather than being pure, so the accent reads as part of the palette instead of
 dropped onto it.
 
-Typography is a **pair**, not a family: Geist Sans for what a person reads, Geist
-Mono for what a machine produced. Buttons are 7px, cards 12px; nothing is a pill.
-Regions are separated by 1px hairlines and, in dark mode, a real surface step.
+Typography is a **trio**, each tier answering "who produced this": Geist Sans for
+interface, Geist Mono for what a machine computed, Literata for what reads as a
+document — job postings, coaching briefs, interview questions. Buttons are 7px,
+cards 12px; nothing is a pill. Regions are separated by 1px hairlines and, in
+dark mode, a real surface step.
 
 ### Key characteristics
 
 - **One aubergine accent** — filled buttons, wordmark, active nav. Blue
   (`--color-link-blue`) is the only other chromatic note in body type, reserved
   for inline links.
+- **Marker and pen are the AI's voice** — `--color-marker` highlights what the
+  posting and your resume agree on; `--color-pen` underlines what is missing.
+  They appear nowhere else, so seeing either one always means "the model marked
+  this". This is why the app has no ✨ icon: the mark *is* the signal.
 - **Mono as an information channel**, not decoration: it marks a value as
   computed and comparable.
 - **A tight radius scale** (4–12px) assigned by role.
@@ -51,6 +57,7 @@ properties the dark palette redefines. See
 | Group | Tokens | Role |
 | --- | --- | --- |
 | Brand | `primary`, `primary-press`, `on-primary` | Filled buttons, wordmark, active nav, accent text |
+| AI | `marker`, `marker-ink`, `pen` | The only marks the model may make on a document: highlight for a match, underline for a gap |
 | Link | `link-blue`, `link-hover` | Inline links — the only non-aubergine body colour |
 | Surface | `canvas`, `canvas-lavender`, `canvas-lavender-hover`, `surface-hover` | `canvas` is the card; `canvas-lavender` is the page beneath it |
 | Line | `hairline` | 1px borders and dividers — the workhorse |
@@ -106,8 +113,10 @@ variants out.
 
 ## Typography
 
-Geist Sans (`--font-sans`) and Geist Mono (`--font-mono`), loaded by `next/font`
-in [`layout.tsx`](../src/app/layout.tsx) via the `geist` package.
+Geist Sans (`--font-sans`) and Geist Mono (`--font-mono`) via the `geist`
+package, plus Literata (`--font-serif`) via `next/font/google` — all loaded in
+[`layout.tsx`](../src/app/layout.tsx). Literata is the document tier: it sets the
+text the app did not write, so a job posting never looks like interface.
 
 **Display tier** — `font-display-lg` (50px) / `-md` (32px, the workhorse) /
 `-sm` (24px). Implemented as `@utility` classes rather than `@theme` variables so
@@ -262,12 +271,14 @@ parameter.
 ## Do's and Don'ts
 
 **Do** — reserve aubergine for filled buttons, the wordmark and active nav (one
-filled aubergine button per viewport) · set computed values in `font-mono` with
+filled aubergine button per viewport) · reserve `marker`/`pen` for marks the
+model made · set document text in `font-serif` · set computed values in `font-mono` with
 `tabular-nums` · set headlines with a `font-display-*` utility · import the
 primitives rather than restyling · take pipeline colours from `STATUS_COLORS` ·
 tint with `bg-primary/15` when a surface must read as raised in both themes.
 
-**Don't** — add a fourth colour family · use aubergine for body text · reach for
+**Don't** — add a fourth colour family · use `marker` or `pen` for anything a
+human wrote · use aubergine for body text · reach for
 `rounded-full` on anything with a text label · set prose in mono or a computed
 value in sans · colour a deadline by hand · fill a status pill where a dot will
 do · assume `canvas-lavender` lifts (it inverts) · write a `dark:` class where a

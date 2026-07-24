@@ -7,7 +7,6 @@ import { chromium, type Page } from "@playwright/test";
 import {
   BASE_URL,
   CONTEXT_OPTIONS,
-  sectionByHeading,
   signInAsDemo,
 } from "../e2e/helpers";
 
@@ -15,8 +14,8 @@ const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const outDir = path.join(rootDir, "docs", "screenshots");
 const outFile = path.join(outDir, "tailor-streaming.gif");
 
-const GIF_WIDTH = 880;
-const FPS = 12;
+const GIF_WIDTH = 640;
+const FPS = 8;
 const MAX_SECONDS = 12;
 const LEAD_IN_MS = 700;
 const TAIL_MS = 1600;
@@ -66,7 +65,11 @@ try {
 await page.goto("/dashboard/applications/demo_app_1");
 await ready(page);
 
-const section = sectionByHeading(page, "Tailor resume bullets");
+// Tailoring lives behind the desk's Tailor tab now, so open it and record the
+// panel rather than a standalone section.
+await page.getByRole("tab", { name: "Tailor" }).click();
+await page.waitForTimeout(400);
+const section = page.locator("#desk-panel-tailor");
 
 const experience = section.getByLabel("Experience to tailor");
 if (!(await experience.inputValue()).trim()) {

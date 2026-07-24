@@ -70,7 +70,7 @@ flowchart TB
 ## Project layout
 
 ```text
-job-tracker/                 # a single Next.js 16 app
+applywise/                   # a single Next.js 16 app
 ├── src/
 │   ├── app/                 # App Router (routes) + Route Handlers
 │   ├── components/          # UI by domain (auth, applications, resumes…)
@@ -78,6 +78,7 @@ job-tracker/                 # a single Next.js 16 app
 │   ├── actions/             # Server Actions
 │   ├── server/              # everything with a secret, a side effect, or a DB
 │   │   ├── ai/  data/       # every module starts with `import "server-only"`
+│   │   └── workflows/       # multi-step AI flows the actions call into
 │   ├── lib/                 # pure, side-effect-free, safe on both sides
 │   │   ├── schemas/         # Zod contracts
 │   │   └── constants/
@@ -85,6 +86,7 @@ job-tracker/                 # a single Next.js 16 app
 ├── prisma/                  # schema + migrations
 ├── evals/                   # AI evaluation harness
 ├── tests/                   # mirrors src/
+├── e2e/                     # Playwright suites (smoke, mutations, axe)
 ├── docs/
 └── scripts/
 ```
@@ -275,10 +277,19 @@ modules — the prompt fence, the admin gate, the AI ownership guard, the PDF pa
 cap — carry 100% coverage thresholds in CI. The full breakdown is in the
 [README](../README.md#testing--quality).
 
-Rollout is Vercel shipping `main` once CI passes (lint → typecheck → tests →
-build). Migrations are developed against the Neon `dev` branch and applied to
-`production` with `prisma migrate deploy` — the step-by-step flow, including the
-HNSW caveat above, is in the [deploy guide](deploy.md).
+CI runs two jobs in parallel. `verify` is the fast one — lint, typecheck, the
+unit and integration suites against a `pgvector` container, a drift guard on the
+test counts the README advertises, and a production build. `e2e` is the slow
+one: it builds the app, starts it against a throwaway Postgres, seeds the demo
+account through the running server, and drives Playwright over it, accessibility
+suite included. Splitting them means a red cross names which half broke, and it
+puts the axe gate somewhere it actually runs.
+
+Rollout is Vercel shipping `main` once CI passes. Migrations are developed
+against the Neon `dev` branch and applied to `production` with
+`prisma migrate deploy` — Vercel does not run it for you, and a merge that ships
+code ahead of its migration takes production down. The step-by-step flow,
+including the HNSW caveat above, is in the [deploy guide](deploy.md).
 
 ## Challenges & solutions
 
@@ -287,6 +298,7 @@ HNSW caveat above, is in the [deploy guide](deploy.md).
 | **Prisma 7 dropped the bundled query engine** | Prisma schema + migrations live in `prisma/`; the client generates into `src/generated/` and is configured via `prisma.config.ts`. |
 | **Connection exhaustion in serverless** | On classic Vercel functions each request got its own isolated instance, so every instance opened its own `pg` pool and Postgres ran out of connections (plus TLS/SNI routing issues from a misplaced `-pooler` suffix). The fix at the time was `@neondatabase/serverless` + `@prisma/adapter-neon`, pooling natively over WebSocket. **Since moving to Vercel Fluid compute** — which keeps instances warm and reuses TCP across requests — the app is back on `pg` + `@prisma/adapter-pg`, which is what Neon now recommends for Fluid. Exhaustion is held off by three things the original setup lacked: `attachDatabasePool` from `@vercel/functions` (drains idle connections before an instance suspends), a `max: 5` cap per instance, and the PgBouncer `-pooler` endpoint fronting it all. |
 | **Better Auth pulled a broken Kysely** | Kysely `0.29.2` stopped re-exporting a symbol the adapter imports; pinned to `0.28.17` via an npm `override`. **Revisit when Better Auth's peer range drops `^0.28`** — the pin is invisible until it blocks an upgrade, so check it whenever `better-auth` itself is bumped. |
+| **Vulnerable transitives with no direct upgrade** | `npm audit` reported four highs — libvips CVEs through `sharp`, and two postcss advisories — all reached through Next's own dependency tree, where the only "fix" npm offers is downgrading Next by seven majors. `find-my-way` arrived the same way through the Prisma CLI. Each is patched upstream in a release Next and Prisma simply have not bumped to yet, so the three are lifted with npm `overrides` (`sharp ^0.35.3`, `postcss ^8.5.22`, `find-my-way ^9.7.0`) and the build, the unit suite and the browser suite all run against the lifted versions. **Drop each override once the parent's own range covers it** — an override that has become a no-op is a version pin nobody asked for. |
 | **Next 16 renamed `middleware` → `proxy`** | Read the bundled Next docs and adopted the new `proxy.ts` convention — which also reinforced the decision to keep auth checks in the data layer. |
 | **AI output can't be trusted** | The Zod round-trip (schema-out, validate-in) makes off-schema Gemini responses an explicit, recoverable failure instead of a page crash. |
 | **Resume privacy** | Private Blob store + authenticated streaming route; no public URLs. |

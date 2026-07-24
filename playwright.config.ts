@@ -22,6 +22,13 @@ export default defineConfig({
     colorScheme: "light",
     trace: "on-first-retry",
   },
+  // The suite runs against one server instance sharing a CI runner with
+  // Postgres and the browser, so the first hit on a route pays for cold Prisma
+  // connections and a cold render on a contended core. That is a latency
+  // budget, not a bug — but at Playwright's 5s default it read as one, and
+  // retries quietly turned it green. Give assertions room in CI instead, and
+  // let `--fail-on-flaky-tests` treat a retry as the failure it is.
+  expect: { timeout: process.env.CI ? 15_000 : 5_000 },
   // The app rate-limits /sign-in/email to 10 attempts per 5 minutes, so the
   // suite signs in exactly once (the setup project) and every test reuses the
   // saved session instead of burning a sign-in each.

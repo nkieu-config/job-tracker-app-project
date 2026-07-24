@@ -7,9 +7,22 @@ on:
   workflow_dispatch:
     inputs:
       suite:
-        description: "Suite to run (all | jd-analysis | skill-match | tailoring)"
-        required: false
-        default: "skill-match"
+        # A dropdown rather than free text: the runner exits non-zero on an
+        # unknown name, and this list had silently fallen three suites behind.
+        # `skill-match` is the default because it is the only suite that runs
+        # entirely on the embeddings quota (1000/day), so it is the one that is
+        # always affordable to re-run.
+        description: "Suite to run"
+        type: choice
+        default: skill-match
+        options:
+          - all
+          - jd-analysis
+          - skill-match
+          - tailoring
+          - coach
+          - autofill
+          - interview
 
 permissions:
   contents: read

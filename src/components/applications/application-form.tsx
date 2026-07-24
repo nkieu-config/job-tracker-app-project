@@ -2,14 +2,12 @@
 
 import { useActionState, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { Sparkles, Wand2 } from "lucide-react";
 import {
   APPLICATION_STATUSES,
   STATUS_LABELS,
 } from "@/lib/schemas/application";
 import { Button, buttonClass } from "@/components/ui/button";
 import { inputClass, labelClass } from "@/components/ui/form-styles";
-import { useToast } from "@/components/ui/toast";
 import { autofillFromJd, type FormState } from "@/actions/applications";
 
 export type ApplicationFormValues = {
@@ -21,6 +19,8 @@ export type ApplicationFormValues = {
   jobDescription?: string;
   notes?: string;
 };
+
+type ReadField = "company" | "role" | "deadline";
 
 function FieldError({ name, messages }: { name: string; messages?: string[] }) {
   if (!messages?.length) return null;
@@ -53,7 +53,6 @@ export function ApplicationForm({
   const fe = state.fieldErrors;
   const values = { ...defaultValues, ...state.values };
 
-  const toast = useToast();
   const companyRef = useRef<HTMLInputElement>(null);
   const roleRef = useRef<HTMLInputElement>(null);
   const deadlineRef = useRef<HTMLInputElement>(null);
@@ -63,6 +62,8 @@ export function ApplicationForm({
   );
   const [autofilling, startAutofill] = useTransition();
   const [autofillError, setAutofillError] = useState<string | null>(null);
+  const [read, setRead] = useState<ReadField[]>([]);
+  const [missed, setMissed] = useState<ReadField[]>([]);
 
   // Fill only fields the user hasn't touched, so re-running never clobbers an
   // edit. The form is uncontrolled, so we read and write the DOM values through
@@ -70,66 +71,186 @@ export function ApplicationForm({
   function onAutofill() {
     setAutofillError(null);
     startAutofill(async () => {
-      const result = await autofillFromJd(jobDescriptionRef.current?.value ?? "");
+      const result = await autofillFromJd(
+        jobDescriptionRef.current?.value ?? "",
+      );
       if (result.error) {
         setAutofillError(result.error);
         return;
       }
       if (!result.fields) return;
 
-      const filled: string[] = [];
+      const filled: ReadField[] = [];
+      const absent: ReadField[] = [];
       const fillIfEmpty = (
         ref: React.RefObject<HTMLInputElement | null>,
         value: string | null,
-        label: string,
+        field: ReadField,
       ) => {
         const el = ref.current;
-        if (value && el && el.value.trim() === "") {
+        if (!value) {
+          if (el && el.value.trim() === "") absent.push(field);
+          return;
+        }
+        if (el && el.value.trim() === "") {
           el.value = value;
-          filled.push(label);
+          filled.push(field);
         }
       };
       fillIfEmpty(companyRef, result.fields.company, "company");
       fillIfEmpty(roleRef, result.fields.role, "role");
       fillIfEmpty(deadlineRef, result.fields.deadline, "deadline");
 
-      toast(
-        filled.length
-          ? `Filled ${filled.join(", ")} from the description.`
-          : "Those fields already have values — nothing to fill.",
-      );
+      setRead(filled);
+      setMissed(absent);
     });
   }
 
+  // A value the model supplied has to stay distinguishable from one you typed,
+  // right up until you touch it.
+  const markRead = (field: ReadField) =>
+    read.includes(field)
+      ? `${inputClass} border-marker bg-marker/25`
+      : inputClass;
+
+  const clearMark = (field: ReadField) => () =>
+    setRead((current) => current.filter((f) => f !== field));
+
+  const readLabel = (field: ReadField) =>
+    read.includes(field) ? (
+      <span className="font-mono text-fine font-normal uppercase tracking-wide text-ink-mute">
+        read from the posting
+      </span>
+    ) : missed.includes(field) ? (
+      <span className="font-sans text-fine font-normal text-ink-mute">
+        not stated — add it yourself
+      </span>
+    ) : null;
+
   return (
-    <form action={formAction} className="flex flex-col gap-5">
-      <div className="grid gap-5 sm:grid-cols-2">
+    <form action={formAction} className="flex flex-col gap-6">
+      <div className={labelClass}>
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <label htmlFor="jobDescription">Job posting</label>
+          <span className="font-sans text-fine font-normal text-ink-mute">
+            Paste it and the rest fills itself in
+          </span>
+        </div>
+        <textarea
+          ref={jobDescriptionRef}
+          id="jobDescription"
+          name="jobDescription"
+          defaultValue={values.jobDescription}
+          onInput={(e) => setJdLength(e.currentTarget.value.trim().length)}
+          rows={10}
+          placeholder="Paste the whole posting — the more of it, the better every AI feature on this application works."
+          aria-invalid={fe?.jobDescription ? true : undefined}
+          aria-describedby={
+            fe?.jobDescription ? "jobDescription-error" : undefined
+          }
+          className={`${inputClass} font-serif leading-relaxed`}
+        />
+        <FieldError name="jobDescription" messages={fe?.jobDescription} />
+
+        <div className="mt-1 flex flex-wrap items-center gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onAutofill}
+            disabled={autofilling || jdLength < 40}
+            aria-describedby={autofillError ? "autofill-error" : undefined}
+          >
+            {autofilling ? "Reading…" : "Read the posting"}
+          </Button>
+          {jdLength > 0 && jdLength < 40 && (
+            <span className="font-sans text-fine text-ink-mute">
+              A little more text and it can read this.
+            </span>
+          )}
+          {read.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                for (const [field, ref] of [
+                  ["company", companyRef],
+                  ["role", roleRef],
+                  ["deadline", deadlineRef],
+                ] as const) {
+                  if (read.includes(field) && ref.current) ref.current.value = "";
+                }
+                setRead([]);
+              }}
+              className="font-sans text-fine font-semibold text-link-blue underline-offset-4 hover:underline"
+            >
+              Clear what it filled
+            </button>
+          )}
+        </div>
+
+        {autofillError && (
+          <span
+            id="autofill-error"
+            role="alert"
+            className="text-fine font-sans text-semantic-error"
+          >
+            {autofillError}
+          </span>
+        )}
+      </div>
+
+      <div className="grid gap-5 border-t border-hairline pt-6 sm:grid-cols-2">
         <label className={labelClass}>
-          Company
+          <span className="flex flex-wrap items-baseline justify-between gap-2">
+            Company
+            {readLabel("company")}
+          </span>
           <input
             ref={companyRef}
             name="company"
             defaultValue={values.company}
             required
+            onInput={clearMark("company")}
             aria-invalid={fe?.company ? true : undefined}
             aria-describedby={fe?.company ? "company-error" : undefined}
-            className={inputClass}
+            className={markRead("company")}
           />
           <FieldError name="company" messages={fe?.company} />
         </label>
 
         <label className={labelClass}>
-          Role
+          <span className="flex flex-wrap items-baseline justify-between gap-2">
+            Role
+            {readLabel("role")}
+          </span>
           <input
             ref={roleRef}
             name="role"
             defaultValue={values.role}
             required
+            onInput={clearMark("role")}
             aria-invalid={fe?.role ? true : undefined}
             aria-describedby={fe?.role ? "role-error" : undefined}
-            className={inputClass}
+            className={markRead("role")}
           />
           <FieldError name="role" messages={fe?.role} />
+        </label>
+
+        <label className={labelClass}>
+          <span className="flex flex-wrap items-baseline justify-between gap-2">
+            Deadline
+            {readLabel("deadline")}
+          </span>
+          <input
+            ref={deadlineRef}
+            type="date"
+            name="deadline"
+            defaultValue={values.deadline}
+            onInput={clearMark("deadline")}
+            aria-invalid={fe?.deadline ? true : undefined}
+            aria-describedby={fe?.deadline ? "deadline-error" : undefined}
+            className={markRead("deadline")}
+          />
+          <FieldError name="deadline" messages={fe?.deadline} />
         </label>
 
         <label className={labelClass}>
@@ -149,20 +270,6 @@ export function ApplicationForm({
           </select>
           <FieldError name="status" messages={fe?.status} />
         </label>
-
-        <label className={labelClass}>
-          Deadline
-          <input
-            ref={deadlineRef}
-            type="date"
-            name="deadline"
-            defaultValue={values.deadline}
-            aria-invalid={fe?.deadline ? true : undefined}
-            aria-describedby={fe?.deadline ? "deadline-error" : undefined}
-            className={inputClass}
-          />
-          <FieldError name="deadline" messages={fe?.deadline} />
-        </label>
       </div>
 
       <label className={labelClass}>
@@ -178,54 +285,6 @@ export function ApplicationForm({
         />
         <FieldError name="jobUrl" messages={fe?.jobUrl} />
       </label>
-
-      <div className={labelClass}>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <label htmlFor="jobDescription">Job description</label>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onAutofill}
-            disabled={autofilling || jdLength < 40}
-            aria-describedby={autofillError ? "autofill-error" : undefined}
-          >
-            <Wand2
-              size={14}
-              aria-hidden="true"
-              className={autofilling ? "animate-pulse" : undefined}
-            />
-            {autofilling ? "Reading…" : "Auto-fill from description"}
-          </Button>
-        </div>
-        <textarea
-          ref={jobDescriptionRef}
-          id="jobDescription"
-          name="jobDescription"
-          defaultValue={values.jobDescription}
-          onInput={(e) => setJdLength(e.currentTarget.value.trim().length)}
-          rows={6}
-          aria-invalid={fe?.jobDescription ? true : undefined}
-          aria-describedby={
-            fe?.jobDescription ? "jobDescription-error" : undefined
-          }
-          className={inputClass}
-        />
-        {autofillError && (
-          <span
-            id="autofill-error"
-            role="alert"
-            className="text-fine font-sans text-semantic-error"
-          >
-            {autofillError}
-          </span>
-        )}
-        <div className="text-caption font-sans text-ink bg-canvas-lavender px-3 py-2 rounded-lg border border-hairline flex items-start gap-2 mt-1 shadow-sm">
-          <Sparkles size={14} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
-          <span><b>Pro Tip:</b> Paste the full job description, then <b>Auto-fill</b> to set the company and role — and unlock AI Skills Analysis and Resume Fit Scoring.</span>
-        </div>
-        <FieldError name="jobDescription" messages={fe?.jobDescription} />
-      </div>
 
       <label className={labelClass}>
         Notes

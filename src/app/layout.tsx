@@ -1,30 +1,45 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { Literata } from "next/font/google";
 import { ToastProvider } from "@/components/ui/toast";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TAGLINE,
+  SITE_URL,
+} from "@/lib/constants/site";
 import "./globals.css";
 
+// The document tier: job descriptions, coaching briefs, interview questions —
+// anything the app presents as a piece of writing rather than as interface.
+const literata = Literata({
+  subsets: ["latin"],
+  variable: "--font-literata",
+  display: "swap",
+});
+
+const SOCIAL_DESCRIPTION =
+  "Paste a job posting and watch it get marked up against your resume — matched skills highlighted, gaps underlined, interview questions drilled.";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://job-tracker-app-project.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Job Tracker — AI-powered job application tracking",
-    template: "%s · Job Tracker",
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    template: `%s · ${SITE_NAME}`,
   },
-  description:
-    "Smart job application tracker with AI-powered JD analysis, resume fit scoring, and resume tailoring.",
+  description: SITE_DESCRIPTION,
   openGraph: {
-    title: "Job Tracker — AI-powered job application tracking",
-    description:
-      "Track your pipeline, analyze job descriptions with AI, and tailor your resume to every application.",
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SOCIAL_DESCRIPTION,
     url: "/",
-    siteName: "Job Tracker",
+    siteName: SITE_NAME,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Job Tracker — AI-powered job application tracking",
-    description:
-      "Track your pipeline, analyze job descriptions with AI, and tailor your resume to every application.",
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SOCIAL_DESCRIPTION,
   },
 };
 
@@ -36,7 +51,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${GeistSans.variable} ${GeistMono.variable} h-full scroll-smooth antialiased`}
+      className={`${GeistSans.variable} ${GeistMono.variable} ${literata.variable} h-full scroll-smooth antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

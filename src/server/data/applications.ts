@@ -9,6 +9,7 @@ import {
   type ApplicationSort,
 } from "@/lib/schemas/application";
 import type { StoredJdAnalysis } from "@/lib/schemas/jd-analysis";
+import type { AgendaRow } from "@/lib/agenda";
 
 // Every query is scoped by userId — a user can only ever read their own
 // applications. This is the real authorization boundary (alongside the
@@ -83,6 +84,41 @@ export function getUpcomingDeadlines(userId: string, limit = 5) {
     orderBy: { deadline: "asc" },
     take: limit,
   });
+}
+
+// Just enough of each application to find it by typing: no job descriptions, no
+// analyses, no prep sheets.
+export function getApplicationIndex(userId: string, limit = MAX_APPLICATIONS) {
+  return prisma.application.findMany({
+    where: { userId },
+    select: { id: true, role: true, company: true, status: true },
+    orderBy: { updatedAt: "desc" },
+    take: limit,
+  });
+}
+
+// The agenda only needs to know *whether* a posting, an analysis and a prep
+// sheet exist, so the booleans are computed in Postgres. Selecting the columns
+// themselves would drag every job description and prep sheet across the wire to
+// answer a question about their emptiness.
+export function getAgendaRows(userId: string, limit = 60) {
+  return prisma.$queryRaw<AgendaRow[]>`
+    SELECT
+      id,
+      role,
+      company,
+      status::text AS status,
+      deadline,
+      ("jobDescription" IS NOT NULL AND btrim("jobDescription") <> '') AS "hasJd",
+      ("analyzedAt" IS NOT NULL) AS analyzed,
+      ("interviewPrep" IS NOT NULL AND btrim("interviewPrep") <> '') AS "hasPrep",
+      "updatedAt"
+    FROM "application"
+    WHERE "userId" = ${userId}
+      AND status <> 'REJECTED'
+    ORDER BY deadline ASC NULLS LAST, "updatedAt" ASC
+    LIMIT ${limit}
+  `;
 }
 
 export function createApplicationForUser(

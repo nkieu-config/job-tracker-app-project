@@ -10,7 +10,7 @@ vi.mock("resend", () => ({
 
 const message = {
   to: "candidate@example.com",
-  subject: "Reset your Job Tracker password",
+  subject: "Reset your Applywise password",
   text: "Reset it here: https://example.com/reset-password/secret-token",
 };
 

@@ -56,6 +56,24 @@ DIRECT_URL=<production-direct-url> npx prisma migrate deploy
 > background is in
 > [architecture.md](./architecture.md#pgvector-via-raw-sql).
 
+### Releasing a change that carries a migration
+
+**Vercel does not run `prisma migrate deploy`.** Merging to `main` ships the
+code, and nothing ships the schema — so a merge whose code reads a column the
+production branch does not have yet takes the site down until someone notices.
+`dev` and `production` are separate Neon branches; applying a migration locally
+proves nothing about production.
+
+Run it in this order:
+
+1. Merge the pull request once CI is green.
+2. **Apply the migration to production** — `DIRECT_URL=<production-direct-url> npx prisma migrate deploy`.
+   Do this while Vercel is still building, so the schema lands first.
+3. Wait for the Vercel deployment to go ready.
+4. Sign in on the live URL. A 500 here almost always means step 2 was skipped —
+   `DIRECT_URL=<production-direct-url> npx prisma migrate status` says so
+   directly.
+
 ## Step 3 — Seed the demo account (optional)
 
 The **Try the demo** button expects `demo@jobtracker.app` to exist with sample
@@ -79,7 +97,15 @@ nightly (20:00 UTC). It needs one repository secret, `PROD_DIRECT_URL` — the
 
 ## Step 4 — Smoke test
 
-See [manual-qa.md](./manual-qa.md) sections 7–9 on the live URL.
+Point the browser suite at the deployment — it is read-only, and the mutating
+suite skips itself anywhere but a local app:
+
+```bash
+BASE_URL=https://job-tracker-app-project.vercel.app npm run test:e2e
+```
+
+Then click the AI steps by hand, which no suite covers:
+[manual-qa.md](./manual-qa.md) steps 6, 17–21 and 26–28.
 
 ## Local development
 

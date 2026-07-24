@@ -35,6 +35,10 @@ const SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
+  // Cross-fades client-side navigations instead of swapping the page in one
+  // frame. Purely additive: browsers without the View Transitions API, and
+  // anyone who has asked for reduced motion, navigate exactly as before.
+  experimental: { viewTransition: true },
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];
   },

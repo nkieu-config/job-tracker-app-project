@@ -44,6 +44,17 @@ export function canonicalSkill(skill: string): string {
   return group ? group[0] : needle;
 }
 
+// Every spelling of a skill worth looking for, longest first. Callers that
+// search text want the longest form to win: given "React" the posting may say
+// "React.js", and matching only the "React" prefix would leave ".js" outside
+// the match.
+export function skillVariants(skill: string): string[] {
+  const needle = skill.trim().toLowerCase();
+  if (!needle) return [];
+  const group = aliasIndex.get(needle) ?? [needle];
+  return [...new Set(group)].sort((a, b) => b.length - a.length);
+}
+
 export function matchSkills(
   requiredSkills: string[],
   resumeText: string,

@@ -35,6 +35,10 @@
 
   --hairline: #e5dde9;
 
+  --marker: #ffdb4d;
+  --marker-ink: #221a26;
+  --pen: #bd3a12;
+
   --semantic-error: #bd3a12;
   --semantic-error-tint: #fdebea;
   --semantic-error-hover: #fad8d6;
@@ -69,6 +73,10 @@
     --surface-hover: #252030;
 
     --hairline: #39323f;
+
+    --marker: rgb(240 205 84 / 0.30);
+    --marker-ink: #e8e5ee;
+    --pen: #f08a6c;
 
     --semantic-error: #f08a6c;
     --semantic-error-tint: #3a1e1a;
@@ -105,9 +113,14 @@
 
   --hairline: #39323f;
 
+  --marker: rgb(240 205 84 / 0.30);
+  --marker-ink: #e8e5ee;
+  --pen: #f08a6c;
+
   --semantic-error: #f08a6c;
   --semantic-error-tint: #3a1e1a;
   --semantic-error-hover: #4c2820;
+  --semantic-error-solid: #c0442a;
   --semantic-success: #4cbf95;
   --semantic-success-tint: #17302a;
   --semantic-warning: #e6b23c;
@@ -120,6 +133,7 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
     monospace;
+  --font-serif: var(--font-literata), ui-serif, Georgia, serif;
 
   /* Slacc Colors */
   --color-primary: var(--primary);
@@ -136,6 +150,10 @@
   --color-canvas-lavender: var(--canvas-lavender);
 
   --color-hairline: var(--hairline);
+
+  --color-marker: var(--marker);
+  --color-marker-ink: var(--marker-ink);
+  --color-pen: var(--pen);
 
   --color-semantic-error: var(--semantic-error);
   --color-semantic-error-tint: var(--semantic-error-tint);
