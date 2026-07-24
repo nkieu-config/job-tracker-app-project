@@ -35,8 +35,23 @@ const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
 };
 
+// `pg` waits forever for a free connection by default, which is the worst way
+// to run out of them: a page that needs more of the pool than is left renders
+// an empty <main> and never resolves or errors, so nothing upstream can retry
+// or say what happened. The browser suite caught exactly that — a desk route
+// that opens a session, its metadata query and three more in parallel, stalled
+// past fifteen seconds against a pool of five under concurrent load, then
+// rendered in one second alone. Ten seconds is far longer than any healthy
+// acquire and short enough that starvation surfaces as an error boundary
+// instead of a hang.
+const POOL_ACQUIRE_TIMEOUT_MS = 10_000;
+
 function createPrismaClient(): PrismaClient {
-  const pool = new pg.Pool({ connectionString, max: 5 });
+  const pool = new pg.Pool({
+    connectionString,
+    max: 5,
+    connectionTimeoutMillis: POOL_ACQUIRE_TIMEOUT_MS,
+  });
   attachDatabasePool(pool);
   return new PrismaClient({ adapter: new PrismaPg(pool) });
 }
