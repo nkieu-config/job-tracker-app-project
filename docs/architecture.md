@@ -301,6 +301,7 @@ including the HNSW caveat above, is in the [deploy guide](deploy.md).
 | **Vulnerable transitives with no direct upgrade** | `npm audit` reported four highs — libvips CVEs through `sharp`, and two postcss advisories — all reached through Next's own dependency tree, where the only "fix" npm offers is downgrading Next by seven majors. `find-my-way` arrived the same way through the Prisma CLI. Each is patched upstream in a release Next and Prisma simply have not bumped to yet, so the three are lifted with npm `overrides` (`sharp ^0.35.3`, `postcss ^8.5.22`, `find-my-way ^9.7.0`) and the build, the unit suite and the browser suite all run against the lifted versions. **Drop each override once the parent's own range covers it** — an override that has become a no-op is a version pin nobody asked for. |
 | **Next 16 renamed `middleware` → `proxy`** | Read the bundled Next docs and adopted the new `proxy.ts` convention — which also reinforced the decision to keep auth checks in the data layer. |
 | **AI output can't be trusted** | The Zod round-trip (schema-out, validate-in) makes off-schema Gemini responses an explicit, recoverable failure instead of a page crash. |
+| **One feature needs a stronger model than the rest** | Bullet tailoring runs on `gemini-3.5-flash` while everything else runs on `gemini-3.5-flash-lite`. The eval harness set that split and then re-tested it: on the current lite model tailoring grounds at 4.4/5 and fabricates in 20% of outputs — against a 20% ceiling — with the miss landing on the item whose source experience is thinnest, exactly where a weaker model fills a gap by inventing. The full flash held 4.83/5 and fabricated nothing. The exception costs 25× less daily quota to give up, and is kept anyway, because a made-up specific on a resume bullet is a different class of error from a mislabelled field. **Re-test whenever the lite model ships a new generation** — the split is a measurement, not a preference. |
 | **Resume privacy** | Private Blob store + authenticated streaming route; no public URLs. |
 
 ## Accepted trade-offs
@@ -315,14 +316,14 @@ Known, deliberate limits — recorded so they read as decisions rather than over
 
 ## Open questions
 
-- **Whether bullet tailoring still needs its own model.** Tailoring runs on
-  `gemini-3.5-flash` while everything else runs on `gemini-3.5-flash-lite`,
-  because the *3.1* lite model grounded it at 3.83/5 and fabricated specifics in
-  half its outputs. The full n=6 re-capture confirms the exception works —
-  grounding 4.83/5, zero hallucinations — but not that it is still necessary now
-  that the lite model is a generation newer. Pointing `TAILORING_MODEL` at the
-  lite model and re-running the suite is what would answer it, and would retire
-  a per-feature exception if the answer is no.
+- **Judge capacity, not model capacity, is what now limits the harness.** The
+  judged suites run on `gemini-3.5-flash` at 20 requests/day, so a suite plus
+  its retries is most of a day's budget and two full re-runs of the same suite
+  are not affordable. The tailoring comparison below rests on one run per model,
+  and one of the six items dropped out to a response the API never returned —
+  fine for a decision whose two independent metrics agree, thin for anything
+  closer. A paid key, or a judge on a higher-quota model with a fresh
+  calibration pass, is what would lift it.
 - **The action layer has two return conventions and one workflow gap.** Actions
   consumed by `useActionState` return a named `*State`; those called imperatively
   return `{ error?: string }`. Both are deliberate, but the workflow layer is

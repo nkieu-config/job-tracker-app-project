@@ -107,10 +107,28 @@ makes a full same-day capture affordable.
 > **grounding 3.83 → 4.83, hallucination rate 50% → 0%**, across the full n=6.
 > A model choice made by measurement, and verified the same way.
 >
-> What is still unmeasured is whether the split is needed *now* that generation
-> runs on `gemini-3.5-flash-lite` rather than the 3.1 lite that failed. Pointing
-> `TAILORING_MODEL` at the lite model and re-running this suite is the one
-> experiment that would retire the exception — worth doing, and cheap.
+> Then the same suite was turned on the exception itself. Generation had since
+> moved to `gemini-3.5-flash-lite`, a generation newer than the 3.1 lite that
+> failed, so `TAILORING_MODEL` was pointed at it and the suite re-run against
+> the same dataset and the same judge:
+>
+> | | grounded /5 | hallucination rate | worst item |
+> | --- | --- | --- | --- |
+> | `gemini-3.5-flash` (kept) | **4.83** | **0%** | 4/5 |
+> | `gemini-3.5-flash-lite` | 4.4 | 20% *(ceiling is 20%)* | **3/5** (`tl-sparse`) |
+>
+> The lite model clears the gate — and the exception stays anyway. It clears it
+> by nothing, and the miss is the legible one: `tl-sparse` is the item with the
+> least source experience to work from, and that is precisely where the weaker
+> model fills the gap by inventing. A fabricated specific in a resume bullet is
+> a different class of error from a mislabelled field, so 25× the daily quota is
+> the right thing to spend here. Re-test when the lite model ships another
+> generation; the split is a measurement, not a preference.
+>
+> One caveat on the comparison, stated rather than buried: the lite run scored
+> 5 of 6 items — `tl-devops` never returned a usable response after retries —
+> and the judge's 20/day quota does not stretch to repeated runs. Two
+> independent metrics move the same way, which is what the decision rests on.
 
 > [!NOTE]
 > The interview suite forced a metric fix, not a model fix. The first run scored
