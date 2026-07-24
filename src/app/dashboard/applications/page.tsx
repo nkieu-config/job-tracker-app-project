@@ -227,7 +227,7 @@ export default async function ApplicationsPage({
                           className={`group ${LIST_GRID} border-b border-hairline px-4 py-3 transition-colors last:border-0 hover:bg-canvas-lavender`}
                         >
                           <div className="min-w-0">
-                            <p className="truncate font-sans text-body font-bold text-ink group-hover:text-primary">
+                            <p className="truncate font-sans text-body font-bold text-ink group-hover:text-primary-ink">
                               {app.role}
                             </p>
                             <p className="truncate font-sans text-caption text-ink-mute">

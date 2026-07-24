@@ -60,25 +60,36 @@ async function expectNoSeriousViolations(page: Page, path: string) {
   ).toEqual([]);
 }
 
-for (const page_ of PAGES) {
-  test(`${page_.name} has no serious accessibility violations`, async ({
-    page,
-  }) => {
-    await expectNoSeriousViolations(page, page_.path);
+// Both themes, because the palette is a full swap rather than a set of `dark:`
+// overrides — the two are different designs sharing a layout, and only one of
+// them had ever been checked. The first dark run failed on every page in the
+// app for a single reason, which is what a gate that only ever ran in light
+// had been hiding.
+for (const scheme of ["light", "dark"] as const) {
+  test.describe(`${scheme} theme`, () => {
+    test.use({ colorScheme: scheme });
+
+    for (const page_ of PAGES) {
+      test(`${page_.name} has no serious accessibility violations`, async ({
+        page,
+      }) => {
+        await expectNoSeriousViolations(page, page_.path);
+      });
+    }
+
+    test.describe("signed out", () => {
+      test.use({ storageState: { cookies: [], origins: [] } });
+
+      for (const page_ of PUBLIC_PAGES) {
+        test(`${page_.name} has no serious accessibility violations`, async ({
+          page,
+        }) => {
+          await expectNoSeriousViolations(page, page_.path);
+        });
+      }
+    });
   });
 }
-
-test.describe("signed out", () => {
-  test.use({ storageState: { cookies: [], origins: [] } });
-
-  for (const page_ of PUBLIC_PAGES) {
-    test(`${page_.name} has no serious accessibility violations`, async ({
-      page,
-    }) => {
-      await expectNoSeriousViolations(page, page_.path);
-    });
-  }
-});
 
 test("the command palette traps nothing and returns focus", async ({ page }) => {
   await page.goto("/dashboard");

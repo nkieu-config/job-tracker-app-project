@@ -54,7 +54,7 @@ export function DashboardNav({
                   : "flex items-center gap-3 rounded-xl px-3 py-2.5 text-body font-bold",
                 active
                   ? bottom
-                    ? "text-primary"
+                    ? "text-primary-ink"
                     : "bg-primary text-on-primary"
                   : "text-ink-mute hover:text-ink",
                 !bottom && !active && "hover:bg-canvas-lavender",

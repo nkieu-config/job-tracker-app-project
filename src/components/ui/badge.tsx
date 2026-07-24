@@ -7,7 +7,7 @@ const base = "inline-flex items-center rounded-md font-sans font-medium";
 
 const TONE: Record<BadgeTone, string> = {
   neutral: "bg-canvas-lavender text-ink-mute",
-  primary: "bg-canvas-lavender text-primary",
+  primary: "bg-canvas-lavender text-primary-ink",
   success: "bg-semantic-success-tint text-semantic-success",
   warning: "bg-semantic-warning-tint text-semantic-warning",
   error: "bg-semantic-error-tint text-semantic-error",

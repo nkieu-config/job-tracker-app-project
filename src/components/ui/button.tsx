@@ -18,7 +18,7 @@ const VARIANT: Record<ButtonVariant, string> = {
   primary: "bg-primary text-on-primary hover:bg-primary-press",
   secondary: "bg-canvas-lavender text-ink hover:bg-canvas-lavender-hover",
   outline:
-    "bg-canvas text-primary border-2 border-primary hover:bg-canvas-lavender",
+    "bg-canvas text-primary-ink border-2 border-primary-ink hover:bg-canvas-lavender",
   // The two actions inside the aubergine band. `primary` is the band's own
   // colour and would vanish into it; `ghost` is a light chip and would float on
   // it. Both of these borrow the band's foreground instead — solid for the
